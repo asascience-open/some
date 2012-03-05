@@ -54,7 +54,7 @@
           <tr><td><div id="chart"></div></td></tr>
         </table></td>
         <td><ol>
-          <li>Add both layers.  Async SOS GetCaps are fired.  The obs layer takes forever to load (server-side issue), but once it's loaded, you'll see dots on the map.  The model layer is faster to load, but you WON'T see dots on the map.  They simply need to be registered as features on the map for later use.</li>
+          <li>Add both layers.  Async SOS GetCaps are fired.  <font color=red><b>The site is using locally cached getcaps for now!</b></font> The obs layer takes forever to load (server-side issue), but once it's loaded, you'll see dots on the map.  The model layer is faster to load, but you WON'T see dots on the map.  They simply need to be registered as features on the map for later use.</li>
           <li>Mouseover an obs site and the popup will show you a snippet of info.</li>
           <li>Click on the properties link, and two things happen: (1) a GetObs for the obs layer is fired and plotted on the graph; (2) the site's spatial location is tested against any available model points (only the one "invisible" layer in this case), and the point that is closest to the obs site is then used to fire a 2nd GetObs for the model station. Since the obs site naming convention is similar from obs to model, you can verify a match by looking at the chart's legend.</li>
           <li>You can click/drag the chart to pan around.</li>
