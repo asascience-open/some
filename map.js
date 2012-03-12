@@ -192,27 +192,22 @@ function init() {
             {
                border : false
               ,cls    : 'directionsPanel'
-              ,html   : 'Select observations to plot. Sites will appear as orange circles.'
-            }
-            ,new Ext.form.FieldSet({
-               title : '&nbsp;Observation datasets&nbsp;'
-              ,id    : 'observationsFieldSet'
-              ,items : observationsGridPanel
-            })
-            ,{
-               border : false
-              ,cls    : 'directionsPanel'
-              ,html   : 'Select models for time series comparisons.  Sites will appear as pink circles.'
+              ,html   : 'Select models and observations for time series comparisons.  Once you click on a site, it will be used as a pivot point, and any companion datasets that you have checked ON will subsequently be queried.  Only the closest point from each companion dataset will be queried.'
             }
             ,new Ext.form.FieldSet({
                title : '&nbsp;Model datasets&nbsp;'
               ,id    : 'modelsFieldSet'
               ,items : modelsGridPanel
             })
+            ,new Ext.form.FieldSet({
+               title : '&nbsp;Observation datasets&nbsp;'
+              ,id    : 'observationsFieldSet'
+              ,items : observationsGridPanel
+            })
           ]}
         ]
         ,listeners        : {afterrender : function() {this.addListener('bodyresize',function(p,w,h) {
-          var targetH = h - Ext.getCmp('queryResultsPanel').getPosition()[1] - 190; 
+          var targetH = h - Ext.getCmp('queryResultsPanel').getPosition()[1] - 210; 
           targetH < 80 ? targetH = 80 : null;
           Ext.getCmp('observationsGridPanel').setHeight(targetH / 2);
           Ext.getCmp('modelsGridPanel').setHeight(targetH / 2);
@@ -252,6 +247,7 @@ function init() {
               {
                  text    : 'View transaction logs'
                 ,icon    : 'img/file_extension_log.png'
+                ,id      : 'transactionLogsButton'
                 ,handler : function() {
                   if (!logsWin || !logsWin.isVisible()) {
                     logsWin = new Ext.Window({
@@ -511,7 +507,7 @@ function getCaps(url,name) {
               var shortP = p.split('/');
               shortP = shortP[shortP.length-1];
               shortP = shortP.substr(0,40) + (shortP.length > 40 ? '...' : '');
-              propertiesLinks.push('<a href="#" onclick="getObs(\'' + properties[p] + '\',\'' + p + '\',\'' + e.feature.attributes.offering.shortName + ' ' + e.feature.attributes.dataset + '\',' + e.feature.attributes.offering.llon + ',' + e.feature.attributes.offering.llat + ')">' + shortP + '</a>');
+              propertiesLinks.push('<a href="#" onclick="getObs(\'' + e.feature.layer.name + '\',\'' + properties[p] + '\',\'' + p + '\',\'' + e.feature.attributes.offering.shortName + ' ' + e.feature.attributes.dataset + '\',' + e.feature.attributes.offering.llon + ',' + e.feature.attributes.offering.llat + ',true)">' + shortP + '</a>');
             }
             var tr = [
                '<td><b>time&nbsp;range</b></td><td>' + shortDateStringNoTime(isoDateToDate(e.feature.attributes.offering.begin_time)) + '&nbsp;\u2011&nbsp;' + shortDateStringNoTime(isoDateToDate(e.feature.attributes.offering.end_time)) + '</td>'
@@ -627,7 +623,7 @@ function getObsCallback(property,name,url,r) {
   Ext.getCmp('timeseriesPanel').fireEvent('resize',Ext.getCmp('timeseriesPanel'));
 }
 
-function getObs(url,property,name,lon,lat) {
+function getObs(layerName,url,property,name,lon,lat,drill) {
   logsStore.insert(0,new logsStore.recordType({
      type : 'GetObs'
     ,name : name
@@ -641,12 +637,12 @@ function getObs(url,property,name,lon,lat) {
   });
 
   // if this is an obs, go find the nearest model point to plot
-  if (name.indexOf('obs.') >= 0) {
+  if (drill) {
     var p0 = new OpenLayers.Geometry.Point(lon,lat).transform(proj4326,map.getProjectionObject());
-    var d;
-    var f;
     for (var i = 0; i < map.layers.length; i++) {
-      if (map.layers[i].name.indexOf('model.') >= 0 && map.layers[i].visibility) {
+      if (new RegExp(/^(obs|model)\./).test(map.layers[i].name) && map.layers[i].name != layerName && map.layers[i].visibility) {
+        var d = null;
+        var f = null;
         for (var j = 0; j < map.layers[i].features.length; j++) {
           if (typeof d != 'number' || p0.distanceTo(map.layers[i].features[j].geometry) < d) {
             d = p0.distanceTo(map.layers[i].features[j].geometry);
@@ -654,12 +650,66 @@ function getObs(url,property,name,lon,lat) {
           }
         }
         if (typeof d == 'number') {
-          var properties = getProperties(f.attributes);
-          for (p in properties) {
-            // for now, just assume that only 1 property comes from the model
-            // if (p == property) {
-              getObs(properties[p],p,f.attributes.offering.shortName + ' ' + f.attributes.dataset,f.attributes.llon,f.attributes.llat);
-            // }
+          var properties  = getProperties(f.attributes);
+          var getObsFired = false;
+          var props       = [];
+          for (var p in properties) {
+            props.push(p);
+            if (p == property) {
+              getObsFired = true;
+              getObs(f.layer.name,properties[p],p,f.attributes.offering.shortName + ' ' + f.attributes.dataset,f.attributes.llon,f.attributes.llat,false);
+            }
+          }
+          if (!getObsFired) {
+            props.sort();
+            var data = [];
+            for (var j = 0; j < props.length; j++) {
+              var shortP = props[j].split('/');
+              shortP = shortP[shortP.length-1];
+              shortP = shortP.substr(0,40) + (shortP.length > 40 ? '...' : '');
+              data.push([
+                 shortP
+                ,props[j]
+              ]);
+            }
+            new Ext.Window({
+               title  : 'Select a variable for comparison'
+              ,modal  : true
+              ,layout : 'fit'
+              ,width  : 275
+              ,height : 250
+              ,items  : [new Ext.FormPanel({
+                 labelWidth : 1
+                ,bodyStyle  : 'padding : 5;border-top : 0px;border-left : 0px;border-right : 0px'
+                ,items      : [
+                   {html : 'We are unable to determine which variable name to use for anlaysis from dataset "' + f.attributes.offering.shortName + ' ' + f.attributes.dataset + '".  Please select from the list below.',border : false}
+                  ,{html : '<img src="img/blank.png" height=8>',border : false}
+                  ,new Ext.form.FieldSet({title : '&nbsp;Available variables&nbsp;',items : new Ext.form.ComboBox({
+                     store          : new Ext.data.ArrayStore({
+                       fields : ['short','id']
+                      ,data   : data
+                    })
+                    ,displayField   : 'short'
+                    ,valueField     : 'id'
+                    ,mode           : 'local'
+                    ,forceSelection : true
+                    ,triggerAction  : 'all'
+                    ,editable       : false
+                    ,width          : 210
+                  })})
+                ]
+                ,buttons : [
+                  {text : 'Query' ,handler : function() {
+                    var p = this.findParentByType('window').findByType('combo')[0].getValue();
+                    if (p != '') {
+                      getObs(f.layer.name,properties[p],p,f.attributes.offering.shortName + ' ' + f.attributes.dataset,f.attributes.llon,f.attributes.llat,false);
+                      this.findParentByType('window').close();
+                    }
+                  }}
+                  ,{text : 'Cancel',handler : function() {this.findParentByType('window').close();}}
+                ]
+              })]
+            }).show();
           }
         }
       }
@@ -706,12 +756,23 @@ function shortDateStringNoTime(d) {
 }
 
 function refreshTimer() {
+  var hits = 0;
   for (i in pendingTransactions) {
     var idx = logsStore.find('url',i);
     if (idx >= 0) {
       var rec = logsStore.getAt(idx);
       rec.set('t',rec.get('t') + 1);
       rec.commit();
+      hits++;
+    }
+  }
+  var el = Ext.getCmp('transactionLogsButton');
+  if (el) {
+    if (hits > 0) {
+      el.setIcon('img/blueSpinner.gif');
+    }
+    else {
+      el.setIcon('img/file_extension_log.png');
     }
   }
   setTimeout('refreshTimer()', 1000);
