@@ -299,8 +299,11 @@ function init() {
                      $('#chart')
                         ,chartData
                       ,{
-                         xaxis : {mode : 'time'}
-                        ,pan   : {interactive : true}
+                         xaxis  : {mode : 'time'}
+                        ,pan    : {interactive : true}
+                        ,zoom   : {interactive : true}
+                        ,grid   : {backgroundColor : {colors : ['#fff','#eee']},borderWidth : 1,borderColor : '#99BBE8',hoverable : true}
+                        ,legend : {backgroundOpacity : 0.3}
                       }
                     );
                   }
