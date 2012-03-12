@@ -277,6 +277,15 @@ function init() {
               }
               ,'->'
               ,{
+                 text    : 'Clear highlighted sites'
+                ,icon    : 'img/draw_eraser.png'
+                ,handler : function() {
+                  var lyr = map.getLayersByName('hiliteMarkers')[0];
+                  lyr.removeFeatures(lyr.features);
+                  lyr.redraw();
+                }
+              }
+              ,{
                  text    : 'Clear graph'
                 ,icon    : 'img/trash-icon.png'
                 ,handler : function() {
@@ -331,7 +340,15 @@ function init() {
                          xaxis  : {mode : 'time'}
                         ,pan    : {interactive : true}
                         ,grid   : {backgroundColor : {colors : ['#fff','#eee']},borderWidth : 1,borderColor : '#99BBE8',hoverable : true}
-                        ,legend : {show : Ext.getCmp('legendPositionComboBox').getValue() != 'Off',position : Ext.getCmp('legendPositionComboBox').getValue().toLowerCase(),backgroundOpacity : 0.3}
+                        ,legend : {
+                           show           : Ext.getCmp('legendPositionComboBox').getValue() != 'Off'
+                          ,position       : Ext.getCmp('legendPositionComboBox').getValue().toLowerCase(),backgroundOpacity : 0.3
+                          ,labelFormatter : function(label,series) {
+                            return label
+                              + ' <a href="javascript:hilitePoint(' + series.lon + ',' + series.lat + ',\'' + series.color + '\')"><img style="margin-bottom:-3px" title="Hilight this site" src="img/flashlight_shine.png"></a>'
+                              + ' <a href="javascript:setCenterOnPoint(' + series.lon + ',' + series.lat + ')"><img style="margin-bottom:-3px" title="Zoom & recenter map to this site" src="img/zoom.png"></a>';
+                          }
+                        }
                       }
                     );
                   }
@@ -386,6 +403,38 @@ function initMap() {
     ,units             : 'm'
     ,maxExtent         : new OpenLayers.Bounds(-20037508,-20037508,20037508,20037508.34)
   });
+
+  map.addControl(new OpenLayers.Control.Graticule({
+    labelSymbolizer : {
+       fontColor   : "#666"
+      ,fontSize    : "10px"
+      ,fontFamily  : "tahoma,helvetica,sans-serif"
+    }
+    ,lineSymbolizer  : {
+       strokeWidth     : 0.40
+      ,strokeOpacity   : 0.75
+      ,strokeColor     : "#999999"
+      ,strokeDashstyle : "dash"
+    }
+  }));
+
+  map.addLayer(new OpenLayers.Layer.Vector(
+     'hiliteMarkers'
+    ,{
+      styleMap : new OpenLayers.StyleMap({
+        'default' : new OpenLayers.Style(
+          {
+             pointRadius     : 20
+            ,fillColor       : "${fillColor}"
+            ,fillOpacity     : 0.7
+            ,strokeWidth     : 1
+            ,strokeColor     : '#0000ff'
+            ,strokeOpacity   : 1
+          }
+        )
+      })
+    }
+  ));
 
   map.setCenter(new OpenLayers.LonLat(-89.2,24.3).transform(proj4326,map.getProjectionObject()),5);
 }
@@ -602,7 +651,7 @@ function getCaps(url,name) {
   }
 }
 
-function getObsCallback(property,name,url,r) {
+function getObsCallback(property,name,url,lon,lat,r) {
   delete pendingTransactions[url];
   var sos = new SOSObservation(new OpenLayers.Format.XML().read(r.responseText));
   if (sos.type === 'EXCEPTION') {
@@ -649,6 +698,8 @@ function getObsCallback(property,name,url,r) {
        data  : d
       ,label : property + ' ' + name + uom
       ,lines : {show : true}
+      ,lon   : lon
+      ,lat   : lat
     });
   }
   Ext.getCmp('timeseriesPanel').fireEvent('resize',Ext.getCmp('timeseriesPanel'));
@@ -664,7 +715,7 @@ function getObs(layerName,url,property,name,lon,lat,drill) {
 
   OpenLayers.Request.issue({
      url      : 'get.php?u=' + encodeURIComponent(url)
-    ,callback : OpenLayers.Function.bind(getObsCallback,null,property,name,url)
+    ,callback : OpenLayers.Function.bind(getObsCallback,null,property,name,url,lon,lat)
   });
 
   // if this is an obs, go find the nearest model point to plot
@@ -688,7 +739,7 @@ function getObs(layerName,url,property,name,lon,lat,drill) {
             props.push(p);
             if (p == property) {
               getObsFired = true;
-              getObs(f.layer.name,properties[p],p,f.attributes.offering.shortName + ' ' + f.attributes.dataset,f.attributes.llon,f.attributes.llat,false);
+              getObs(f.layer.name,properties[p],p,f.attributes.offering.shortName + ' ' + f.attributes.dataset,f.attributes.offering.llon,f.attributes.offering.llat,false);
             }
           }
           if (!getObsFired) {
@@ -705,8 +756,8 @@ function getObs(layerName,url,property,name,lon,lat,drill) {
                 ,properties[props[j]]
                 ,f.attributes.offering.shortName
                 ,f.attributes.dataset
-                ,f.attributes.llon
-                ,f.attributes.llat
+                ,f.attributes.offering.llon
+                ,f.attributes.offering.llat
               ]);
             }
             new Ext.Window({
@@ -742,7 +793,7 @@ function getObs(layerName,url,property,name,lon,lat,drill) {
                     var idx   = sto.find('id',combo.getValue());
                     if (idx >= 0) {
                       var rec = sto.getAt(idx);
-                      getObs(rec.get('layerName'),rec.get('url'),rec.get('id'),rec.get('shortName') + ' ' + rec.get('dataset'),rec.get('llon'),rec.get('lat'),false);
+                      getObs(rec.get('layerName'),rec.get('url'),rec.get('id'),rec.get('shortName') + ' ' + rec.get('dataset'),rec.get('llon'),rec.get('llat'),false);
                       this.findParentByType('window').close();
                     }
                   }}
@@ -816,4 +867,18 @@ function refreshTimer() {
     }
   }
   setTimeout('refreshTimer()', 1000);
+}
+
+function hilitePoint(lon,lat,color) {
+  var f = new OpenLayers.Feature.Vector(new OpenLayers.Geometry.Point(lon,lat).transform(proj4326,map.getProjectionObject()));
+  f.attributes = {
+    fillColor : color
+  }
+  var lyr = map.getLayersByName('hiliteMarkers')[0];
+  lyr.addFeatures(f);
+  lyr.redraw();
+}
+
+function setCenterOnPoint(lon,lat) {
+  map.setCenter(new OpenLayers.LonLat(lon,lat).transform(proj4326,map.getProjectionObject()),map.getZoom() > 9 ? map.getZoom() : 9);
 }
