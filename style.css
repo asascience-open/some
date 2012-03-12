@@ -1,0 +1,94 @@
+#loading-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000000;
+  z-index: 1;
+}
+#loading {
+  position: absolute;
+  top: 40%;
+  left: 45%;
+  z-index: 2;
+}
+#loading SPAN {
+  background: url('img/loader.gif') no-repeat left center;
+  padding: 5px 30px;
+  display: block;
+  font-family: "Lucida Grande", Arial, Helvetica, sans-serif;
+  color: #444444;
+  font-size: 12px;
+}
+
+div.olLayerGoogleCopyright, div.olLayerGooglePoweredBy {
+  display: none !important;
+}
+
+.directionsPanel {
+  font       : 11px/13px tahoma,helvetica,sans-serif;
+  text-align : justify;
+  padding    : 2px 2px 7px 2px;
+}
+
+#queryResultsPanel {
+  border-top: 1px solid #99BBE8;
+}
+
+#observationsGridPanel .x-grid3-row {
+  border-color   : #ffffff;
+}
+#observationsGridPanel .x-grid3-row-selected {
+  background-color : transparent !important;
+}
+#observationsGridPanel .x-grid3-body .x-grid3-row-selected .x-grid3-td-numberer, .x-grid3-body .x-grid3-row-selected .x-grid3-td-checker, .x-grid3-body .x-grid3-row-selected .x-grid3-td-expander {
+  background-image : url('img/blank.png');
+}
+#observationsGridPanel .x-grid3-body .x-grid3-td-checker {
+  background-image : url('img/blank.png');
+}
+
+#modelsGridPanel .x-grid3-row {
+  border-color   : #ffffff;
+}
+#modelsGridPanel .x-grid3-row-selected {
+  background-color : transparent !important;
+}
+#modelsGridPanel .x-grid3-body .x-grid3-row-selected .x-grid3-td-numberer, .x-grid3-body .x-grid3-row-selected .x-grid3-td-checker, .x-grid3-body .x-grid3-row-selected .x-grid3-td-expander {
+  background-image : url('img/blank.png');
+}
+#modelsGridPanel .x-grid3-body .x-grid3-td-checker {
+  background-image : url('img/blank.png');
+}
+
+.popup {
+  background : white;
+  padding    : 6px;
+}
+.popup td {
+  vertical-align : top;
+  font-family: Verdana,Arial,Helvetica;
+  font-size: 10px;
+}
+
+.obsPopup {
+  background : white;
+  padding    : 6px;
+  width      : 315px;
+}
+.obsPopup th {
+  font        : 11px tahoma,helvetica,sans-serif;
+  font-weight : bold;
+}
+.obsPopup td {
+  font        : 11px tahoma,helvetica,sans-serif;
+  padding     : 3px;
+}
+
+.tickLabel {
+  font : 10px/13px tahoma,helvetica,sans-serif;
+}
+.legendLabel {
+  font : 10px/13px tahoma,helvetica,sans-serif;
+}
