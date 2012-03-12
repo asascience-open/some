@@ -670,6 +670,12 @@ function getObs(layerName,url,property,name,lon,lat,drill) {
               data.push([
                  shortP
                 ,props[j]
+                ,f.layer.name
+                ,properties[props[j]]
+                ,f.attributes.offering.shortName
+                ,f.attributes.dataset
+                ,f.attributes.llon
+                ,f.attributes.llat
               ]);
             }
             new Ext.Window({
@@ -686,7 +692,7 @@ function getObs(layerName,url,property,name,lon,lat,drill) {
                   ,{html : '<img src="img/blank.png" height=8>',border : false}
                   ,new Ext.form.FieldSet({title : '&nbsp;Available variables&nbsp;',items : new Ext.form.ComboBox({
                      store          : new Ext.data.ArrayStore({
-                       fields : ['short','id']
+                       fields : ['short','id','layerName','url','shortName','dataset','llon','llat']
                       ,data   : data
                     })
                     ,displayField   : 'short'
@@ -700,9 +706,12 @@ function getObs(layerName,url,property,name,lon,lat,drill) {
                 ]
                 ,buttons : [
                   {text : 'Query' ,handler : function() {
-                    var p = this.findParentByType('window').findByType('combo')[0].getValue();
-                    if (p != '') {
-                      getObs(f.layer.name,properties[p],p,f.attributes.offering.shortName + ' ' + f.attributes.dataset,f.attributes.llon,f.attributes.llat,false);
+                    var combo = this.findParentByType('window').findByType('combo')[0];
+                    var sto   = combo.getStore();
+                    var idx   = sto.find('id',combo.getValue());
+                    if (idx >= 0) {
+                      var rec = sto.getAt(idx);
+                      getObs(rec.get('layerName'),rec.get('url'),rec.get('id'),rec.get('shortName') + ' ' + rec.get('dataset'),rec.get('llon'),rec.get('lat'),false);
                       this.findParentByType('window').close();
                     }
                   }}
