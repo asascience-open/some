@@ -285,6 +285,35 @@ function init() {
                 }
               }
             ]
+            ,bbar      : [
+               '->'
+              ,'Legend position :'
+              ,' '
+              ,new Ext.form.ComboBox({
+                 store          : new Ext.data.ArrayStore({
+                   fields : ['id']
+                  ,data   : [
+                     ['NE']
+                    ,['NW']
+                    ,['SE']
+                    ,['SW'] 
+                    ,['Off']
+                  ]
+                })
+                ,id             : 'legendPositionComboBox'
+                ,valueField     : 'id'
+                ,displayField   : 'id'
+                ,mode           : 'local'
+                ,forceSelection : true
+                ,triggerAction  : 'all'
+                ,editable       : false
+                ,value          : 'NE'
+                ,width          : 50
+                ,listeners      : {select : function(comboBox,rec) {
+                  Ext.getCmp('timeseriesPanel').fireEvent('resize',Ext.getCmp('timeseriesPanel'));
+                }}
+              })
+            ]
             ,listeners : {
               afterrender : function(win) {
                 win.addListener('resize',function(win) {
@@ -297,13 +326,12 @@ function init() {
                   else {
                     $.plot(
                      $('#chart')
-                        ,chartData
+                      ,chartData
                       ,{
                          xaxis  : {mode : 'time'}
                         ,pan    : {interactive : true}
-                        ,zoom   : {interactive : true}
                         ,grid   : {backgroundColor : {colors : ['#fff','#eee']},borderWidth : 1,borderColor : '#99BBE8',hoverable : true}
-                        ,legend : {backgroundOpacity : 0.3}
+                        ,legend : {show : Ext.getCmp('legendPositionComboBox').getValue() != 'Off',position : Ext.getCmp('legendPositionComboBox').getValue().toLowerCase(),backgroundOpacity : 0.3}
                       }
                     );
                   }
