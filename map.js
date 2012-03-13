@@ -339,7 +339,7 @@ function init() {
                 win.addListener('resize',function(win) {
                   var el = document.getElementById('chart');
                   el.style.width  = win.getWidth() - 15;
-                  el.style.height = win.getHeight() - 55;
+                  el.style.height = win.getHeight() - 85;
                   if (!chartData || chartData.length <= 0) {
                     el.innerHTML = '<table width="100%" class="directionsPanel"><tr><td style="padding:10px 40px 0px 40px">Begin by selecting values for the catalog query filters.  Then select observation and model datasets to analyze.  Once you see dots on the map, click one, and then click on the parmater link in the popup window.  A time series graph will appear here.</td></tr></table>';
                   }
