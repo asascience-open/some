@@ -18,8 +18,6 @@
     <script type="text/javascript" src="./js/jquery/jquery.parseSOSGetObs.js"></script>
     <script type="text/javascript" src="./js/jquery/jquery.flot.js"></script>
     <script type="text/javascript" src="./js/jquery/jquery.flot.navigate.js"></script>
-    <script type="text/javascript" src="./js/overlib.js"></script>
     <script type="text/javascript" src="map.js"></script>
-    <div id="overDiv" class="overStyle" style="position:absolute;visibility:hidden;z-index:1000000;"></div>
   </body>
 </html>
