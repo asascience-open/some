@@ -122,7 +122,7 @@ function init() {
      header    : ''
     ,listeners : {
       rowselect : function(sm,rowIndex,rec) {
-        getCaps(rec.get('url'),rec.get('name'));
+        getCaps(rec.get('url'),rec.get('name'),'observations');
       }
       ,rowdeselect : function(sm,rowIndex,rec) {
         map.getLayersByName(rec.get('name'))[0].setVisibility(false);
@@ -134,7 +134,7 @@ function init() {
     ,id          : 'observationsGridPanel'
     ,store : new Ext.data.JsonStore({
        url       : 'query.php?type=obs'
-      ,fields    : ['name','url']
+      ,fields    : ['name','url','properties']
       ,root      : 'data'
       ,listeners : {
         beforeload : function(sto) {
@@ -161,7 +161,7 @@ function init() {
      header    : ''
     ,listeners : {
       rowselect : function(sm,rowIndex,rec) {
-        getCaps(rec.get('url'),rec.get('name'));
+        getCaps(rec.get('url'),rec.get('name'),'models');
       }
       ,rowdeselect : function(sm,rowIndex,rec) {
         map.getLayersByName(rec.get('name'))[0].setVisibility(false);
@@ -173,7 +173,7 @@ function init() {
     ,id          : 'modelsGridPanel'
     ,store : new Ext.data.JsonStore({
        url       : 'query.php?type=models'
-      ,fields    : ['name','url']
+      ,fields    : ['name','url','properties']
       ,root      : 'data'
       ,listeners : {
         beforeload : function(sto) {
@@ -499,23 +499,38 @@ function renderUrl(val,metadata,rec) {
   return '<a target=_blank href="' + val + '">' + val + '</a>';
 }
 
-function getCaps(url,name) {
+function getCaps(url,name,type) {
 
-  function getCapsCallback(l,url,r) {
+  function getCapsCallback(l,url,type,r) {
     delete pendingTransactions[url];
     var sos = new SOSCapabilities(new OpenLayers.Format.XML().read(r.responseText));
     if (sos.type === 'EXCEPTION') {
       Ext.Msg.alert('SOS exception',sos.exception_error);
       return;
     }
+
+    var rec = Ext.getCmp(type + 'GridPanel').getStore().getAt(Ext.getCmp(type + 'GridPanel').getStore().find('name',name));
+    var targetProperties = rec.get('properties')[Ext.getCmp('parametersComboBox').getValue()];
+
     for (var i = 0; i < sos.offerings.length; i++) {
-      var f = new OpenLayers.Feature.Vector(new OpenLayers.Geometry.Point(sos.offerings[i].llon,sos.offerings[i].llat).transform(proj4326,map.getProjectionObject()));
-      f.attributes = {
-         type     : 'getCaps'
-        ,offering : sos.offerings[i]
-        ,dataset  : name
-      };
-      l.addFeatures(f);
+      var properties = getProperties({offering : sos.offerings[i]});
+      var plot = false;
+      for (var p in properties) {
+        if (targetProperties) {
+          for (var j = 0; j < targetProperties.length; j++) {
+            plot = plot || targetProperties[j] == p;
+          }
+        }
+      }
+      if (plot) {
+        var f = new OpenLayers.Feature.Vector(new OpenLayers.Geometry.Point(sos.offerings[i].llon,sos.offerings[i].llat).transform(proj4326,map.getProjectionObject()));
+        f.attributes = {
+           type     : 'getCaps'
+          ,offering : sos.offerings[i]
+          ,dataset  : name
+        };
+        l.addFeatures(f);
+      }
     }
   }
 
@@ -697,7 +712,7 @@ function getCaps(url,name) {
     OpenLayers.Request.issue({
        url      : url
 //       url      : 'get.php?u=' + encodeURIComponent(url)
-      ,callback : OpenLayers.Function.bind(getCapsCallback,null,l,url)
+      ,callback : OpenLayers.Function.bind(getCapsCallback,null,l,url,type)
     });
   }
   else {
