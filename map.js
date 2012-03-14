@@ -180,7 +180,7 @@ function init() {
           sto.setBaseParam('eventtime',getEventtimeFromEventsComboBox());
         }
         ,load      : function(sto) {
-          Ext.getCmp('modelsGridPanel').getSelectionModel().selectAll();
+          // Ext.getCmp('modelsGridPanel').getSelectionModel().selectAll();
         }
       }
     })
@@ -515,19 +515,24 @@ function getCaps(url,name,type) {
     for (var i = 0; i < sos.offerings.length; i++) {
       var properties = getProperties({offering : sos.offerings[i]});
       var plot = false;
+      var tp = [];
       for (var p in properties) {
         if (targetProperties) {
           for (var j = 0; j < targetProperties.length; j++) {
             plot = plot || targetProperties[j] == p;
+            if (targetProperties[j] == p) {
+              tp.push(p);
+            }
           }
         }
       }
       if (plot) {
         var f = new OpenLayers.Feature.Vector(new OpenLayers.Geometry.Point(sos.offerings[i].llon,sos.offerings[i].llat).transform(proj4326,map.getProjectionObject()));
         f.attributes = {
-           type     : 'getCaps'
-          ,offering : sos.offerings[i]
-          ,dataset  : name
+           type             : 'getCaps'
+          ,offering         : sos.offerings[i]
+          ,dataset          : name
+          ,targetProperties : tp
         };
         l.addFeatures(f);
       }
@@ -814,7 +819,7 @@ function getObs(layerName,url,property,name,lon,lat,drill) {
           var props       = [];
           for (var p in properties) {
             props.push(p);
-            if (p == property) {
+            if (p == property || (f.attributes.targetProperties && f.attributes.targetProperties.length == 1 && f.attributes.targetProperties[0] == p)) {
               getObsFired = true;
               getObs(f.layer.name,properties[p],p,f.attributes.offering.shortName + ' ' + f.attributes.dataset,f.attributes.offering.llon,f.attributes.offering.llat,false);
             }
