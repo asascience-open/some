@@ -65,8 +65,11 @@ function init() {
     ,border          : false
     ,items           : new Ext.form.ComboBox({
       store : new Ext.data.ArrayStore({
-         fields : ['id']
-        ,data   : [['Hurricane Ike']]
+         fields : ['id','eventtime']
+        ,data   : [
+           ['Hurricane Ike'   ,'2008-09-08T00:30:00Z/2008-09-16T00:00:00Z']
+          ,['Current forecast','current']
+        ]
       })
       ,id             : 'eventsComboBox'
       ,displayField   : 'id'
@@ -113,11 +116,14 @@ function init() {
   var observationsGridPanel = new Ext.grid.GridPanel({
      height      : 50
     ,id          : 'observationsGridPanel'
-    ,store : new Ext.data.ArrayStore({
-       fields : ['name','url']
-      ,data   : [['obs.coops','xml/coops.xml'],['obs.watlev_CRMS_2008.F.C.nc','xml/obs.watlev_CRMS_2008.F.C.nc.getcaps.xml']]
-//      ,data   : [['obs.watlev_CRMS_2008.F.C.nc','xml/obs.watlev_CRMS_2008.F.C.nc.getcaps.xml']]
-//      ,data   : [['obs.watlev_CRMS_2008.F.C.nc','http://testbedapps-dev.sura.org/thredds/sos/alldata/acrosby/watlev_CRMS_2008.F.C.nc?service=sos&version=1.0.0&request=GetCapabilities']]
+    ,store : new Ext.data.JsonStore({
+       url       : 'query.php?type=obs'
+      ,fields    : ['name','url']
+      ,root      : 'data'
+      ,autoLoad  : true
+      ,listeners : {beforeload : function(sto) {
+        sto.setBaseParam('eventtime',getEventtimeFromEventsComboBox());
+      }}
     })
     ,selModel    : observationsSelModel
     ,autoExpandColumn : 'name'
@@ -145,10 +151,14 @@ function init() {
   var modelsGridPanel = new Ext.grid.GridPanel({
      height      : 50
     ,id          : 'modelsGridPanel'
-    ,store : new Ext.data.ArrayStore({
-       fields : ['name','url']
-      ,data   : [['model.watlev_CRMS_2008.F.C__IKE_VIMS_3D_WITHWAVE.nc','xml/model.watlev_CRMS_2008.F.C__IKE_VIMS_3D_WITHWAVE.nc.getcaps.xml']]
-//      ,data   : [['model.watlev_CRMS_2008.F.C__IKE_VIMS_3D_WITHWAVE.nc','http://testbedapps-dev.sura.org/thredds/sos/alldata/acrosby/watlev_CRMS_2008.F.C__IKE_VIMS_3D_WITHWAVE.nc?service=sos&version=1.0.0&request=GetCapabilities']]
+    ,store : new Ext.data.JsonStore({
+       url       : 'query.php?type=models'
+      ,fields    : ['name','url']
+      ,root      : 'data'
+      ,autoLoad  : true
+      ,listeners : {beforeload : function(sto) {
+        sto.setBaseParam('eventtime',getEventtimeFromEventsComboBox());
+      }}
     })
     ,selModel    : modelsSelModel
     ,autoExpandColumn : 'name'
@@ -173,7 +183,7 @@ function init() {
             {
                border : false
               ,cls    : 'directionsPanel'
-              ,html   : 'Select a model type, a storm or an event, and a parameter to begin your search.'
+              ,html   : 'Select a model type, a storm or an event, and a parameter to begin your search.  Then click "Run query".'
             }
             ,new Ext.form.FieldSet({
                title : '&nbsp;Model type&nbsp;'
@@ -186,6 +196,19 @@ function init() {
             ,new Ext.form.FieldSet({
                title : '&nbsp;Parameter&nbsp;'
               ,items : parametersFormPanel
+            })
+            ,new Ext.FormPanel({
+               layout      : 'column'
+              ,border      : false
+              ,bodyStyle   : 'padding:0px 0px 10px 0px'
+              ,items       : [
+                 {border : false,columnWidth : 0.20,html : '&nbsp;'}
+                ,new Ext.Button({border : false,columnWidth : 0.60,text : 'Run query',handler : function() {
+                  Ext.getCmp('modelsGridPanel').getStore().load();
+                  Ext.getCmp('observationsGridPanel').getStore().load();
+                }})
+                ,{border : false,columnWidth : 0.20,html : '&nbsp;'}
+              ]
             })
           ]}
           ,{title : 'Catalog query results',id : 'queryResultsPanel',border : false,bodyStyle : 'padding:5px 5px 0',items : [
@@ -447,7 +470,7 @@ function initMap() {
     }
   ));
 
-  map.setCenter(new OpenLayers.LonLat(-89.2,24.3).transform(proj4326,map.getProjectionObject()),5);
+  map.setCenter(new OpenLayers.LonLat(-10536302.833765,3885808.4963698),4);
 }
 
 function renderName(val,metadata,rec) {
@@ -613,6 +636,9 @@ function getCaps(url,name) {
               ,target    : 'OpenLayers.Geometry.Point_' + (Number(e.feature.id.split('_')[e.feature.id.split('_').length - 1]) - 1)
               ,autoHide  : false
               ,closable  : true
+              ,style     : {
+                'z-index' : 5000 // keep the popup below any subsequent form 'popups'
+              }
               ,listeners : {
                 hide : function(tt) {
                   if (!tt.isDestroyed) {
@@ -670,18 +696,16 @@ function getObsCallback(property,name,url,lon,lat,r) {
     return;
   }
 
-  // Look to see if only one index outside of stationId and Time was pulled back.
-  // If so, use it, and don't worry about a crosswalk.
-  var properties = [];
-  if (sos.observations.length > 0) {
-    for (var i in sos.observations[0]) {
-      if (!new RegExp(/^stationId|Time$/).test(i)) {
-        properties.push(i);
-      }
-    }
-  }
-  if (properties.length == 1) {
-    property = properties[0];
+  var definitionToFieldNameAndUOM = {};
+  var fieldNameToUOM              = {};
+  for (var i = 0; i < sos.fields.length; i++) {
+    definitionToFieldNameAndUOM[sos.fields[i].definition] = {
+       fieldName : sos.fields[i].name
+      ,uom       : sos.fields[i].uom
+    };
+    fieldNameToUOM[sos.fields[i].name] = {
+      uom        : sos.fields[i].uom
+    };
   }
 
   var d = [];
@@ -694,16 +718,24 @@ function getObsCallback(property,name,url,lon,lat,r) {
       t = isoDateToDate(sos.observations[i].time);
     }
     if (t) {
-      d.push([t.getTime(),sos.observations[i][property]]);
+      var val;
+      if (typeof definitionToFieldNameAndUOM[property] == 'object') {
+        val = sos.observations[i][definitionToFieldNameAndUOM[property].fieldName];
+      }
+      else {
+        val = sos.observations[i][property];
+      }
+      d.push([t.getTime(),val]);
     }
   }
 
   if (d.length > 0) {
     var uom = '';
-    for (var i = 0; i < sos.fields.length; i++) {
-      if (sos.fields[i].name == property) {
-        uom = ' (' + sos.fields[i].uom + ')';
-      }
+    if (typeof definitionToFieldNameAndUOM[property] == 'object') {
+      uom = ' (' + definitionToFieldNameAndUOM[property].uom + ')';
+    }
+    else {
+      uom = ' (' + fieldNameToUOM[property].uom + ')';
     }
     chartData.push({
        data  : d
@@ -823,7 +855,7 @@ function getProperties(attr) {
   var p = {};
   attr.offering.properties.sort();
   for (var i = 0; i < attr.offering.properties.length; i++) {
-    p[attr.offering.properties[i]] = attr.offering.getObsUrl(attr.offering.properties[i]) + '&eventtime=2008-09-08T00:30:00Z/2008-09-16T00:00:00Z'; // '&eventtime=' + attr.offering.begin_time + '/' + attr.offering.end_time;
+    p[attr.offering.properties[i]] = attr.offering.getObsUrl(attr.offering.properties[i]) + '&eventtime=' + getEventtimeFromEventsComboBox();
   }
   return p;
 }
@@ -892,4 +924,22 @@ function hilitePoint(lon,lat,color) {
 
 function setCenterOnPoint(lon,lat) {
   map.setCenter(new OpenLayers.LonLat(lon,lat).transform(proj4326,map.getProjectionObject()),map.getZoom() > 9 ? map.getZoom() : 9);
+}
+
+function getEventtimeFromEventsComboBox() {
+  var rec = Ext.getCmp('eventsComboBox').getStore().getAt(Ext.getCmp('eventsComboBox').getStore().find('id',Ext.getCmp('eventsComboBox').getValue()));
+  var eventtime = rec.get('eventtime');
+  if (eventtime == 'current') {
+    var dNow = new Date();
+    dNow.setUTCHours(0);
+    dNow.setUTCMinutes(0);
+    dNow.setUTCSeconds(0);
+    dNow.setUTCMilliseconds(0);
+    var dMin = new Date(dNow.getTime() - 12 * 60 * 60 * 1000);
+    var dMax = new Date(dNow.getTime() + 24 * 60 * 60 * 1000);
+    eventtime = dMin.getUTCFullYear() + '-' + String.leftPad(dMin.getUTCMonth() + 1,2,'0') + '-' + String.leftPad(dMin.getUTCDate(),2,'0') + 'T' + String.leftPad(dMin.getUTCHours(),2,'0') + ':00:00Z'
+      + '/'
+      + dMax.getUTCFullYear() + '-' + String.leftPad(dMax.getUTCMonth() + 1,2,'0') + '-' + String.leftPad(dMax.getUTCDate(),2,'0') + 'T' + String.leftPad(dMax.getUTCHours(),2,'0') + ':00:00Z';
+  }
+  return eventtime;
 }

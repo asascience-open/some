@@ -1,0 +1,1110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sos:Capabilities xmlns:oost="http://www.oostethys.org/schemas/0.1.0/oostethys"
+                  xmlns:ows="http://www.opengis.net/ows/1.1"
+                  xmlns:sos="http://www.opengis.net/sos/1.0"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:gml="http://www.opengis.net/gml"
+                  xmlns:xlink="http://www.w3.org/1999/xlink"
+                  xmlns:swe="http://www.opengis.net/swe/1.0.1"
+                  xsi:schemaLocation="http://www.opengis.net/sos/1.0 http://schemas.opengis.net/sos/1.0.0/sosGetCapabilities.xsd"
+                  version="1.0.0">
+   <ows:ServiceIdentification>
+      <ows:Title>Sensor Observation Service (SOS) for  USGS</ows:Title>
+      <ows:Abstract>Sensor Observation Service (SOS) for  USGS</ows:Abstract>
+      <ows:ServiceType codeSpace="http://opengeospatial.net">OGC:SOS</ows:ServiceType>
+      <ows:ServiceTypeVersion>1.0.0</ows:ServiceTypeVersion>
+   </ows:ServiceIdentification>
+   <ows:ServiceProvider>
+      <ows:ProviderName> USGS</ows:ProviderName>
+      <ows:ProviderSite xlink:href="http://www.usgs.gov"/>
+      <ows:ServiceContact>
+         <ows:IndividualName>Rich Signell</ows:IndividualName>
+         <ows:ContactInfo>
+            <ows:Address>
+               <ows:ElectronicMailAddress>rsignll@usgs.gov</ows:ElectronicMailAddress>
+            </ows:Address>
+         </ows:ContactInfo>
+      </ows:ServiceContact>
+   </ows:ServiceProvider>
+   <ows:OperationsMetadata>
+      <ows:Operation name="GetCapabilities">
+         <ows:DCP>
+            <ows:HTTP>
+               <ows:Get xlink:href="http://mcqueen.gomoos.org:8080/oostethys/sos"/>
+               <ows:Post xlink:href="http://mcqueen.gomoos.org:8080/oostethys/sos"/>
+            </ows:HTTP>
+         </ows:DCP>
+         <ows:Parameter name="service">
+            <ows:AllowedValues>
+               <ows:Value>SOS</ows:Value>
+            </ows:AllowedValues>
+         </ows:Parameter>
+         <ows:Parameter name="version">
+            <ows:AllowedValues>
+               <ows:Value>1.0.0</ows:Value>
+            </ows:AllowedValues>
+         </ows:Parameter>
+      </ows:Operation>
+      <ows:Operation name="GetObservation">
+         <ows:DCP>
+            <ows:HTTP>
+               <ows:Get xlink:href="http://mcqueen.gomoos.org:8080/oostethys/sos"/>
+               <ows:Post xlink:href="http://mcqueen.gomoos.org:8080/oostethys/sos"/>
+            </ows:HTTP>
+         </ows:DCP>
+         <ows:Parameter name="offering">
+            <ows:AllowedValues>
+               <ows:Value>observationOffering1</ows:Value>
+               <ows:Value>observationOffering2</ows:Value>
+               <ows:Value>observationOffering3</ows:Value>
+               <ows:Value>observationOffering4</ows:Value>
+               <ows:Value>observationOffering5</ows:Value>
+               <ows:Value>observationOffering6</ows:Value>
+               <ows:Value>observationOffering7</ows:Value>
+               <ows:Value>observationOffering8</ows:Value>
+               <ows:Value>observationOffering9</ows:Value>
+               <ows:Value>observationOffering10</ows:Value>
+               <ows:Value>observationOffering11</ows:Value>
+               <ows:Value>observationOffering12</ows:Value>
+               <ows:Value>observationOffering13</ows:Value>
+               <ows:Value>observationOffering14</ows:Value>
+               <ows:Value>observationOffering15</ows:Value>
+               <ows:Value>observationOffering16</ows:Value>
+               <ows:Value>observationOffering17</ows:Value>
+               <ows:Value>observationOffering18</ows:Value>
+               <ows:Value>observationOffering19</ows:Value>
+               <ows:Value>observationOffering20</ows:Value>
+               <ows:Value>observationOffering21</ows:Value>
+               <ows:Value>observationOffering22</ows:Value>
+               <ows:Value>observationOffering23</ows:Value>
+               <ows:Value>observationOffering24</ows:Value>
+               <ows:Value>observationOffering25</ows:Value>
+               <ows:Value>observationOffering26</ows:Value>
+               <ows:Value>observationOffering27</ows:Value>
+               <ows:Value>observationOffering28</ows:Value>
+               <ows:Value>observationOffering29</ows:Value>
+               <ows:Value>observationOffering30</ows:Value>
+               <ows:Value>observationOffering31</ows:Value>
+               <ows:Value>observationOffering32</ows:Value>
+               <ows:Value>observationOffering33</ows:Value>
+               <ows:Value>observationOffering34</ows:Value>
+               <ows:Value>observationOffering35</ows:Value>
+               <ows:Value>observationOffering36</ows:Value>
+               <ows:Value>observationOffering37</ows:Value>
+               <ows:Value>observationOffering38</ows:Value>
+               <ows:Value>observationOffering39</ows:Value>
+               <ows:Value>observationOffering40</ows:Value>
+               <ows:Value>observationOffering41</ows:Value>
+               <ows:Value>observationOffering42</ows:Value>
+               <ows:Value>observationOffering43</ows:Value>
+               <ows:Value>observationOffering44</ows:Value>
+               <ows:Value>observationOffering45</ows:Value>
+               <ows:Value>observationOffering46</ows:Value>
+            </ows:AllowedValues>
+         </ows:Parameter>
+         <ows:Parameter name="observedProperty">
+            <ows:AllowedValues>
+               <ows:Value>http://mmisw.org/cf/parameter/significant_height_of_wind_and_swell_waves</ows:Value>
+               <ows:Value>http://mmisw.org/cf/parameter/water_level</ows:Value>
+            </ows:AllowedValues>
+         </ows:Parameter>
+      </ows:Operation>
+      <ows:Operation name="DescribeSensor">
+         <ows:DCP>
+            <ows:HTTP>
+               <ows:Get xlink:href="http://mcqueen.gomoos.org:8080/oostethys/sos"/>
+               <ows:Post xlink:href="http://mcqueen.gomoos.org:8080/oostethys/sos"/>
+            </ows:HTTP>
+         </ows:DCP>
+         <ows:Parameter name="version">
+            <ows:AllowedValues>
+               <ows:Value>1.0.0</ows:Value>
+            </ows:AllowedValues>
+         </ows:Parameter>
+         <ows:Parameter name="service">
+            <ows:AllowedValues>
+               <ows:Value>SOS</ows:Value>
+            </ows:AllowedValues>
+         </ows:Parameter>
+         <ows:Parameter name="outputFormat">
+            <ows:AllowedValues>
+               <ows:Value>text/xml;subtype="sensorML/1.0.1"</ows:Value>
+            </ows:AllowedValues>
+         </ows:Parameter>
+         <ows:Parameter name="procedure">
+            <ows:AllowedValues>
+               <ows:Value>urn:usgs:org:model:ww3:A01</ows:Value>
+               <ows:Value>urn:usgs:org:model:ww3:B01</ows:Value>
+               <ows:Value>urn:usgs:org:model:ww3:D02</ows:Value>
+               <ows:Value>urn:usgs:org:model:ww3:E01</ows:Value>
+               <ows:Value>urn:usgs:org:model:ww3:F01</ows:Value>
+               <ows:Value>urn:usgs:org:model:ww3:I01</ows:Value>
+               <ows:Value>urn:usgs:org:model:ww3:M01</ows:Value>
+               <ows:Value>urn:usgs:org:model:ww3:N01</ows:Value>
+               <ows:Value>urn:usgs:org:model:ww3:44098</ows:Value>
+               <ows:Value>urn:usgs:org:model:ww3:MDS02</ows:Value>
+               <ows:Value>urn:usgs:org:model:ww3:CDIP154</ows:Value>
+               <ows:Value>urn:usgs:org:model:ww3:44018</ows:Value>
+               <ows:Value>urn:usgs:org:model:ww3:44020</ows:Value>
+               <ows:Value>urn:usgs:org:model:ww3:44013</ows:Value>
+               <ows:Value>urn:usgs:org:model:ww3:44005</ows:Value>
+               <ows:Value>urn:usgs:org:model:ww3:44007</ows:Value>
+               <ows:Value>urn:usgs:org:model:ww3:44027</ows:Value>
+               <ows:Value>urn:usgs:org:model:ww3:44017</ows:Value>
+               <ows:Value>urn:usgs:org:model:ww3:44150</ows:Value>
+               <ows:Value>urn:usgs:org:model:ww3:44258</ows:Value>
+               <ows:Value>urn:usgs:org:model:ww3:saco</ows:Value>
+               <ows:Value>urn:usgs:org:model:ww3:scituate</ows:Value>
+               <ows:Value>urn:usgs:org:model:necofs:8423898</ows:Value>
+               <ows:Value>urn:usgs:org:model:necofs:8443970</ows:Value>
+               <ows:Value>urn:usgs:org:model:necofs:8447930</ows:Value>
+               <ows:Value>urn:usgs:org:model:necofs:8448725</ows:Value>
+               <ows:Value>urn:usgs:org:model:necofs:8449130</ows:Value>
+               <ows:Value>urn:usgs:org:model:necofs:8447435</ows:Value>
+               <ows:Value>urn:usgs:org:model:necofs:scituate</ows:Value>
+               <ows:Value>urn:usgs:org:model:necofs:scituate_hi_res</ows:Value>
+               <ows:Value>urn:usgs:org:model:necofs:8410140</ows:Value>
+               <ows:Value>urn:usgs:org:model:necofs:8411250</ows:Value>
+               <ows:Value>urn:usgs:org:model:necofs:8413320</ows:Value>
+               <ows:Value>urn:usgs:org:model:necofs:8418150</ows:Value>
+               <ows:Value>urn:usgs:org:model:necofs:8419317</ows:Value>
+               <ows:Value>urn:usgs:org:model:necofs:8447386</ows:Value>
+               <ows:Value>urn:usgs:org:model:necofs:8447387</ows:Value>
+               <ows:Value>urn:usgs:org:model:necofs:8452660</ows:Value>
+               <ows:Value>urn:usgs:org:model:necofs:8454049</ows:Value>
+               <ows:Value>urn:usgs:org:model:necofs:8452944</ows:Value>
+               <ows:Value>urn:usgs:org:model:necofs:8461490</ows:Value>
+               <ows:Value>urn:usgs:org:model:necofs:8465705</ows:Value>
+               <ows:Value>urn:usgs:org:model:necofs:8467150</ows:Value>
+               <ows:Value>urn:usgs:org:model:necofs:8510560</ows:Value>
+               <ows:Value>urn:usgs:org:model:necofs:8516945</ows:Value>
+               <ows:Value>urn:usgs:org:model:necofs:saco</ows:Value>
+            </ows:AllowedValues>
+         </ows:Parameter>
+      </ows:Operation>
+   </ows:OperationsMetadata>
+   <sos:Contents>
+      <sos:ObservationOfferingList>
+         <sos:ObservationOffering gml:id="observationOffering_ww3_A01">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>42.55 -70.55</gml:lowerCorner>
+                  <gml:upperCorner>42.55 -70.55</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod1">
+                  <gml:beginPosition>2012-03-13T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:ww3:A01"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/significant_height_of_wind_and_swell_waves"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_ww3_B01">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>43.15 -70.45</gml:lowerCorner>
+                  <gml:upperCorner>43.15 -70.45</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod2">
+                  <gml:beginPosition>2012-03-13T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:ww3:B01"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/significant_height_of_wind_and_swell_waves"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_ww3_D02">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>43.75 -69.95</gml:lowerCorner>
+                  <gml:upperCorner>43.75 -69.95</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod3">
+                  <gml:beginPosition>2012-03-13T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:ww3:D02"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/significant_height_of_wind_and_swell_waves"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_ww3_E01">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>43.75 -69.35</gml:lowerCorner>
+                  <gml:upperCorner>43.75 -69.35</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod4">
+                  <gml:beginPosition>2012-03-13T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:ww3:E01"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/significant_height_of_wind_and_swell_waves"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_ww3_F01">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>43.75 -68.95</gml:lowerCorner>
+                  <gml:upperCorner>43.75 -68.95</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod5">
+                  <gml:beginPosition>2012-03-13T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:ww3:F01"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/significant_height_of_wind_and_swell_waves"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_ww3_I01">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>44.15 -68.15</gml:lowerCorner>
+                  <gml:upperCorner>44.15 -68.15</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod6">
+                  <gml:beginPosition>2012-03-13T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:ww3:I01"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/significant_height_of_wind_and_swell_waves"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_ww3_M01">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>43.45 -67.85</gml:lowerCorner>
+                  <gml:upperCorner>43.45 -67.85</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod7">
+                  <gml:beginPosition>2012-03-13T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:ww3:M01"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/significant_height_of_wind_and_swell_waves"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_ww3_N01">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>42.35 -65.95</gml:lowerCorner>
+                  <gml:upperCorner>42.35 -65.95</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod8">
+                  <gml:beginPosition>2012-03-13T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:ww3:N01"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/significant_height_of_wind_and_swell_waves"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_ww3_44098">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>42.85 -70.15</gml:lowerCorner>
+                  <gml:upperCorner>42.85 -70.15</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod9">
+                  <gml:beginPosition>2012-03-13T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:ww3:44098"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/significant_height_of_wind_and_swell_waves"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_ww3_MDS02">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>41.15 -71.55</gml:lowerCorner>
+                  <gml:upperCorner>41.15 -71.55</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod10">
+                  <gml:beginPosition>2012-03-13T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:ww3:MDS02"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/significant_height_of_wind_and_swell_waves"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_ww3_CDIP154">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>40.95 -71.15</gml:lowerCorner>
+                  <gml:upperCorner>40.95 -71.15</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod11">
+                  <gml:beginPosition>2012-03-13T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:ww3:CDIP154"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/significant_height_of_wind_and_swell_waves"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_ww3_44018">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>41.35 -69.25</gml:lowerCorner>
+                  <gml:upperCorner>41.35 -69.25</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod12">
+                  <gml:beginPosition>2012-03-13T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:ww3:44018"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/significant_height_of_wind_and_swell_waves"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_ww3_44020">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>41.45 -70.15</gml:lowerCorner>
+                  <gml:upperCorner>41.45 -70.15</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod13">
+                  <gml:beginPosition>2012-03-13T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:ww3:44020"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/significant_height_of_wind_and_swell_waves"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_ww3_44013">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>42.35 -70.65</gml:lowerCorner>
+                  <gml:upperCorner>42.35 -70.65</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod14">
+                  <gml:beginPosition>2012-03-13T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:ww3:44013"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/significant_height_of_wind_and_swell_waves"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_ww3_44005">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>42.35 -70.65</gml:lowerCorner>
+                  <gml:upperCorner>42.35 -70.65</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod15">
+                  <gml:beginPosition>2012-03-13T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:ww3:44005"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/significant_height_of_wind_and_swell_waves"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_ww3_44007">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>43.55 -70.15</gml:lowerCorner>
+                  <gml:upperCorner>43.55 -70.15</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod16">
+                  <gml:beginPosition>2012-03-13T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:ww3:44007"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/significant_height_of_wind_and_swell_waves"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_ww3_44027">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>44.25 -67.35</gml:lowerCorner>
+                  <gml:upperCorner>44.25 -67.35</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod17">
+                  <gml:beginPosition>2012-03-13T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:ww3:44027"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/significant_height_of_wind_and_swell_waves"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_ww3_44017">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>40.65 -71.95</gml:lowerCorner>
+                  <gml:upperCorner>40.65 -71.95</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod18">
+                  <gml:beginPosition>2012-03-13T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:ww3:44017"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/significant_height_of_wind_and_swell_waves"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_ww3_44150">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>42.55 -64.05</gml:lowerCorner>
+                  <gml:upperCorner>42.55 -64.05</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod19">
+                  <gml:beginPosition>2012-03-13T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:ww3:44150"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/significant_height_of_wind_and_swell_waves"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_ww3_44258">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>44.55 -63.45</gml:lowerCorner>
+                  <gml:upperCorner>44.55 -63.45</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod20">
+                  <gml:beginPosition>2012-03-13T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:ww3:44258"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/significant_height_of_wind_and_swell_waves"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_ww3_saco">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>43.55 -70.35</gml:lowerCorner>
+                  <gml:upperCorner>43.55 -70.35</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod21">
+                  <gml:beginPosition>2012-03-13T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:ww3:saco"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/significant_height_of_wind_and_swell_waves"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_ww3_scituate">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>42.25 -70.75</gml:lowerCorner>
+                  <gml:upperCorner>42.25 -70.75</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod22">
+                  <gml:beginPosition>2012-03-13T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:ww3:scituate"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/significant_height_of_wind_and_swell_waves"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_necofs_8423898">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>43.07141 -70.71215</gml:lowerCorner>
+                  <gml:upperCorner>43.07141 -70.71215</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod23">
+                  <gml:beginPosition>2012-03-11T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-14T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:necofs:8423898"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/water_level"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_necofs_8443970">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>42.35507 -71.05025</gml:lowerCorner>
+                  <gml:upperCorner>42.35507 -71.05025</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod24">
+                  <gml:beginPosition>2012-03-11T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-14T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:necofs:8443970"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/water_level"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_necofs_8447930">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>41.523266 -70.67151</gml:lowerCorner>
+                  <gml:upperCorner>41.523266 -70.67151</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod25">
+                  <gml:beginPosition>2012-03-11T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-14T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:necofs:8447930"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/water_level"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_necofs_8448725">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>41.354202 -70.7675</gml:lowerCorner>
+                  <gml:upperCorner>41.354202 -70.7675</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod26">
+                  <gml:beginPosition>2012-03-11T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-14T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:necofs:8448725"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/water_level"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_necofs_8449130">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>41.354202 -70.7675</gml:lowerCorner>
+                  <gml:upperCorner>41.354202 -70.7675</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod27">
+                  <gml:beginPosition>2012-03-11T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-14T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:necofs:8449130"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/water_level"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_necofs_8447435">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>41.68823 -69.95093</gml:lowerCorner>
+                  <gml:upperCorner>41.68823 -69.95093</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod28">
+                  <gml:beginPosition>2012-03-11T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-14T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:necofs:8447435"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/water_level"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_necofs_scituate">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>42.20133 -70.71034</gml:lowerCorner>
+                  <gml:upperCorner>42.20133 -70.71034</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod29">
+                  <gml:beginPosition>2012-03-11T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-14T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:necofs:scituate"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/water_level"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_necofs_scituate_hi_res">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>42.1993 -70.72022</gml:lowerCorner>
+                  <gml:upperCorner>42.1993 -70.72022</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod30">
+                  <gml:beginPosition>2011-04-12T19:58:04Z</gml:beginPosition>
+                  <gml:endPosition>2011-04-16T22:58:04Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:necofs:scituate_hi_res"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/water_level"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_necofs_8410140">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>44.893513 -67.00033</gml:lowerCorner>
+                  <gml:upperCorner>44.893513 -67.00033</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod31">
+                  <gml:beginPosition>2012-03-12T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:necofs:8410140"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/water_level"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_necofs_8411250">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>44.650215 -67.31125</gml:lowerCorner>
+                  <gml:upperCorner>44.650215 -67.31125</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod32">
+                  <gml:beginPosition>2012-03-12T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:necofs:8411250"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/water_level"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_necofs_8413320">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>44.330708 -68.421616</gml:lowerCorner>
+                  <gml:upperCorner>44.330708 -68.421616</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod33">
+                  <gml:beginPosition>2012-03-12T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:necofs:8413320"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/water_level"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_necofs_8418150">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>43.652313 -70.25027</gml:lowerCorner>
+                  <gml:upperCorner>43.652313 -70.25027</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod34">
+                  <gml:beginPosition>2012-03-12T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:necofs:8418150"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/water_level"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_necofs_8419317">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>43.283566 -70.55552</gml:lowerCorner>
+                  <gml:upperCorner>43.283566 -70.55552</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod35">
+                  <gml:beginPosition>2012-03-12T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:necofs:8419317"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/water_level"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_necofs_8447386">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>41.702213 -71.16967</gml:lowerCorner>
+                  <gml:upperCorner>41.702213 -71.16967</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod36">
+                  <gml:beginPosition>2012-03-12T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:necofs:8447386"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/water_level"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_necofs_8447387">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>41.698376 -71.174736</gml:lowerCorner>
+                  <gml:upperCorner>41.698376 -71.174736</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod37">
+                  <gml:beginPosition>2012-03-12T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:necofs:8447387"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/water_level"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_necofs_8452660">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>41.505016 -71.33464</gml:lowerCorner>
+                  <gml:upperCorner>41.505016 -71.33464</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod38">
+                  <gml:beginPosition>2012-03-12T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:necofs:8452660"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/water_level"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_necofs_8454049">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>41.59417 -71.364876</gml:lowerCorner>
+                  <gml:upperCorner>41.59417 -71.364876</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod39">
+                  <gml:beginPosition>2012-03-12T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:necofs:8454049"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/water_level"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_necofs_8452944">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>41.71113 -71.16891</gml:lowerCorner>
+                  <gml:upperCorner>41.71113 -71.16891</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod40">
+                  <gml:beginPosition>2012-03-12T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:necofs:8452944"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/water_level"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_necofs_8461490">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>41.353634 -72.09602</gml:lowerCorner>
+                  <gml:upperCorner>41.353634 -72.09602</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod41">
+                  <gml:beginPosition>2012-03-12T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:necofs:8461490"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/water_level"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_necofs_8465705">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>42.00637 -70.71663</gml:lowerCorner>
+                  <gml:upperCorner>42.00637 -70.71663</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod42">
+                  <gml:beginPosition>2012-03-12T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:necofs:8465705"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/water_level"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_necofs_8467150">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>41.17498 -73.186195</gml:lowerCorner>
+                  <gml:upperCorner>41.17498 -73.186195</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod43">
+                  <gml:beginPosition>2012-03-12T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:necofs:8467150"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/water_level"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_necofs_8510560">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>40.83302 -73.744896</gml:lowerCorner>
+                  <gml:upperCorner>40.83302 -73.744896</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod44">
+                  <gml:beginPosition>2012-03-12T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:necofs:8510560"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/water_level"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_necofs_8516945">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>40.825634 -73.76775</gml:lowerCorner>
+                  <gml:upperCorner>40.825634 -73.76775</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod45">
+                  <gml:beginPosition>2012-03-12T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:necofs:8516945"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/water_level"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+         <sos:ObservationOffering gml:id="observationOffering_necofs_saco">
+            <gml:description/>
+            <gml:boundedBy>
+               <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.5:4326">
+                  <gml:lowerCorner>43.634235 -70.16116</gml:lowerCorner>
+                  <gml:upperCorner>43.634235 -70.16116</gml:upperCorner>
+               </gml:Envelope>
+            </gml:boundedBy>
+            <sos:time>
+               <gml:TimePeriod gml:id="timePeriod46">
+                  <gml:beginPosition>2012-03-12T00:00:00Z</gml:beginPosition>
+                  <gml:endPosition>2012-03-15T00:00:00Z</gml:endPosition>
+               </gml:TimePeriod>
+            </sos:time>
+            <sos:procedure xlink:href="urn:usgs:org:model:necofs:saco"/>
+            <sos:observedProperty xlink:href="http://mmisw.org/cf/parameter/water_level"/>
+            <sos:featureOfInterest xlink:href="http://mmisw.org/mmi/20080516/system#EarthRealm"/>
+            <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
+            <sos:responseMode>inline</sos:responseMode>
+         </sos:ObservationOffering>
+      </sos:ObservationOfferingList>
+   </sos:Contents>
+</sos:Capabilities>
