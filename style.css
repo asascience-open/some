@@ -84,6 +84,7 @@ div.olLayerGoogleCopyright, div.olLayerGooglePoweredBy {
 .obsPopup td {
   font        : 11px tahoma,helvetica,sans-serif;
   padding     : 3px;
+  vertical-align : top;
 }
 
 .tickLabel {

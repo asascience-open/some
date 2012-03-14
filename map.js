@@ -141,7 +141,7 @@ function init() {
           sto.setBaseParam('eventtime',getEventtimeFromEventsComboBox());
         }
         ,load      : function(sto) {
-          Ext.getCmp('observationsGridPanel').getSelectionModel().selectAll();
+          // Ext.getCmp('observationsGridPanel').getSelectionModel().selectAll();
         }
       }
     })
@@ -483,11 +483,6 @@ function initMap() {
 
   map.setCenter(new OpenLayers.LonLat(-10536302.833765,3885808.4963698),4);
 
-  map.events.register('zoomend',this,function() {
-    if (popupObs && !popupObs.isDestroyed) {
-      popupObs.hide();
-    }
-  });
   map.events.register('moveend',this,function() {
     if (popupObs && !popupObs.isDestroyed) {
       popupObs.show();
@@ -648,7 +643,7 @@ function getCaps(url,name) {
             var tr = [
                '<td><b>time&nbsp;range</b></td><td>' + shortDateStringNoTime(isoDateToDate(e.feature.attributes.offering.begin_time)) + '&nbsp;\u2011&nbsp;' + shortDateStringNoTime(isoDateToDate(e.feature.attributes.offering.end_time)) + '</td>'
               ,'<td><b>properties</b></td><td>' + propertiesLinks.join(', ') + '</td>'
-              ,'<td><b>dataset</b></td><td>' + e.feature.attributes.dataset + '</td>'
+              ,'<td><b>dataset</b></td><td>' + e.feature.attributes.dataset + '<br><a href="javascript:setCenterOnPoint(' + e.feature.attributes.offering.llon + ',' + e.feature.attributes.offering.llat + ')">zoom & recenter map to this site</a></td>'
             ];
             popupObs = new Ext.ToolTip({
                title     : e.feature.attributes.dataset + ' : ' + e.feature.attributes.offering.shortName
@@ -771,6 +766,8 @@ function getObsCallback(property,name,url,lon,lat,r) {
 }
 
 function getObs(layerName,url,property,name,lon,lat,drill) {
+  url += Ext.getCmp('parametersComboBox').getStore().getAt(Ext.getCmp('parametersComboBox').getStore().find('id',Ext.getCmp('parametersComboBox').getValue())).get('extraUrl');
+
   logsStore.insert(0,new logsStore.recordType({
      type : 'GetObs'
     ,name : name
