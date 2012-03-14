@@ -180,7 +180,7 @@ function init() {
           sto.setBaseParam('eventtime',getEventtimeFromEventsComboBox());
         }
         ,load      : function(sto) {
-          // Ext.getCmp('modelsGridPanel').getSelectionModel().selectAll();
+          Ext.getCmp('modelsGridPanel').getSelectionModel().selectAll();
         }
       }
     })
