@@ -14,6 +14,7 @@ var logsStore = new Ext.data.ArrayStore({
   }}
 });
 var pendingTransactions = {};
+var viewsReady = 0;
 
 var logsWin;
 
@@ -56,6 +57,11 @@ function init() {
       ,triggerAction  : 'all'
       ,editable       : false
       ,value          : 'Inundation'
+      ,listeners      : {
+        select : function(combo,rec) {
+          runQuery();
+        }
+      }
     })
   });
 
@@ -79,6 +85,11 @@ function init() {
       ,triggerAction  : 'all'
       ,editable       : false
       ,value          : 'Hurricane Ike'
+      ,listeners      : {
+        select : function(combo,rec) {
+          runQuery();
+        }
+      }
     })
   });
 
@@ -88,8 +99,8 @@ function init() {
     ,border          : false
     ,items           : new Ext.form.ComboBox({
       store : new Ext.data.ArrayStore({
-         fields : ['id']
-        ,data   : [['Water level']]
+         fields : ['id','extraUrl']
+        ,data   : [['Water level','&result=VerticalDatum%3D%3Durn:ioos:def:datum:noaa::MSL']]
       })
       ,id             : 'parametersComboBox'
       ,displayField   : 'id'
@@ -99,6 +110,11 @@ function init() {
       ,triggerAction  : 'all'
       ,editable       : false
       ,value          : 'Water level'
+      ,listeners      : {
+        select : function(combo,rec) {
+          runQuery();
+        }
+      }
     })
   });
 
@@ -120,10 +136,14 @@ function init() {
        url       : 'query.php?type=obs'
       ,fields    : ['name','url']
       ,root      : 'data'
-      ,autoLoad  : true
-      ,listeners : {beforeload : function(sto) {
-        sto.setBaseParam('eventtime',getEventtimeFromEventsComboBox());
-      }}
+      ,listeners : {
+        beforeload : function(sto) {
+          sto.setBaseParam('eventtime',getEventtimeFromEventsComboBox());
+        }
+        ,load      : function(sto) {
+          Ext.getCmp('observationsGridPanel').getSelectionModel().selectAll();
+        }
+      }
     })
     ,selModel    : observationsSelModel
     ,autoExpandColumn : 'name'
@@ -133,7 +153,7 @@ function init() {
     ]
     ,hideHeaders : true
     ,listeners   : {viewready : function() {
-      this.getSelectionModel().selectAll();
+      viewReady();
     }}
   });
 
@@ -155,10 +175,14 @@ function init() {
        url       : 'query.php?type=models'
       ,fields    : ['name','url']
       ,root      : 'data'
-      ,autoLoad  : true
-      ,listeners : {beforeload : function(sto) {
-        sto.setBaseParam('eventtime',getEventtimeFromEventsComboBox());
-      }}
+      ,listeners : {
+        beforeload : function(sto) {
+          sto.setBaseParam('eventtime',getEventtimeFromEventsComboBox());
+        }
+        ,load      : function(sto) {
+          Ext.getCmp('modelsGridPanel').getSelectionModel().selectAll();
+        }
+      }
     })
     ,selModel    : modelsSelModel
     ,autoExpandColumn : 'name'
@@ -168,7 +192,7 @@ function init() {
     ]
     ,hideHeaders : true
     ,listeners   : {viewready : function() {
-      this.getSelectionModel().selectAll();
+      viewReady();
     }}
   });
 
@@ -183,7 +207,7 @@ function init() {
             {
                border : false
               ,cls    : 'directionsPanel'
-              ,html   : 'Select a model type, a storm or an event, and a parameter to begin your search.  Then click "Run query".'
+              ,html   : 'Select a model type, a storm or an event, and a parameter to begin your search.'
             }
             ,new Ext.form.FieldSet({
                title : '&nbsp;Model type&nbsp;'
@@ -197,25 +221,12 @@ function init() {
                title : '&nbsp;Parameter&nbsp;'
               ,items : parametersFormPanel
             })
-            ,new Ext.FormPanel({
-               layout      : 'column'
-              ,border      : false
-              ,bodyStyle   : 'padding:0px 0px 10px 0px'
-              ,items       : [
-                 {border : false,columnWidth : 0.20,html : '&nbsp;'}
-                ,new Ext.Button({border : false,columnWidth : 0.60,text : 'Run query',handler : function() {
-                  Ext.getCmp('modelsGridPanel').getStore().load();
-                  Ext.getCmp('observationsGridPanel').getStore().load();
-                }})
-                ,{border : false,columnWidth : 0.20,html : '&nbsp;'}
-              ]
-            })
           ]}
           ,{title : 'Catalog query results',id : 'queryResultsPanel',border : false,bodyStyle : 'padding:5px 5px 0',items : [
             {
                border : false
               ,cls    : 'directionsPanel'
-              ,html   : 'Select models and observations for time series comparisons.  Once you click on a site, it will be used as a pivot point, and any companion datasets that you have checked ON will subsequently be queried.  Only the closest point from each companion dataset will be queried.'
+              ,html   : 'Select models and observations for time series comparisons.  Once you click on a site, it will be used as a pivot point, and any companion datasets that you have checked ON will subsequently be queried.  Only the closest point from each companion dataset will be queried.<br><b>HINT:</b> Choosing an observation site as the pivot point may yield the best results since they are more likely to have a more complex set of potential properties.'
             }
             ,new Ext.form.FieldSet({
                title : '&nbsp;Model datasets&nbsp;'
@@ -230,7 +241,7 @@ function init() {
           ]}
         ]
         ,listeners        : {afterrender : function() {this.addListener('bodyresize',function(p,w,h) {
-          var targetH = h - Ext.getCmp('queryResultsPanel').getPosition()[1] - 210; 
+          var targetH = h - Ext.getCmp('queryResultsPanel').getPosition()[1] - 245; 
           targetH < 80 ? targetH = 80 : null;
           Ext.getCmp('observationsGridPanel').setHeight(targetH / 2);
           Ext.getCmp('modelsGridPanel').setHeight(targetH / 2);
@@ -471,6 +482,17 @@ function initMap() {
   ));
 
   map.setCenter(new OpenLayers.LonLat(-10536302.833765,3885808.4963698),4);
+
+  map.events.register('zoomend',this,function() {
+    if (popupObs && !popupObs.isDestroyed) {
+      popupObs.hide();
+    }
+  });
+  map.events.register('moveend',this,function() {
+    if (popupObs && !popupObs.isDestroyed) {
+      popupObs.show();
+    }
+  });
 }
 
 function renderName(val,metadata,rec) {
@@ -942,4 +964,31 @@ function getEventtimeFromEventsComboBox() {
       + dMax.getUTCFullYear() + '-' + String.leftPad(dMax.getUTCMonth() + 1,2,'0') + '-' + String.leftPad(dMax.getUTCDate(),2,'0') + 'T' + String.leftPad(dMax.getUTCHours(),2,'0') + ':00:00Z';
   }
   return eventtime;
+}
+
+function runQuery() {
+  var selMod = Ext.getCmp('modelsGridPanel').getSelectionModel();
+  var selObs = Ext.getCmp('observationsGridPanel').getSelectionModel();
+
+  if (selMod.getSelections().length + selObs.getSelections().length > 0) {
+    Ext.MessageBox.confirm('Comfirm map reset','You have changed your filter options; the map must be reset.  Are you sure you wish to continue?',function(but) {
+      if (but == 'yes') {
+        selMod.clearSelections();
+        selObs.clearSelections(); 
+        Ext.getCmp('modelsGridPanel').getStore().load();
+        Ext.getCmp('observationsGridPanel').getStore().load();
+      }
+    });
+  }
+  else {
+    Ext.getCmp('modelsGridPanel').getStore().load();
+    Ext.getCmp('observationsGridPanel').getStore().load();
+  }
+}
+
+function viewReady() {
+  viewsReady++;
+  if (viewsReady == 2) {
+    runQuery();
+  }
 }
