@@ -226,7 +226,7 @@ function init() {
             {
                border : false
               ,cls    : 'directionsPanel'
-              ,html   : 'Select models and observations for time series comparisons.  Once you click on a site, it will be used as a pivot point, and any companion datasets that you have checked ON will subsequently be queried.  Only the closest point from each companion dataset will be queried.<br><b>HINT:</b> Choosing an observation site as the pivot point may yield the best results since they are more likely to have a more complex set of potential properties.'
+              ,html   : 'Select models and observations for time series comparisons.  Once you click on a site, it will be used as a pivot point, and any companion datasets that you have checked ON will subsequently be queried.  Only the closest point from each companion dataset will be queried.'
             }
             ,new Ext.form.FieldSet({
                title : '&nbsp;Model datasets&nbsp;'
@@ -241,7 +241,7 @@ function init() {
           ]}
         ]
         ,listeners        : {afterrender : function() {this.addListener('bodyresize',function(p,w,h) {
-          var targetH = h - Ext.getCmp('queryResultsPanel').getPosition()[1] - 245; 
+          var targetH = h - Ext.getCmp('queryResultsPanel').getPosition()[1] - 210; 
           targetH < 80 ? targetH = 80 : null;
           Ext.getCmp('observationsGridPanel').setHeight(targetH / 2);
           Ext.getCmp('modelsGridPanel').setHeight(targetH / 2);
