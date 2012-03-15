@@ -1013,6 +1013,9 @@ function runQuery() {
         selObs.clearSelections(); 
         Ext.getCmp('modelsGridPanel').getStore().load();
         Ext.getCmp('observationsGridPanel').getStore().load();
+        if (popupObs && !popupObs.isDestroyed) {
+          popupObs.hide();
+        }
       }
     });
   }
