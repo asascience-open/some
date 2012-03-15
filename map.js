@@ -99,8 +99,8 @@ function init() {
     ,border          : false
     ,items           : new Ext.form.ComboBox({
       store : new Ext.data.ArrayStore({
-         fields : ['id','extraUrl']
-        ,data   : [['Water level','&result=VerticalDatum%3D%3Durn:ioos:def:datum:noaa::MSL']]
+         fields : ['id']
+        ,data   : [['Water level']]
       })
       ,id             : 'parametersComboBox'
       ,displayField   : 'id'
@@ -519,9 +519,12 @@ function getCaps(url,name,type) {
       for (var p in properties) {
         if (targetProperties) {
           for (var j = 0; j < targetProperties.length; j++) {
-            plot = plot || targetProperties[j] == p;
-            if (targetProperties[j] == p) {
-              tp.push(p);
+            plot = plot || targetProperties[j].prop == p;
+            if (targetProperties[j].prop == p) {
+              tp.push({
+                 prop        : p
+                ,getObsExtra : targetProperties[j].getObsExtra
+              });
             }
           }
         }
@@ -715,8 +718,8 @@ function getCaps(url,name,type) {
     }));
 
     OpenLayers.Request.issue({
-//       url      : url
-       url      : 'get.php?u=' + encodeURIComponent(url)
+       url      : url
+//       url      : 'get.php?u=' + encodeURIComponent(url)
       ,callback : OpenLayers.Function.bind(getCapsCallback,null,l,url,type)
     });
   }
@@ -786,7 +789,10 @@ function getObsCallback(property,name,url,lon,lat,r) {
 }
 
 function getObs(layerName,url,property,name,lon,lat,drill) {
+// foo
+/*
   url += Ext.getCmp('parametersComboBox').getStore().getAt(Ext.getCmp('parametersComboBox').getStore().find('id',Ext.getCmp('parametersComboBox').getValue())).get('extraUrl');
+*/
 
   logsStore.insert(0,new logsStore.recordType({
      type : 'GetObs'
@@ -819,7 +825,9 @@ function getObs(layerName,url,property,name,lon,lat,drill) {
           var props       = [];
           for (var p in properties) {
             props.push(p);
-            if (p == property || (f.attributes.targetProperties && f.attributes.targetProperties.length == 1 && f.attributes.targetProperties[0] == p)) {
+            if (p == property || (
+              f.attributes.targetProperties && f.attributes.targetProperties.length == 1 && f.attributes.targetProperties[0].prop == p)
+            ) {
               getObsFired = true;
               getObs(f.layer.name,properties[p],p,f.attributes.offering.shortName + ' ' + f.attributes.dataset,f.attributes.offering.llon,f.attributes.offering.llat,false);
             }
