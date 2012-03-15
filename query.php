@@ -19,10 +19,8 @@
       ,'maxT' => date('Y-m-d',$today + 3600 * 24 * 2).'T'.date('H:i:s',$today + 3600 * 24 * 2).'Z'
       ,'properties' => array(
         'Water level' => array(
-          array(
-             'prop'        => 'http://mmisw.org/cf/parameter/water_level'
-            ,'getObsExtra' => '&result=VerticalDatum==urn:ogc:def:datum:epsg::MSL'
-          )
+           'prop'        => 'http://mmisw.org/cf/parameter/water_level'
+          ,'getObsExtra' => '&result=VerticalDatum==urn:ioos:def:datum:noaa::MSL'
         )
       )
     )
@@ -34,10 +32,8 @@
       ,'maxT' => '2008-09-16T00:00Z'
       ,'properties' => array(
         'Water level' => array(
-          array(
-             'prop'        => 'watlev'
-            ,'getObsExtra' => '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
-          )
+           'prop'        => 'watlev'
+          ,'getObsExtra' => '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
         )
       )
     )
@@ -52,10 +48,8 @@
       ,'maxT' => date('Y-m-d',$today + 3600 * 24 * 2).'T'.date('H:i:s',$today + 3600 * 24 * 2).'Z'
       ,'properties' => array(
         'Water level' => array(
-          array(
-             'prop'        => 'http://mmisw.org/ont/cf/parameter/water_surface_height_above_reference_datum'
-            ,'getObsExtra' => ''
-          )
+           'prop'        => 'http://mmisw.org/ont/cf/parameter/water_surface_height_above_reference_datum'
+          ,'getObsExtra' => ''
         )
       )
     )
@@ -67,10 +61,8 @@
       ,'maxT' => '2008-09-16T00:00Z'
       ,'properties' => array(
         'Water level' => array(
-          array(
-             'prop'        => 'watlev'
-            ,'getObsExtra' => '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
-          )
+           'prop'        => 'watlev'
+          ,'getObsExtra' => '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
         )
       )
     )

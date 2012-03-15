@@ -515,17 +515,15 @@ function getCaps(url,name,type) {
     for (var i = 0; i < sos.offerings.length; i++) {
       var properties = getProperties({offering : sos.offerings[i]});
       var plot = false;
-      var tp = [];
+      var tp = {};
       for (var p in properties) {
         if (targetProperties) {
-          for (var j = 0; j < targetProperties.length; j++) {
-            plot = plot || targetProperties[j].prop == p;
-            if (targetProperties[j].prop == p) {
-              tp.push({
-                 prop        : p
-                ,getObsExtra : targetProperties[j].getObsExtra
-              });
-            }
+          plot = plot || targetProperties.prop == p;
+          if (targetProperties.prop == p) {
+            tp = {
+               prop        : p
+              ,getObsExtra : targetProperties.getObsExtra
+            };
           }
         }
       }
@@ -661,7 +659,7 @@ function getCaps(url,name,type) {
               var shortP = p.split('/');
               shortP = shortP[shortP.length-1];
               shortP = shortP.substr(0,40) + (shortP.length > 40 ? '...' : '');
-              propertiesLinks.push('<a href="#" onclick="getObs(\'' + e.feature.layer.name + '\',\'' + properties[p] + '\',\'' + p + '\',\'' + e.feature.attributes.offering.shortName + ' ' + e.feature.attributes.dataset + '\',' + e.feature.attributes.offering.llon + ',' + e.feature.attributes.offering.llat + ',true)">' + shortP + '</a>');
+              propertiesLinks.push('<a href="#" onclick="getObs(\'' + e.feature.layer.name + '\',\'' + properties[p] + '\',\'' + p + '\',\'' + e.feature.attributes.offering.shortName + ' ' + e.feature.attributes.dataset + '\',' + e.feature.attributes.offering.llon + ',' + e.feature.attributes.offering.llat + ',true,\'' + (e.feature.attributes.targetProperties ? e.feature.attributes.targetProperties.getObsExtra : '') + '\')">' + shortP + '</a>');
             }
             var tr = [
                '<td><b>time&nbsp;range</b></td><td>' + shortDateStringNoTime(isoDateToDate(e.feature.attributes.offering.begin_time)) + '&nbsp;\u2011&nbsp;' + shortDateStringNoTime(isoDateToDate(e.feature.attributes.offering.end_time)) + '</td>'
@@ -788,11 +786,8 @@ function getObsCallback(property,name,url,lon,lat,r) {
   Ext.getCmp('timeseriesPanel').fireEvent('resize',Ext.getCmp('timeseriesPanel'));
 }
 
-function getObs(layerName,url,property,name,lon,lat,drill) {
-// foo
-/*
-  url += Ext.getCmp('parametersComboBox').getStore().getAt(Ext.getCmp('parametersComboBox').getStore().find('id',Ext.getCmp('parametersComboBox').getValue())).get('extraUrl');
-*/
+function getObs(layerName,url,property,name,lon,lat,drill,getObsExtra) {
+  url += getObsExtra;
 
   logsStore.insert(0,new logsStore.recordType({
      type : 'GetObs'
@@ -806,7 +801,6 @@ function getObs(layerName,url,property,name,lon,lat,drill) {
     ,callback : OpenLayers.Function.bind(getObsCallback,null,property,name,url,lon,lat)
   });
 
-  // if this is an obs, go find the nearest model point to plot
   if (drill) {
     var p0 = new OpenLayers.Geometry.Point(lon,lat).transform(proj4326,map.getProjectionObject());
     for (var i = 0; i < map.layers.length; i++) {
@@ -825,11 +819,18 @@ function getObs(layerName,url,property,name,lon,lat,drill) {
           var props       = [];
           for (var p in properties) {
             props.push(p);
-            if (p == property || (
-              f.attributes.targetProperties && f.attributes.targetProperties.length == 1 && f.attributes.targetProperties[0].prop == p)
-            ) {
+            if (p == property || (f.attributes.targetProperties && f.attributes.targetProperties.prop == p)) {
               getObsFired = true;
-              getObs(f.layer.name,properties[p],p,f.attributes.offering.shortName + ' ' + f.attributes.dataset,f.attributes.offering.llon,f.attributes.offering.llat,false);
+              getObs(
+                 f.layer.name
+                ,properties[p]
+                ,p
+                ,f.attributes.offering.shortName + ' ' + f.attributes.dataset
+                ,f.attributes.offering.llon
+                ,f.attributes.offering.llat
+                ,false
+                ,getObsExtra
+              );
             }
           }
           if (!getObsFired) {
@@ -848,6 +849,7 @@ function getObs(layerName,url,property,name,lon,lat,drill) {
                 ,f.attributes.dataset
                 ,f.attributes.offering.llon
                 ,f.attributes.offering.llat
+                ,getObsExtra
               ]);
             }
             new Ext.Window({
@@ -864,7 +866,7 @@ function getObs(layerName,url,property,name,lon,lat,drill) {
                   ,{html : '<img src="img/blank.png" height=8>',border : false}
                   ,new Ext.form.FieldSet({title : '&nbsp;Available variables&nbsp;',items : new Ext.form.ComboBox({
                      store          : new Ext.data.ArrayStore({
-                       fields : ['short','id','layerName','url','shortName','dataset','llon','llat']
+                       fields : ['short','id','layerName','url','shortName','dataset','llon','llat','getObsExtra']
                       ,data   : data
                     })
                     ,displayField   : 'short'
@@ -883,7 +885,16 @@ function getObs(layerName,url,property,name,lon,lat,drill) {
                     var idx   = sto.find('id',combo.getValue());
                     if (idx >= 0) {
                       var rec = sto.getAt(idx);
-                      getObs(rec.get('layerName'),rec.get('url'),rec.get('id'),rec.get('shortName') + ' ' + rec.get('dataset'),rec.get('llon'),rec.get('llat'),false);
+                      getObs(
+                         rec.get('layerName')
+                        ,rec.get('url')
+                        ,rec.get('id')
+                        ,rec.get('shortName') + ' ' + rec.get('dataset')
+                        ,rec.get('llon')
+                        ,rec.get('llat')
+                        ,false
+                        ,rec.get('getObsExtra')
+                      );
                       this.findParentByType('window').close();
                     }
                   }}
