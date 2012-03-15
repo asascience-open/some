@@ -715,8 +715,8 @@ function getCaps(url,name,type) {
     }));
 
     OpenLayers.Request.issue({
-       url      : url
-//       url      : 'get.php?u=' + encodeURIComponent(url)
+//       url      : url
+       url      : 'get.php?u=' + encodeURIComponent(url)
       ,callback : OpenLayers.Function.bind(getCapsCallback,null,l,url,type)
     });
   }
