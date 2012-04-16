@@ -746,6 +746,7 @@ function getObsCallback(property,name,url,lon,lat,r) {
   delete pendingTransactions[url];
   var sos = new SOSObservation(new OpenLayers.Format.XML().read(r.responseText));
   if (sos.type === 'EXCEPTION') {
+    graphLoadendUnmask(url);
     Ext.Msg.alert('SOS exception',sos.exception_error);
     return;
   }
