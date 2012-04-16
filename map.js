@@ -139,9 +139,10 @@ function init() {
       ,listeners : {
         beforeload : function(sto) {
           sto.setBaseParam('eventtime',getEventtimeFromEventsComboBox());
+          Ext.getCmp('observationsGridPanel').getEl().mask('<table><tr><td>Loading...&nbsp;</td><td><img src="js/ext-3.3.0/resources/images/default/grid/loading.gif"></td></tr></table>');
         }
         ,load      : function(sto) {
-          // Ext.getCmp('observationsGridPanel').getSelectionModel().selectAll();
+          Ext.getCmp('observationsGridPanel').getEl().unmask();
         }
       }
     })
@@ -178,9 +179,11 @@ function init() {
       ,listeners : {
         beforeload : function(sto) {
           sto.setBaseParam('eventtime',getEventtimeFromEventsComboBox());
+          Ext.getCmp('modelsGridPanel').getEl().mask('<table><tr><td>Loading...&nbsp;</td><td><img src="js/ext-3.3.0/resources/images/default/grid/loading.gif"></td></tr></table>');
         }
         ,load      : function(sto) {
           Ext.getCmp('modelsGridPanel').getSelectionModel().selectAll();
+          Ext.getCmp('modelsGridPanel').getEl().unmask();
         }
       }
     })
