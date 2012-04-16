@@ -52,7 +52,7 @@
     $q = queryCatalog('Imeds CRMS watlev_CRMS_2008.F.C.IMEDS');
     for ($i = 0; $i < count($q); $i++) {
       array_push($obs,array(
-         'name' => 'model.'.$q[$i]['title']
+         'name' => 'obs.'.$q[$i]['title']
         ,'url'  => $q[$i]['sosGetCaps']
         ,'minT' => $q[$i]['sosTemporalBbox'][0]
         ,'maxT' => $q[$i]['sosTemporalBbox'][1]
