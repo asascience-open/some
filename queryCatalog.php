@@ -17,6 +17,7 @@
   $gmdNs = 'http://www.isotc211.org/2005/gmd';
   $srvNs = 'http://www.isotc211.org/2005/srv';
   $gcoNs = 'http://www.isotc211.org/2005/gco';
+  $gmlNs = 'http://www.opengis.net/gml/3.2';
 
   $d = array();
   foreach ($xml->children($cswNs)->{'SearchResults'} as $searchResults) {
@@ -29,6 +30,18 @@
         foreach ($identificationInfo->children($srvNs)->{'SV_ServiceIdentification'} as $serviceIdentification) {
           if (sprintf("%s",$serviceIdentification->attributes()->{'id'}) == 'OGC-SOS') {
             $m['sosGetCaps'] = sprintf("%s",$serviceIdentification->children($srvNs)->{'containsOperations'}[0]->children($srvNs)->{'SV_OperationMetadata'}->children($srvNs)->{'connectPoint'}->children($gmdNs)->{'CI_OnlineResource'}->children($gmdNs)->{'linkage'}->children($gmdNs)->{'URL'});
+            $eXGeographicBoundingBoxChildren = $serviceIdentification->children($srvNs)->{'extent'}[0]->children($gmdNs)->{'EX_Extent'}[0]->children($gmdNs)->{'geographicElement'}[0]->children($gmdNs)->{'EX_GeographicBoundingBox'}[0]->children($gmdNs);
+            $m['sosGeographicBbox'] = array(
+               sprintf("%s",$eXGeographicBoundingBoxChildren->{'westBoundLongitude'}->children($gcoNs)->{'Decimal'})
+              ,sprintf("%s",$eXGeographicBoundingBoxChildren->{'southBoundLatitude'}->children($gcoNs)->{'Decimal'})
+              ,sprintf("%s",$eXGeographicBoundingBoxChildren->{'eastBoundLongitude'}->children($gcoNs)->{'Decimal'})
+              ,sprintf("%s",$eXGeographicBoundingBoxChildren->{'northBoundLatitude'}->children($gcoNs)->{'Decimal'})
+            );
+            $timePeriodChildren = $serviceIdentification->children($srvNs)->{'extent'}[0]->children($gmdNs)->{'EX_Extent'}[0]->children($gmdNs)->{'temporalElement'}[0]->children($gmdNs)->{'EX_TemporalExtent'}[0]->children($gmdNs)->{'extent'}[0]->children($gmlNs)->{'TimePeriod'}->children($gmlNs);
+            $m['sosTemporalBbox'] = array(
+               sprintf("%s",$timePeriodChildren->{'beginPosition'})
+              ,sprintf("%s",$timePeriodChildren->{'endPosition'})
+            );
           }
         } 
       }
