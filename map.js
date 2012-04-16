@@ -7,6 +7,7 @@ var hiliteCtl;
 var popupObs;
 var popupCtl;
 var chartData = [];
+var chartUrls = {};
 var logsStore = new Ext.data.ArrayStore({
    fields    : ['type','name','url','t']
   ,listeners : {add : function(store,recs,idx) {
@@ -786,10 +787,22 @@ function getObsCallback(property,name,url,lon,lat,r) {
     });
   }
   Ext.getCmp('timeseriesPanel').fireEvent('resize',Ext.getCmp('timeseriesPanel'));
+
+  delete chartUrls[url];
+  var hits = 0;
+  for (var i in chartUrls) {
+    hits++;
+  }
+  if (hits == 0) {
+    graphLoadendUnmask();
+  }
 }
 
 function getObs(layerName,url,property,name,lon,lat,drill,getObsExtra) {
   url += getObsExtra;
+
+  graphLoadstartMask();
+  chartUrls[url] = true;
 
   logsStore.insert(0,new logsStore.recordType({
      type : 'GetObs'
@@ -1032,4 +1045,12 @@ function viewReady() {
   if (viewsReady == 2) {
     runQuery();
   }
+}
+
+function graphLoadstartMask() {
+  Ext.getCmp('timeseriesPanel').getEl().mask('<table><tr><td>Updating graph...&nbsp;</td><td><img src="js/ext-3.3.0/resources/images/default/grid/loading.gif"></td></tr></table>','mask');
+}
+
+function graphLoadendUnmask() {
+  Ext.getCmp('timeseriesPanel').getEl().unmask();
 }
