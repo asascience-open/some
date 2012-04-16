@@ -10,8 +10,13 @@
     ,$eventTime[1]
   );
 
-  $models = array(
-    array(
+  $providers = explode(',',$_REQUEST['providers']);
+
+  $models = array();
+  $obs    = array();
+
+  if (in_array('gomaine',$providers)) {
+    array_push($models,array(
        'name' => 'model.elevation_gomaine.nc'
       ,'url'  => 'xml/elevation_gomaine.xml'
       // ,'url' => 'http://mcqueen.gomoos.org:8080/oostethys/sos?VERSION=1.0.0&SERVICE=SOS&REQUEST=GetCapabilities'
@@ -23,8 +28,11 @@
           ,'getObsExtra' => '&result=VerticalDatum==urn:ioos:def:datum:noaa::MSL'
         )
       )
-    )
-    ,array(
+    ));
+  }
+
+  if (in_array('sura',$providers)) {
+    array_push($models,array(
        'name' => 'model.watlev_CRMS_2008.F.C__IKE_VIMS_3D_WITHWAVE.nc'
       ,'url'  => 'xml/model.watlev_CRMS_2008.F.C__IKE_VIMS_3D_WITHWAVE.nc.getcaps.xml'
       // ,'url' => 'http://testbedapps-dev.sura.org/thredds/sos/alldata/acrosby/watlev_CRMS_2008.F.C__IKE_VIMS_3D_WITHWAVE.nc?service=sos&version=1.0.0&request=GetCapabilities'
@@ -36,24 +44,8 @@
           ,'getObsExtra' => '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
         )
       )
-    )
-  );
-
-  $obs = array(
-    array(
-       'name' => 'obs.coops'
-      ,'url'  => 'xml/coops.xml'
-      // ,'url' => 'http://opendap.co-ops.nos.noaa.gov/ioos-dif-sos/SOS?service=SOS&request=GetCapabilities'
-      ,'minT' => '1970-02-01T00:00Z'
-      ,'maxT' => date('Y-m-d',$today + 3600 * 24 * 2).'T'.date('H:i:s',$today + 3600 * 24 * 2).'Z'
-      ,'properties' => array(
-        'Water level' => array(
-           'prop'        => 'http://mmisw.org/ont/cf/parameter/water_surface_height_above_reference_datum'
-          ,'getObsExtra' => ''
-        )
-      )
-    )
-    ,array(
+    ));
+    array_push($obs,array(
        'name' => 'obs.watlev_CRMS_2008.F.C.nc'
       ,'url'  => 'xml/obs.watlev_CRMS_2008.F.C.nc.getcaps.xml'
       // ,'url' => 'http://testbedapps-dev.sura.org/thredds/sos/alldata/acrosby/watlev_CRMS_2008.F.C.nc?service=sos&version=1.0.0&request=GetCapabilities'
@@ -65,8 +57,24 @@
           ,'getObsExtra' => '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
         )
       )
-    )
-  );
+    ));
+  }
+
+  if (in_array('coops',$providers)) {
+    array_push($obs,array(
+       'name' => 'obs.coops'
+      ,'url'  => 'xml/coops.xml'
+      // ,'url' => 'http://opendap.co-ops.nos.noaa.gov/ioos-dif-sos/SOS?service=SOS&request=GetCapabilities'
+      ,'minT' => '1970-02-01T00:00Z'
+      ,'maxT' => date('Y-m-d',$today + 3600 * 24 * 2).'T'.date('H:i:s',$today + 3600 * 24 * 2).'Z'
+      ,'properties' => array(
+        'Water level' => array(
+           'prop'        => 'http://mmisw.org/ont/cf/parameter/water_surface_height_above_reference_datum'
+          ,'getObsExtra' => ''
+        )
+      )
+    ));
+  }
 
   $data = array();
   if ($_REQUEST['type'] == 'models') {
