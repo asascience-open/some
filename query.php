@@ -38,7 +38,7 @@
     for ($i = 0; $i < count($q); $i++) {
       array_push($models,array(
          'name' => 'model.'.$q[$i]['title']
-        ,'url'  => $q[$i]['sosGetCaps']
+        ,'url'  => $q[$i]['sosGetCaps'].'&useCache=true'
         ,'minT' => $q[$i]['sosTemporalBbox'][0]
         ,'maxT' => $q[$i]['sosTemporalBbox'][1]
         ,'properties' => array(
@@ -53,7 +53,7 @@
     for ($i = 0; $i < count($q); $i++) {
       array_push($obs,array(
          'name' => 'obs.'.$q[$i]['title']
-        ,'url'  => $q[$i]['sosGetCaps']
+        ,'url'  => $q[$i]['sosGetCaps'].'&useCache=true'
         ,'minT' => $q[$i]['sosTemporalBbox'][0]
         ,'maxT' => $q[$i]['sosTemporalBbox'][1]
         ,'properties' => array(
