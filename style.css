@@ -103,3 +103,6 @@ div.olLayerGoogleCopyright, div.olLayerGooglePoweredBy {
 #timeseriesPanel td {
   font : 11px/13px tahoma,helvetica,sans-serif;
 }
+#mapPanel td {
+  font : 11px/13px tahoma,helvetica,sans-serif;
+}

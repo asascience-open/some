@@ -248,7 +248,6 @@ function init() {
           {
              text    : 'View transaction logs'
             ,icon    : 'img/file_extension_log.png'
-            ,id      : 'transactionLogsButton'
             ,handler : function() {
               if (!logsWin || !logsWin.isVisible()) {
                 logsWin = new Ext.Window({
@@ -303,6 +302,7 @@ function init() {
           {
              split     : true
             ,region    : 'center'
+            ,id        : 'mapPanel'
             ,html      : '<div id="map"></div>'
             ,listeners : {
               afterrender : function(p) {
@@ -970,15 +970,6 @@ function refreshTimer() {
       rec.set('t',rec.get('t') + 1);
       rec.commit();
       hits++;
-    }
-  }
-  var el = Ext.getCmp('transactionLogsButton');
-  if (el) {
-    if (hits > 0) {
-      el.setIcon('img/blueSpinner.gif');
-    }
-    else {
-      el.setIcon('img/file_extension_log.png');
     }
   }
   setTimeout('refreshTimer()', 1000);
