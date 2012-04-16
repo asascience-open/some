@@ -8,6 +8,7 @@ var popupObs;
 var popupCtl;
 var chartData = [];
 var chartUrls = {};
+var layerUrls = {};
 var logsStore = new Ext.data.ArrayStore({
    fields    : ['type','name','url','t']
   ,listeners : {add : function(store,recs,idx) {
@@ -428,7 +429,7 @@ function initMap() {
   OpenLayers.Layer.Google.v3.setGMapVisibility = function(visible) {
     var cache = OpenLayers.Layer.Google.cache[this.map.id];
     if (visible && cache && cache.resized) {
-      google.maps.event.trigger(this.mapObject, "resize");
+      google.maps.event.trigger(this.mapObject,'resize');
       delete cache.resized;
     }
     OpenLayers.Layer.Google.v3.setGMapVisibility_old.apply(this,arguments);
@@ -508,6 +509,7 @@ function getCaps(url,name,type) {
     delete pendingTransactions[url];
     var sos = new SOSCapabilities(new OpenLayers.Format.XML().read(r.responseText));
     if (sos.type === 'EXCEPTION') {
+      l.events.triggerEvent('loadend');
       Ext.Msg.alert('SOS exception',sos.exception_error);
       return;
     }
@@ -541,6 +543,8 @@ function getCaps(url,name,type) {
         l.addFeatures(f);
       }
     }
+
+    l.events.triggerEvent('loadend');
   }
 
   var l = map.getLayersByName(name)[0];
@@ -606,6 +610,15 @@ function getCaps(url,name,type) {
         })
       }
     );
+    l.events.register('loadstart',this,function(e) {
+      layerLoadstartMask(l.name);
+    });
+    l.events.register('loadend',this,function(e) {
+      layerLoadendUnmask(l.name);
+    });
+    l.events.register('visibilitychanged',this,function(e) {
+      layerLoadendUnmask(l.name);
+    });
     map.addLayer(l);
 
     if (!hiliteCtl) {
@@ -718,6 +731,7 @@ function getCaps(url,name,type) {
       ,t    : 0
     }));
 
+    l.events.triggerEvent('loadstart');
     OpenLayers.Request.issue({
        url      : 'get.php?u=' + encodeURIComponent(url)
       ,callback : OpenLayers.Function.bind(getCapsCallback,null,l,url,type)
@@ -787,21 +801,13 @@ function getObsCallback(property,name,url,lon,lat,r) {
   }
   Ext.getCmp('timeseriesPanel').fireEvent('resize',Ext.getCmp('timeseriesPanel'));
 
-  delete chartUrls[url];
-  var hits = 0;
-  for (var i in chartUrls) {
-    hits++;
-  }
-  if (hits == 0) {
-    graphLoadendUnmask();
-  }
+  graphLoadendUnmask(url);
 }
 
 function getObs(layerName,url,property,name,lon,lat,drill,getObsExtra) {
   url += getObsExtra;
 
-  graphLoadstartMask();
-  chartUrls[url] = true;
+  graphLoadstartMask(url);
 
   logsStore.insert(0,new logsStore.recordType({
      type : 'GetObs'
@@ -1037,10 +1043,34 @@ function viewReady() {
   }
 }
 
-function graphLoadstartMask() {
+function graphLoadstartMask(url) {
+  chartUrls[url] = true;
   Ext.getCmp('timeseriesPanel').getEl().mask('<table><tr><td>Updating graph...&nbsp;</td><td><img src="js/ext-3.3.0/resources/images/default/grid/loading.gif"></td></tr></table>','mask');
 }
 
-function graphLoadendUnmask() {
-  Ext.getCmp('timeseriesPanel').getEl().unmask();
+function graphLoadendUnmask(url) {
+  delete chartUrls[url];
+  var hits = 0;
+  for (var i in chartUrls) {
+    hits++;
+  }
+  if (hits == 0) {
+    Ext.getCmp('timeseriesPanel').getEl().unmask();
+  }
+}
+
+function layerLoadstartMask(url) {
+  layerUrls[url] = true;
+  Ext.getCmp('mapPanel').getEl().mask('<table><tr><td>Updating map...&nbsp;</td><td><img src="js/ext-3.3.0/resources/images/default/grid/loading.gif"></td></tr></table>','mask');
+}
+
+function layerLoadendUnmask(url) {
+  delete layerUrls[url];
+  var hits = 0;
+  for (var i in layerUrls) {
+    hits++;
+  }
+  if (hits == 0) {
+    Ext.getCmp('mapPanel').getEl().unmask();
+  }
 }
