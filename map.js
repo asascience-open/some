@@ -133,7 +133,7 @@ function init() {
      height      : 50
     ,id          : 'observationsGridPanel'
     ,store : new Ext.data.JsonStore({
-       url       : 'query.php?type=obs'
+       url       : 'query.php?type=obs&providers=coops,sura'
       ,fields    : ['name','url','properties']
       ,root      : 'data'
       ,listeners : {
@@ -172,7 +172,7 @@ function init() {
      height      : 50
     ,id          : 'modelsGridPanel'
     ,store : new Ext.data.JsonStore({
-       url       : 'query.php?type=models'
+       url       : 'query.php?type=models&providers=gomaine,sura'
       ,fields    : ['name','url','properties']
       ,root      : 'data'
       ,listeners : {
@@ -716,8 +716,7 @@ function getCaps(url,name,type) {
     }));
 
     OpenLayers.Request.issue({
-       url      : url
-//       url      : 'get.php?u=' + encodeURIComponent(url)
+       url      : 'get.php?u=' + encodeURIComponent(url)
       ,callback : OpenLayers.Function.bind(getCapsCallback,null,l,url,type)
     });
   }

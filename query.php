@@ -1,4 +1,6 @@
 <?php
+  include_once('utils.php');
+
   header('Content-type:application/json');
 
   date_default_timezone_set('UTC');
@@ -32,32 +34,36 @@
   }
 
   if (in_array('sura',$providers)) {
-    array_push($models,array(
-       'name' => 'model.watlev_CRMS_2008.F.C__IKE_VIMS_3D_WITHWAVE.nc'
-      ,'url'  => 'xml/model.watlev_CRMS_2008.F.C__IKE_VIMS_3D_WITHWAVE.nc.getcaps.xml'
-      // ,'url' => 'http://testbedapps-dev.sura.org/thredds/sos/alldata/acrosby/watlev_CRMS_2008.F.C__IKE_VIMS_3D_WITHWAVE.nc?service=sos&version=1.0.0&request=GetCapabilities'
-      ,'minT' => '2008-09-08T00:30Z'
-      ,'maxT' => '2008-09-16T00:00Z'
-      ,'properties' => array(
-        'Water level' => array(
-           'prop'        => 'watlev'
-          ,'getObsExtra' => '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
+    $q = queryCatalog('Imeds CRMS watlev_CRMS_2008.F.C__IKE_VIMS_3D_WITHWAVE.IMEDS');
+    for ($i = 0; $i < count($q); $i++) {
+      array_push($models,array(
+         'name' => 'model.'.$q[$i]['title']
+        ,'url'  => $q[$i]['sosGetCaps']
+        ,'minT' => $q[$i]['sosTemporalBbox'][0]
+        ,'maxT' => $q[$i]['sosTemporalBbox'][1]
+        ,'properties' => array(
+          'Water level' => array(
+             'prop'        => 'watlev'
+            ,'getObsExtra' => '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
+          )
         )
-      )
-    ));
-    array_push($obs,array(
-       'name' => 'obs.watlev_CRMS_2008.F.C.nc'
-      ,'url'  => 'xml/obs.watlev_CRMS_2008.F.C.nc.getcaps.xml'
-      // ,'url' => 'http://testbedapps-dev.sura.org/thredds/sos/alldata/acrosby/watlev_CRMS_2008.F.C.nc?service=sos&version=1.0.0&request=GetCapabilities'
-      ,'minT' => '2008-09-08T00:30Z'
-      ,'maxT' => '2008-09-16T00:00Z'
-      ,'properties' => array(
-        'Water level' => array(
-           'prop'        => 'watlev'
-          ,'getObsExtra' => '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
+      ));
+    }
+    $q = queryCatalog('Imeds CRMS watlev_CRMS_2008.F.C.IMEDS');
+    for ($i = 0; $i < count($q); $i++) {
+      array_push($obs,array(
+         'name' => 'model.'.$q[$i]['title']
+        ,'url'  => $q[$i]['sosGetCaps']
+        ,'minT' => $q[$i]['sosTemporalBbox'][0]
+        ,'maxT' => $q[$i]['sosTemporalBbox'][1]
+        ,'properties' => array(
+          'Water level' => array(
+             'prop'        => 'watlev'
+            ,'getObsExtra' => '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
+          )
         )
-      )
-    ));
+      ));
+    }
   }
 
   if (in_array('coops',$providers)) {
