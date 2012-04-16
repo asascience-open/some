@@ -244,6 +244,50 @@ function init() {
             })
           ]}
         ]
+        ,bbar : [
+          {
+             text    : 'View transaction logs'
+            ,icon    : 'img/file_extension_log.png'
+            ,id      : 'transactionLogsButton'
+            ,handler : function() {
+              if (!logsWin || !logsWin.isVisible()) {
+                logsWin = new Ext.Window({
+                   title  : 'Transaction logs'
+                  ,layout : 'fit'
+                  ,width  : 640
+                  ,height : 480
+                  ,constrainHeader : true
+                  ,items  : new Ext.grid.GridPanel({
+                     store        : logsStore
+                    ,loadMask     : true
+                    ,border       : false
+                    ,enableHdMenu : false
+                    ,disableSelection : true
+                    ,columns      : [
+                       {id : 'type',header : 'Type'              ,dataIndex : 'type'}
+                      ,{id : 'name',header : 'Name'              ,dataIndex : 'name'}
+                      ,{id : 'url' ,header : 'URL'               ,dataIndex : 'url' ,renderer : renderUrl}
+                      ,{id : 't'   ,header : 'Elapsed time (sec)',dataIndex : 't'   ,align    : 'center'}
+                    ]
+                    ,autoExpandColumn : 'name'
+                  })
+                  ,tbar : [
+                     '->'
+                    ,{
+                       text    : 'Clear transactions'
+                      ,icon    : 'img/trash-icon.png'
+                      ,handler : function() {
+                        logsStore.removeAll();
+                        pendingTransactions = {};
+                      }
+                    }
+                  ]
+                });
+                logsWin.show();
+              }
+            }
+          }
+        ]
         ,listeners        : {afterrender : function() {this.addListener('bodyresize',function(p,w,h) {
           var targetH = h - Ext.getCmp('queryResultsPanel').getPosition()[1] - 210; 
           targetH < 80 ? targetH = 80 : null;
@@ -283,48 +327,13 @@ function init() {
             ,html      : '<div id="chart"></div>'
             ,tbar      : [
               {
-                 text    : 'View transaction logs'
-                ,icon    : 'img/file_extension_log.png'
-                ,id      : 'transactionLogsButton'
+                 text    : 'Clear graph'
+                ,icon    : 'img/trash-icon.png'
                 ,handler : function() {
-                  if (!logsWin || !logsWin.isVisible()) {
-                    logsWin = new Ext.Window({
-                       title  : 'Transaction logs'
-                      ,layout : 'fit'
-                      ,width  : 640
-                      ,height : 480
-                      ,constrainHeader : true
-                      ,items  : new Ext.grid.GridPanel({
-                         store        : logsStore
-                        ,loadMask     : true
-                        ,border       : false
-                        ,enableHdMenu : false
-                        ,disableSelection : true
-                        ,columns      : [
-                           {id : 'type',header : 'Type'              ,dataIndex : 'type'}
-                          ,{id : 'name',header : 'Name'              ,dataIndex : 'name'}
-                          ,{id : 'url' ,header : 'URL'               ,dataIndex : 'url' ,renderer : renderUrl}
-                          ,{id : 't'   ,header : 'Elapsed time (sec)',dataIndex : 't'   ,align    : 'center'}
-                        ]
-                        ,autoExpandColumn : 'name'
-                      })
-                      ,tbar : [
-                         '->'
-                        ,{
-                           text    : 'Clear transactions'
-                          ,icon    : 'img/trash-icon.png'
-                          ,handler : function() {
-                            logsStore.removeAll();
-                            pendingTransactions = {};
-                          }
-                        }
-                      ]
-                    });
-                    logsWin.show();
-                  }
+                  chartData = [];
+                  Ext.getCmp('timeseriesPanel').fireEvent('resize',Ext.getCmp('timeseriesPanel'));
                 }
               }
-              ,'->'
               ,{
                  text    : 'Clear highlighted sites'
                 ,icon    : 'img/draw_eraser.png'
@@ -334,17 +343,7 @@ function init() {
                   lyr.redraw();
                 }
               }
-              ,{
-                 text    : 'Clear graph'
-                ,icon    : 'img/trash-icon.png'
-                ,handler : function() {
-                  chartData = [];
-                  Ext.getCmp('timeseriesPanel').fireEvent('resize',Ext.getCmp('timeseriesPanel'));
-                }
-              }
-            ]
-            ,bbar      : [
-               '->'
+              ,'->'
               ,'Legend position :'
               ,' '
               ,new Ext.form.ComboBox({
