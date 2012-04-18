@@ -272,8 +272,7 @@ function init() {
                     ,autoExpandColumn : 'name'
                   })
                   ,tbar : [
-                     '->'
-                    ,{
+                    {
                        text    : 'Clear transactions'
                       ,icon    : 'img/trash-icon.png'
                       ,handler : function() {
