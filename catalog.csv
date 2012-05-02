@@ -1,0 +1,79 @@
+GetCapsUrl,Title,Category
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_CRMS.nc,CRMS,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_CRMS_2008.F.nc,CRMS 2008 F,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_CRMS_2008.F.C.nc,CRMS 2008 FC,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_CRMS_2008.F.C_mod_base_cycle_5.nc,CRMS 2008 FC Mod Base Cycle 5,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_CRMS.F.nc,CRMS F,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_CRMS.F.C.nc,CRMS FC,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_CSI.nc,CSI,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_CSI.F.nc,CSI F,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_CSI_mod_base_cycle_5.nc,CSI Mod Base Cycle 5,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_CSI_v2.nc,CSI v1,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_CSI_v1.nc,CSI v2,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_NOAA.nc,NOAA,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_NOAA.F.nc,NOAA F,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_NOAA.F.C.nc,NOAA FC,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_NOAA.F.C_mod_base_cycle_5.nc,NOAA FC Mod Base Cycle 5,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_NOAA_NAVD_PRE.nc,NOAA Navd Pre,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_NOAA_NAVD_VER.nc,NOAA Navd Ver,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_NOAA_PRE.nc,NOAA Pre,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_NOAA_VER.nc,NOAA Ver,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_TCOON.nc,TCOON,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_TCOON.F.nc,TCOON F,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_TCOON.F.C.nc,TCOON FC,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_TCOON.F.C_mod_base_cycle_5.nc,TCOON FC Mod Base Cycle 5,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_UNDKennedy.nc,UNDKennedy,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_UNDKennedy_mod_base_cycle_5.nc,UNDKennedy Mod Base Cycle 5,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USACE.nc,USACE,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USACE.F.nc,USACE F,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USACE.F.C.nc,USACE FC,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USACE.F.C_mod_base_cycle_5.nc,USACE FC Mod Base Cycle 5,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USACE-CHL.nc,USACE-CHL,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USACE-CHL.F.nc,USACE-CHL F,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USACE-CHL_mod_base_cycle_5.nc,USACE-CHL Mod Base Cycle 5,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USGS-DEPL.nc,USGS-DEPL,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USGS-DEPL_beach.nc,USGS-DEPL Beach,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USGS-DEPL.C.nc,USGS-DEPL C,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USGS-DEPL.C.F.nc,USGS-DEPL CF,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USGS-DEPL.F.nc,USGS-DEPL F,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USGS-DEPL.F.C.nc,USGS-DEPL FC,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USGS-DEPL.F.C_mod_base_cycle_5.nc,USGS-DEPL FC Mod Base Cycle 5,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USGS-DEPL_riverine.nc,USGS-DEPL Riverine,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USGS-DEPL_surge.nc,USGS-DEPL Surge,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USGS-DEPL_surge.F.nc,USGS-DEPL Surge F,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USGS-DEPL_surge.F.C.nc,USGS-DEPL Surge FC,Measurement
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_CSI.Ike2D.elev.61.nc,CSI Ike 2D Elev,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_CSI__IKE_VIMS_2D_WITHWAVE.nc,CSI Ike Vims 2D Withwave,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_CSI__IKE_VIMS_3D_NOWAVE.nc,CSI Ike Vims 3D Nowave,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_CSI__IKE_VIMS_3D_WITHWAVE.nc,CSI Ike Vims 3D Withwave,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_NOAA.F.C.P.Ike2D.elev.61.nc,NOAA Ike 2D Elev,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_NOAA.F.C__IKE_VIMS_2D_WITHWAVE.nc,NOAA Ike Vims 2D Withwave,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_NOAA.F.C__IKE_VIMS_3D_NOWAVE.nc,NOAA Ike Vims 3D Nowave,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_NOAA.F.C__IKE_VIMS_3D_WITHWAVE.nc,NOAA Ike Vims 3D Withwave,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_TCOON.F.C.P.Ike2D.elev.61.nc,TCOON Ike 2D Elev,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_TCOON.F.C__IKE_VIMS_2D_WITHWAVE.nc,TCOON Ike Vims 2D Withwave,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_TCOON.F.C__IKE_VIMS_3D_NOWAVE.nc,TCOON Ike Vims 3D Nowave,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_TCOON.F.C__IKE_VIMS_3D_WITHWAVE.nc,TCOON Ike Vims 3D Withwave,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_UNDKennedy.Ike2D.elev.61.nc,UNDKennedy Ike 2D Elev,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_UNDKennedy__IKE_VIMS_2D_WITHWAVE.nc,UNDKennedy Ike Vims 2D Withwave,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_UNDKennedy__IKE_VIMS_3D_NOWAVE.nc,UNDKennedy Ike Vims 3D Nowave,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_UNDKennedy__IKE_VIMS_3D_WITHWAVE.nc,UNDKennedy Ike Vims 3D Withwave,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_USACE.F.C.P.Ike2D.elev.61.nc,USACE Ike 2D Elev,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_USACE.F.C__IKE_VIMS_2D_WITHWAVE.nc,USACE Ike Vims 2D Withwave,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_USACE.F.C__IKE_VIMS_3D_NOWAVE.nc,USACE Ike Vims 3D Nowave,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_USACE.F.C__IKE_VIMS_3D_WITHWAVE.nc,USACE Ike Vims 3D Withwave,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_USACE-CHL.Ike2D.elev.61.nc,USACE-CHL Ike 2D Elev,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_USACE-CHL__IKE_VIMS_2D_WITHWAVE.nc,USACE-CHL Ike Vims 2D Withwave,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_USACE-CHL__IKE_VIMS_3D_NOWAVE.nc,USACE-CHL Ike Vims 3D Nowave,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_USACE-CHL__IKE_VIMS_3D_WITHWAVE.nc,USACE-CHL Ike Vims 3D Withwave,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_USFFVCOM.IKE2DWITHWAVE.F.C.P.nc,USFFVCOM Ike 2D Withwave,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_USFFVCOM.IKE3DNOWAVE.F.C.P.nc,USFFVCOM Ike 3D Nowave,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_USFFVCOM.IKE3DWITHWAVE.F.C.P.nc,USFFVCOM Ike 3D Withwave,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_USGS-DEPL.F.C.P.Ike2D.elev.61.nc,USGS-DEPL Ike 2D Elev,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_USGS-DEPL.F.C__IKE_VIMS_2D_WITHWAVE.nc,USGS-DEPL Ike Vims 2D Withwave,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_USGS-DEPL.F.C__IKE_VIMS_3D_NOWAVE.nc,USGS-DEPL Ike Vims 3D Nowave,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_USGS-DEPL.F.C__IKE_VIMS_3D_WITHWAVE.nc,USGS-DEPL Ike Vims 3D Withwave,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_USGS-PERM.F.C.P.Ike2D.elev.61.nc,USGS-PERM Ike 2D Elev,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_USGS-PERM.F.C__IKE_VIMS_2D_WITHWAVE.nc,USGS-PERM Ike Vims 2D Withwave,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_USGS-PERM.F.C__IKE_VIMS_3D_NOWAVE.nc,USGS-PERM Ike Vims 3D Nowave,Simulation
+http://testbedapps-dev.sura.org/thredds/sos/imeds/simulation/watlev_USGS-PERM.F.C__IKE_VIMS_3D_WITHWAVE.nc,USGS-PERM Ike Vims 3D Withwave,Simulation

@@ -34,6 +34,7 @@
   }
 
   if (in_array('sura',$providers)) {
+/*
     $q = queryCatalog('Imeds CRMS watlev_CRMS_2008.F.C__IKE_VIMS_3D_WITHWAVE.IMEDS');
     for ($i = 0; $i < count($q); $i++) {
       array_push($models,array(
@@ -50,6 +51,38 @@
       ));
     }
     $q = queryCatalog('Imeds CRMS watlev_CRMS_2008.F.C.IMEDS');
+    for ($i = 0; $i < count($q); $i++) {
+      array_push($obs,array(
+         'name' => 'obs.'.$q[$i]['title']
+        ,'url'  => $q[$i]['sosGetCaps'].'&useCache=true'
+        ,'minT' => $q[$i]['sosTemporalBbox'][0]
+        ,'maxT' => $q[$i]['sosTemporalBbox'][1]
+        ,'properties' => array(
+          'Water level' => array(
+             'prop'        => 'watlev'
+            ,'getObsExtra' => '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
+          )
+        )
+      ));
+    }
+*/
+    $q = fakeQueryCatalog('Simulation');
+    for ($i = 0; $i < count($q); $i++) {
+      array_push($models,array(
+         'name' => 'model.'.$q[$i]['title']
+        ,'url'  => $q[$i]['sosGetCaps'].'&useCache=true'
+        ,'minT' => $q[$i]['sosTemporalBbox'][0]
+        ,'maxT' => $q[$i]['sosTemporalBbox'][1]
+        ,'properties' => array(
+          'Water level' => array(
+             'prop'        => 'watlev'
+            ,'getObsExtra' => '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
+          )
+        )
+      ));
+    }
+
+    $q = fakeQueryCatalog('Measurement');
     for ($i = 0; $i < count($q); $i++) {
       array_push($obs,array(
          'name' => 'obs.'.$q[$i]['title']

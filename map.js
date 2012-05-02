@@ -184,7 +184,7 @@ function init() {
           Ext.getCmp('modelsGridPanel').getEl().mask('<table><tr><td>Loading...&nbsp;</td><td><img src="js/ext-3.3.0/resources/images/default/grid/loading.gif"></td></tr></table>');
         }
         ,load      : function(sto) {
-          Ext.getCmp('modelsGridPanel').getSelectionModel().selectAll();
+          // Ext.getCmp('modelsGridPanel').getSelectionModel().selectAll();
           Ext.getCmp('modelsGridPanel').getEl().unmask();
         }
       }

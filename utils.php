@@ -52,4 +52,29 @@
     return $d;
   }
 
+  function fakeQueryCatalog($category) {
+    $d = array();
+    $col2idx = array();
+    $f = fopen('catalog.csv','r');
+    while (($csvData = fgetcsv($f)) !== FALSE) {
+      if (count($col2idx) == 0) {
+        foreach ($csvData as $k => $v) {
+          $col2idx[$v] = count($col2idx);
+        }
+      }
+      else {
+        if ($category == $csvData[$col2idx['Category']]) {
+          array_push($d,array(
+             'title'             => $csvData[$col2idx['Title']]
+            ,'sosGetCaps'        => $csvData[$col2idx['GetCapsUrl']].'?VERSION=1.0.0&SERVICE=SOS&REQUEST=GetCapabilities'
+            ,'sosGeographicBbox' => array(-180,-90,180,90)
+            ,'sosTemporalBbox'   => array('2008-09-08T00:30:00Z','2008-09-16T00:00:00Z')
+          ));
+        }
+      }
+    }
+
+    return $d;
+  }
+
 ?>
