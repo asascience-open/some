@@ -1,10 +1,7 @@
 GetCapsUrl,Title,Category
-http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_CRMS.nc,CRMS,Measurement
 http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_CRMS_2008.F.nc,CRMS 2008 F,Measurement
 http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_CRMS_2008.F.C.nc,CRMS 2008 FC,Measurement
 http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_CRMS_2008.F.C_mod_base_cycle_5.nc,CRMS 2008 FC Mod Base Cycle 5,Measurement
-http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_CRMS.F.nc,CRMS F,Measurement
-http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_CRMS.F.C.nc,CRMS FC,Measurement
 http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_CSI.nc,CSI,Measurement
 http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_CSI.F.nc,CSI F,Measurement
 http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_CSI_mod_base_cycle_5.nc,CSI Mod Base Cycle 5,Measurement
@@ -31,12 +28,7 @@ http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USACE.F.C_m
 http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USACE-CHL.nc,USACE-CHL,Measurement
 http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USACE-CHL.F.nc,USACE-CHL F,Measurement
 http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USACE-CHL_mod_base_cycle_5.nc,USACE-CHL Mod Base Cycle 5,Measurement
-http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USGS-DEPL.nc,USGS-DEPL,Measurement
 http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USGS-DEPL_beach.nc,USGS-DEPL Beach,Measurement
-http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USGS-DEPL.C.nc,USGS-DEPL C,Measurement
-http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USGS-DEPL.C.F.nc,USGS-DEPL CF,Measurement
-http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USGS-DEPL.F.nc,USGS-DEPL F,Measurement
-http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USGS-DEPL.F.C.nc,USGS-DEPL FC,Measurement
 http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USGS-DEPL.F.C_mod_base_cycle_5.nc,USGS-DEPL FC Mod Base Cycle 5,Measurement
 http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USGS-DEPL_riverine.nc,USGS-DEPL Riverine,Measurement
 http://testbedapps-dev.sura.org/thredds/sos/imeds/measurement/watlev_USGS-DEPL_surge.nc,USGS-DEPL Surge,Measurement
