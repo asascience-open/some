@@ -73,10 +73,10 @@ function init() {
     ,border          : false
     ,items           : new Ext.form.ComboBox({
       store : new Ext.data.ArrayStore({
-         fields : ['id','eventtime']
+         fields : ['id','eventtime','year']
         ,data   : [
-           ['Hurricane Ike'   ,'2008-09-08T00:30:00Z/2008-09-16T00:00:00Z']
-          ,['Current forecast','current']
+           ['Ike'             ,'2008-09-08T00:30:00Z/2008-09-16T00:00:00Z','2008']
+          ,['Current forecast','current'                                  ,''    ]
         ]
       })
       ,id             : 'eventsComboBox'
@@ -86,7 +86,7 @@ function init() {
       ,forceSelection : true
       ,triggerAction  : 'all'
       ,editable       : false
-      ,value          : 'Hurricane Ike'
+      ,value          : 'Ike'
       ,listeners      : {
         select : function(combo,rec) {
           runQuery();
@@ -665,46 +665,7 @@ function getCaps(url,name,type) {
     });
     map.addLayer(l);
 
-    if (!hiliteCtl) {
-      hiliteCtl = new OpenLayers.Control.SelectFeature(l,{
-         hover         : true
-        ,highlightOnly : true
-        ,renderIntent  : 'temporary'
-        ,eventListeners : {
-          beforefeaturehighlighted : function(e) {
-            if (mouseoverObs && mouseoverObs.isVisible()) {
-              mouseoverObs.hide();
-            }
-            mouseoverObs = new Ext.ToolTip({
-               html         : e.feature.attributes.dataset + ' : ' + e.feature.attributes.offering.shortName
-              ,anchor       : 'bottom'
-              ,target       : 'OpenLayers.Geometry.Point_' + (Number(e.feature.id.split('_')[e.feature.id.split('_').length - 1]) - 1)
-              ,hideDelay    : 0
-              ,listeners    : {hide : function(tt) {
-                if (!tt.isDestroyed && !Ext.isIE) {
-                  tt.destroy();
-                }
-              }}
-            });
-            mouseoverObs.show();
-          }
-        }
-      });
-      map.addControl(hiliteCtl);
-      hiliteCtl.activate();
-    }
-    else {
-      var layers = [l];
-      if (hiliteCtl.layers) {
-        for (var i = 0; i < hiliteCtl.layers.length; i++) {
-          layers.push(hiliteCtl.layers[i]);
-        }
-      }
-      else {
-        layers.push(hiliteCtl.layer);
-      }
-      hiliteCtl.setLayer(layers);
-    }
+    addToHiliteCtl(l);
     
     if (!popupCtl) {
       popupCtl = new OpenLayers.Control.SelectFeature(l,{
@@ -1092,6 +1053,8 @@ function runQuery() {
   else {
     Ext.getCmp('modelsGridPanel').getStore().load();
     Ext.getCmp('observationsGridPanel').getStore().load();
+    var rec = Ext.getCmp('eventsComboBox').getStore().getAt(Ext.getCmp('eventsComboBox').getStore().find('id',Ext.getCmp('eventsComboBox').getValue()));
+    addStormTrack(rec.get('id'),rec.get('eventtime'),rec.get('year'));
   }
 }
 
@@ -1155,4 +1118,116 @@ function zeroPad(number,length) {
      zeros.push('0');
    }
    return zeros.join('').substring(0, length - number.length) + number;
+}
+
+function addStormTrack(storm,eventtime,year) {
+  if (map.getLayersByName('Storm track')[0]) {
+    var lyr = map.getLayersByName('Storm track')[0];
+    map.removeLayer(lyr);
+  }
+
+  var lyr = new OpenLayers.Layer.Vector('Storm track',{
+    styleMap   : new OpenLayers.StyleMap({
+      'default' : new OpenLayers.Style(
+        {
+           pointRadius   : 2
+          ,fillColor     : '#333333'
+          ,fillOpacity   : 0.20
+          ,strokeColor   : '#333333'
+          ,strokeOpacity : 0.20
+        }
+      )
+      ,'temporary' : new OpenLayers.Style(
+        {
+           pointRadius     : "${pointRadius}"
+          ,fillColor       : '#333333'
+          ,fillOpacity     : "${fillOpacity}"
+          ,strokeColor     : '#333333'
+          ,strokeOpacity   : "${strokeOpacity}"
+        }
+        ,{
+          context          : {
+            pointRadius : function(f) {
+              return f.attributes.t ? 5 : 2;
+            }
+            ,strokeOpacity : function(f) {
+              return f.attributes.t ? 0.75 : 0.20;
+            }
+            ,fillOpacity : function(f) {
+              return f.attributes.t ? 0.40 : 0.20;
+            }
+          }
+        }
+      )
+    })
+  });
+  map.addLayer(lyr);
+
+  addToHiliteCtl(lyr);
+
+  OpenLayers.Request.issue({
+     url      : 'getStormGeoJSON.php?storm=' + storm + '&eventtime=' + eventtime + '&year=' + year
+    ,callback : function(r) {
+      var json = new OpenLayers.Format.JSON().read(r.responseText);
+      for (var i = 0; i < json.length; i++) {
+        var geojson = new OpenLayers.Format.GeoJSON();
+        var f       = geojson.read(json[i])[0];
+        f.geometry.transform(proj4326,map.getProjectionObject());
+        lyr.addFeatures(f);
+      }
+    }
+  });
+}
+
+function addToHiliteCtl(lyr) {
+  if (!hiliteCtl) {
+    hiliteCtl = new OpenLayers.Control.SelectFeature(lyr,{
+       hover         : true
+      ,highlightOnly : true
+      ,renderIntent  : 'temporary'
+      ,eventListeners : {
+        beforefeaturehighlighted : function(e) {
+          if (mouseoverObs && mouseoverObs.isVisible()) {
+            mouseoverObs.hide();
+          }
+          var html;
+          if (e.feature.attributes.dataset && e.feature.attributes.offering) {
+            html = e.feature.attributes.dataset + ' : ' + e.feature.attributes.offering.shortName;
+          }
+          else {
+            html = e.feature.attributes.storm + ' : ' + shortMonthDayStringWithTime(new Date(e.feature.attributes.t * 1000));
+          }
+          var target = document.getElementById('OpenLayers.Geometry.Point_' + (Number(e.feature.id.split('_')[e.feature.id.split('_').length - 1]) - 1));
+          if (target) {
+            mouseoverObs = new Ext.ToolTip({
+               html         : html
+              ,anchor       : 'bottom'
+              ,target       : target
+              ,hideDelay    : 0
+              ,listeners    : {hide : function(tt) {
+                if (!tt.isDestroyed && !Ext.isIE) {
+                  tt.destroy();
+                }
+              }}
+            });
+            mouseoverObs.show();
+          }
+        }
+      }
+    });
+    map.addControl(hiliteCtl);
+    hiliteCtl.activate();
+  }
+  else {
+    var layers = [lyr];
+    if (hiliteCtl.layers) {
+      for (var i = 0; i < hiliteCtl.layers.length; i++) {
+        layers.push(hiliteCtl.layers[i]);
+      }
+    }
+    else {
+      layers.push(hiliteCtl.layer);
+    }
+    hiliteCtl.setLayer(layers);
+  }
 }
