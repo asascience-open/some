@@ -201,6 +201,42 @@ function init() {
     }}
   });
 
+  var gridsSelModel = new Ext.grid.CheckboxSelectionModel({
+     header    : ''
+    ,listeners : {
+      rowselect : function(sm,rowIndex,rec) {
+        getCaps(rec.get('url'),rec.get('name'),'grids');
+      }
+      ,rowdeselect : function(sm,rowIndex,rec) {
+        map.getLayersByName(rec.get('name'))[0].setVisibility(false);
+      }
+    }
+  });
+  var gridsGridPanel = new Ext.grid.GridPanel({
+     height      : 50
+    ,id          : 'gridsGridPanel'
+    ,store : new Ext.data.JsonStore({
+       url       : 'query.php?'
+      ,fields    : ['name','url','properties']
+      ,root      : 'data'
+      ,listeners : {
+        beforeload : function(sto) {
+        }
+        ,load      : function(sto) {
+        }
+      }
+    })
+    ,selModel    : gridsSelModel
+    ,autoExpandColumn : 'name'
+    ,columns     : [
+       gridsSelModel
+      ,{id : 'name',dataIndex :'name',renderer : renderName}
+    ]
+    ,hideHeaders : true
+    ,listeners   : {viewready : function() {
+    }}
+  });
+
   new Ext.Viewport({
      layout : 'border'
     ,items  : [
@@ -276,30 +312,63 @@ function init() {
             ]}
           }
           ,{
-             title     : 'Catalog query results'
-            ,id        : 'queryResultsPanel'
+             id        : 'queryResultsPanel'
+            ,title     : 'Catalog query results'
             ,border    : false
             ,bodyStyle : 'padding:5px 5px 0'
             ,items     : [
               {
                  border : false
                 ,cls    : 'directionsPanel'
-                ,html   : 'Select models and observations for time series comparisons.  Once you click on a site, it will be used as a pivot point, and any companion datasets that you have checked ON will subsequently be queried.  Only the closest point from each companion dataset will be queried.'
+                ,html   : 'Station data as well as gridded data may be mapped independently. When switching between station and grid tabs, be aware that your map and time series graph will be cleared.'
               }
-              ,new Ext.form.FieldSet({
-                 title : '&nbsp;Model datasets&nbsp;'
-                ,id    : 'modelsFieldSet'
-                ,items : modelsGridPanel
-              })
-              ,new Ext.form.FieldSet({
-                 title : '&nbsp;Observation datasets&nbsp;'
-                ,id    : 'observationsFieldSet'
-                ,items : observationsGridPanel
+              ,new Ext.TabPanel({
+                 activeTab  : 0
+                ,plain      : true
+                ,resizeTabs : true
+                ,tabWidth   : 135
+                ,bodyStyle  : 'padding:5px 5px 0'
+                ,items      : [
+                  {
+                     title : 'Available stations'
+                    ,id    : 'stationsTab'
+                    ,items : [
+                      {
+                         border : false
+                        ,cls    : 'directionsPanel'
+                        ,html   : 'Select models and observations for time series comparisons.  Click here for more information on how this analysis is performed.'
+                      }
+                      ,new Ext.form.FieldSet({
+                         title : '&nbsp;Model datasets&nbsp;'
+                        ,items : modelsGridPanel
+                      })
+                      ,new Ext.form.FieldSet({
+                         title : '&nbsp;Observation datasets&nbsp;'
+                        ,items : observationsGridPanel
+                      })
+                    ]
+                  }
+                  ,{
+                     title : 'Available grids'
+                    ,id    : 'gridsTab'
+                    ,items : [
+                      {
+                         border : false
+                        ,cls    : 'directionsPanel'
+                        ,html   : 'Select gridded datasets for mapping.  Click anywhere on the map to perform a time series extraction.'
+                      }
+                      ,new Ext.form.FieldSet({
+                         title : '&nbsp;Gridded datasets&nbsp;'
+                        ,items : gridsGridPanel
+                      })
+                    ]
+                  }
+                ]
               })
             ]
             ,tbar        : {items : [
               {
-                 text    : 'Remove all datasets'
+                 text    : 'Remove all mapped datasets'
                 ,icon    : 'img/trash-icon.png'
                 ,id      : 'removeDatasetsButton'
                 ,handler : function() {
@@ -317,10 +386,14 @@ function init() {
           }
         ]
         ,listeners        : {afterrender : function() {this.addListener('bodyresize',function(p,w,h) {
-          var targetH = h - Ext.getCmp('queryResultsPanel').getPosition()[1] - 235; 
-          targetH < 80 ? targetH = 80 : null;
+          var targetH = h - Ext.getCmp('queryResultsPanel').getPosition()[1] - 160; 
+          targetH < 100 ? targetH = 100 : null;
+          Ext.getCmp('stationsTab').setHeight(targetH);
+          Ext.getCmp('gridsTab').setHeight(targetH);
+          targetH -= 137;
           Ext.getCmp('observationsGridPanel').setHeight(targetH / 2);
           Ext.getCmp('modelsGridPanel').setHeight(targetH / 2);
+          Ext.getCmp('gridsGridPanel').setHeight(targetH + 46);
         })}}
       }
       ,{
