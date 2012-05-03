@@ -308,6 +308,9 @@ function init() {
                   if (popupObs && popupObs.isVisible()) {
                     popupObs.hide();
                   }
+                  var lyr = map.getLayersByName('hiliteMarkers')[0];
+                  lyr.removeFeatures(lyr.features);
+                  lyr.redraw();
                 }
               }
             ]}
