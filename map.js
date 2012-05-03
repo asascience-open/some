@@ -1195,7 +1195,7 @@ function addToHiliteCtl(lyr) {
             html = e.feature.attributes.dataset + ' : ' + e.feature.attributes.offering.shortName;
           }
           else {
-            html = e.feature.attributes.storm + ' : ' + shortMonthDayStringWithTime(new Date(e.feature.attributes.t * 1000));
+            html = e.feature.attributes.storm + ' : ' + shortMonthDayStringWithTime(new Date(e.feature.attributes.t * 1000)) + '<br/>' + e.feature.attributes.cat;
           }
           var target = document.getElementById('OpenLayers.Geometry.Point_' + (Number(e.feature.id.split('_')[e.feature.id.split('_').length - 1]) - 1));
           if (target) {
