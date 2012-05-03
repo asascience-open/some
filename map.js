@@ -327,8 +327,8 @@ function init() {
             ,html      : '<div id="chart"></div>'
             ,tbar      : [
               {
-                 text    : 'Clear graph'
-                ,icon    : 'img/trash-icon.png'
+                 text    : 'New graph'
+                ,icon    : 'img/document_empty.png'
                 ,handler : function() {
                   chartData = [];
                   Ext.getCmp('timeseriesPanel').fireEvent('resize',Ext.getCmp('timeseriesPanel'));
