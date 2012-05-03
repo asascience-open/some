@@ -62,6 +62,19 @@ div.olLayerGoogleCopyright, div.olLayerGooglePoweredBy {
   background-image : url('img/blank.png');
 }
 
+#gridsGridPanel .x-grid3-row {
+  border-color   : #ffffff;
+}
+#gridsGridPanel .x-grid3-row-selected {
+  background-color : transparent !important;
+}
+#gridsGridPanel .x-grid3-body .x-grid3-row-selected .x-grid3-td-numberer, .x-grid3-body .x-grid3-row-selected .x-grid3-td-checker, .x-grid3-body .x-grid3-row-selected .x-grid3-td-expander {
+  background-image : url('img/blank.png');
+}
+#gridsGridPanel .x-grid3-body .x-grid3-td-checker {
+  background-image : url('img/blank.png');
+}
+
 .popup {
   background : white;
   padding    : 6px;
@@ -101,6 +114,9 @@ div.olLayerGoogleCopyright, div.olLayerGooglePoweredBy {
   font : 11px/13px tahoma,helvetica,sans-serif;
 }
 #modelsGridPanel td {
+  font : 11px/13px tahoma,helvetica,sans-serif;
+}
+#gridsGridPanel td {
   font : 11px/13px tahoma,helvetica,sans-serif;
 }
 #timeseriesPanel td {

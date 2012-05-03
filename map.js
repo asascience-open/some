@@ -216,13 +216,20 @@ function init() {
      height      : 50
     ,id          : 'gridsGridPanel'
     ,store : new Ext.data.JsonStore({
-       url       : 'query.php?'
+       url       : 'query.php?type=models&providers=gomaine,sura'
       ,fields    : ['name','url','properties']
       ,root      : 'data'
       ,listeners : {
         beforeload : function(sto) {
+          sto.setBaseParam('eventtime',getEventtimeFromEventsComboBox());
+          if (Ext.getCmp('gridsGridPanel').getEl()) {
+            Ext.getCmp('gridsGridPanel').getEl().mask('<table><tr><td>Loading...&nbsp;</td><td><img src="js/ext-3.3.0/resources/images/default/grid/loading.gif"></td></tr></table>');
+          }
         }
         ,load      : function(sto) {
+          if (Ext.getCmp('gridsGridPanel').getEl()) {
+            Ext.getCmp('gridsGridPanel').getEl().unmask();
+          }
         }
       }
     })
@@ -1053,14 +1060,17 @@ function getEventtimeFromEventsComboBox() {
 function runQuery() {
   var selMod = Ext.getCmp('modelsGridPanel').getSelectionModel();
   var selObs = Ext.getCmp('observationsGridPanel').getSelectionModel();
+  var selGrd = Ext.getCmp('gridsGridPanel').getSelectionModel();
 
-  if (selMod.getSelections().length + selObs.getSelections().length > 0) {
+  if (selMod.getSelections().length + selObs.getSelections().length + selGrd.getSelections().length > 0) {
     Ext.MessageBox.confirm('Comfirm map reset','You have changed your filter options; the map must be reset.  Are you sure you wish to continue?',function(but) {
       if (but == 'yes') {
         selMod.clearSelections();
         selObs.clearSelections(); 
+        selGrd.clearSelections();
         Ext.getCmp('modelsGridPanel').getStore().load();
         Ext.getCmp('observationsGridPanel').getStore().load();
+        Ext.getCmp('gridsGridPanel').getStore().load();
         if (popupObs && !popupObs.isDestroyed) {
           popupObs.hide();
         }
@@ -1070,6 +1080,7 @@ function runQuery() {
   else {
     Ext.getCmp('modelsGridPanel').getStore().load();
     Ext.getCmp('observationsGridPanel').getStore().load();
+    Ext.getCmp('gridsGridPanel').getStore().load();
     var rec = Ext.getCmp('eventsComboBox').getStore().getAt(Ext.getCmp('eventsComboBox').getStore().find('id',Ext.getCmp('eventsComboBox').getValue()));
     addStormTrack(rec.get('id'),rec.get('eventtime'),rec.get('year'));
   }
