@@ -216,12 +216,11 @@ function init() {
      height      : 50
     ,id          : 'gridsGridPanel'
     ,store : new Ext.data.JsonStore({
-       url       : 'query.php?type=models&providers=gomaine,sura'
+       url       : 'query.php?'
       ,fields    : ['name','url','properties']
       ,root      : 'data'
       ,listeners : {
         beforeload : function(sto) {
-          sto.setBaseParam('eventtime',getEventtimeFromEventsComboBox());
           if (Ext.getCmp('gridsGridPanel').getEl()) {
             Ext.getCmp('gridsGridPanel').getEl().mask('<table><tr><td>Loading...&nbsp;</td><td><img src="js/ext-3.3.0/resources/images/default/grid/loading.gif"></td></tr></table>');
           }
