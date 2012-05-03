@@ -494,8 +494,10 @@ function initMap() {
 }
 
 function renderName(val,metadata,rec) {
-  metadata.attr = 'ext:qtip="' + val + '"';
-  return val;
+  var lab = val.split('.');
+  lab.shift();
+  metadata.attr = 'ext:qtip="' + lab.join('.') + '"';
+  return lab.join('.');
 }
 
 function renderUrl(val,metadata,rec) {
