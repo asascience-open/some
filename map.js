@@ -209,11 +209,11 @@ function init() {
         ,width       : 275
         ,items       : [
           {
-             title : 'Catalog query filters'
-            ,id : 'queryFiltersPanel'
-            ,border : false
+             title     : 'Catalog query filters'
+            ,id        : 'queryFiltersPanel'
+            ,border    : false
             ,bodyStyle : 'padding:5px 5px 0'
-            ,items : [
+            ,items     : [
               {
                  border : false
                 ,cls    : 'directionsPanel'
@@ -275,26 +275,46 @@ function init() {
               }
             ]}
           }
-          ,{title : 'Catalog query results',id : 'queryResultsPanel',border : false,bodyStyle : 'padding:5px 5px 0',items : [
-            {
-               border : false
-              ,cls    : 'directionsPanel'
-              ,html   : 'Select models and observations for time series comparisons.  Once you click on a site, it will be used as a pivot point, and any companion datasets that you have checked ON will subsequently be queried.  Only the closest point from each companion dataset will be queried.'
-            }
-            ,new Ext.form.FieldSet({
-               title : '&nbsp;Model datasets&nbsp;'
-              ,id    : 'modelsFieldSet'
-              ,items : modelsGridPanel
-            })
-            ,new Ext.form.FieldSet({
-               title : '&nbsp;Observation datasets&nbsp;'
-              ,id    : 'observationsFieldSet'
-              ,items : observationsGridPanel
-            })
-          ]}
+          ,{
+             title     : 'Catalog query results'
+            ,id        : 'queryResultsPanel'
+            ,border    : false
+            ,bodyStyle : 'padding:5px 5px 0'
+            ,items     : [
+              {
+                 border : false
+                ,cls    : 'directionsPanel'
+                ,html   : 'Select models and observations for time series comparisons.  Once you click on a site, it will be used as a pivot point, and any companion datasets that you have checked ON will subsequently be queried.  Only the closest point from each companion dataset will be queried.'
+              }
+              ,new Ext.form.FieldSet({
+                 title : '&nbsp;Model datasets&nbsp;'
+                ,id    : 'modelsFieldSet'
+                ,items : modelsGridPanel
+              })
+              ,new Ext.form.FieldSet({
+                 title : '&nbsp;Observation datasets&nbsp;'
+                ,id    : 'observationsFieldSet'
+                ,items : observationsGridPanel
+              })
+            ]
+            ,tbar        : {items : [
+              {
+                 text    : 'Remove all datasets'
+                ,icon    : 'img/trash-icon.png'
+                ,id      : 'removeDatasetsButton'
+                ,handler : function() {
+                  Ext.getCmp('modelsGridPanel').getSelectionModel().clearSelections();
+                  Ext.getCmp('observationsGridPanel').getSelectionModel().clearSelections();
+                  if (popupObs && popupObs.isVisible()) {
+                    popupObs.hide();
+                  }
+                }
+              }
+            ]}
+          }
         ]
         ,listeners        : {afterrender : function() {this.addListener('bodyresize',function(p,w,h) {
-          var targetH = h - Ext.getCmp('queryResultsPanel').getPosition()[1] - 210; 
+          var targetH = h - Ext.getCmp('queryResultsPanel').getPosition()[1] - 235; 
           targetH < 80 ? targetH = 80 : null;
           Ext.getCmp('observationsGridPanel').setHeight(targetH / 2);
           Ext.getCmp('modelsGridPanel').setHeight(targetH / 2);
@@ -387,6 +407,23 @@ function init() {
                     el.innerHTML = '<table width="100%" class="directionsPanel"><tr><td style="padding:10px 40px 0px 40px">Begin by selecting values for the catalog query filters.  Then select observation and model datasets to analyze.  Once you see dots on the map, click one, and then click on the parmater link in the popup window.  A time series graph will appear here.</td></tr></table>';
                   }
                   else {
+                    var prevPt;
+                    $('#chart').bind('plothover',function(event,pos,item) {
+                      if (item) {
+                        var x = new Date(item.datapoint[0] + new Date().getTimezoneOffset() * 60 * 1000);
+                        var y = item.datapoint[1];
+                        if (prevPoint != item.dataIndex) {
+                          $('#tooltip').remove();
+                          showToolTip(item.pageX,item.pageY,item.series.label + '<br/>' + y + ' @ ' + shortMonthDayStringWithTime(x));
+                        }
+                        prevPoint = item.dataIndex;
+                      }
+                      else {
+                        $('#tooltip').remove();
+                        prevPoint = null;
+                      }
+                    });
+
                     $.plot(
                      $('#chart')
                       ,chartData
@@ -975,6 +1012,20 @@ function shortDateStringNoTime(d) {
     + '/' + d.getUTCFullYear();
 }
 
+function shortMonthDayStringWithTime(d) {
+  if (!d) {
+    return ' ';
+  }
+  return zeroPad((d.getUTCMonth() + 1) * 1,2)
+    + '/'
+    + zeroPad(d.getUTCDate(),2)
+    + ' '
+    + zeroPad(d.getUTCHours(),2)
+    + ':'
+    + zeroPad(d.getUTCMinutes(),2)
+    + ' UTC';
+}
+
 function refreshTimer() {
   var hits = 0;
   for (i in pendingTransactions) {
@@ -1081,4 +1132,27 @@ function layerLoadendUnmask(url) {
   if (hits == 0) {
     Ext.getCmp('mapPanel').getEl().unmask();
   }
+}
+
+function showToolTip(x,y,contents) {
+  $('<div id="tooltip">' + contents + '</div>').css({
+     position           : 'absolute'
+    ,display            : 'none'
+    ,top                : y + 10
+    ,left               : x + 10
+    ,border             : '1px solid #99BBE8'
+    ,padding            : '2px'
+    ,'background-color' : '#fff'
+    ,opacity            : 0.80
+    ,'z-index'          : 10000001
+  }).appendTo("body").fadeIn(200);
+}
+
+function zeroPad(number,length) {
+   number = String(number);
+   var zeros = [];
+   for (var i = 0 ; i < length ; ++i) {
+     zeros.push('0');
+   }
+   return zeros.join('').substring(0, length - number.length) + number;
 }

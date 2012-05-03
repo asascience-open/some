@@ -93,6 +93,9 @@ div.olLayerGoogleCopyright, div.olLayerGooglePoweredBy {
 .legendLabel {
   font : 10px/13px tahoma,helvetica,sans-serif;
 }
+#tooltip {
+  font : 11px/13px tahoma,helvetica,sans-serif;
+}
 
 #observationsGridPanel td {
   font : 11px/13px tahoma,helvetica,sans-serif;
