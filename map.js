@@ -664,70 +664,8 @@ function getCaps(url,name,type) {
       layerLoadendUnmask(l.name);
     });
     map.addLayer(l);
-
     addToHiliteCtl(l);
-    
-    if (!popupCtl) {
-      popupCtl = new OpenLayers.Control.SelectFeature(l,{
-        eventListeners : {
-          featurehighlighted : function(e) {
-            if (popupObs && popupObs.isVisible()) {
-              popupObs.hide();
-            }
-            var properties = getProperties(e.feature.attributes);
-            var propertiesLinks = [];
-            for (p in properties) {
-              var shortP = p.split('/');
-              shortP = shortP[shortP.length-1];
-              shortP = shortP.substr(0,40) + (shortP.length > 40 ? '...' : '');
-              propertiesLinks.push('<a href="#" onclick="getObs(\'' + e.feature.layer.name + '\',\'' + properties[p] + '\',\'' + p + '\',\'' + e.feature.attributes.offering.shortName + ' ' + e.feature.attributes.dataset + '\',' + e.feature.attributes.offering.llon + ',' + e.feature.attributes.offering.llat + ',true,\'' + (e.feature.attributes.targetProperties ? e.feature.attributes.targetProperties.getObsExtra : '') + '\')">' + shortP + '</a>');
-            }
-            var tr = [
-               '<td><b>time&nbsp;range</b></td><td>' + shortDateStringNoTime(isoDateToDate(e.feature.attributes.offering.begin_time)) + '&nbsp;\u2011&nbsp;' + shortDateStringNoTime(isoDateToDate(e.feature.attributes.offering.end_time)) + '</td>'
-              ,'<td><b>properties</b></td><td>' + propertiesLinks.join(', ') + '</td>'
-              ,'<td><b>dataset</b></td><td>' + e.feature.attributes.dataset + '<br><a href="javascript:setCenterOnPoint(' + e.feature.attributes.offering.llon + ',' + e.feature.attributes.offering.llat + ')">zoom & recenter map to this site</a></td>'
-            ];
-            popupObs = new Ext.ToolTip({
-               title     : e.feature.attributes.dataset + ' : ' + e.feature.attributes.offering.shortName
-              ,items     : {bodyCssClass : 'obsPopup',html : '<table><tr>' + tr.join('</tr><tr>') + '</tr></table>'}
-              ,anchor    : 'bottom'
-              ,width     : 345
-              ,target    : 'OpenLayers.Geometry.Point_' + (Number(e.feature.id.split('_')[e.feature.id.split('_').length - 1]) - 1)
-              ,autoHide  : false
-              ,closable  : true
-              ,style     : {
-                'z-index' : 5000 // keep the popup below any subsequent form 'popups'
-              }
-              ,listeners : {
-                hide : function(tt) {
-                  if (!tt.isDestroyed) {
-                    tt.destroy();
-                  }
-                  if (e.feature.layer) {
-                    popupCtl.unselect(e.feature);
-                  }
-                }
-              }
-            });
-            popupObs.show();
-          }
-        }
-      });
-      map.addControl(popupCtl);
-      popupCtl.activate();
-    }
-    else {
-      var layers = [l];
-      if (popupCtl.layers) {
-        for (var i = 0; i < popupCtl.layers.length; i++) {
-          layers.push(popupCtl.layers[i]);
-        }
-      }
-      else {
-        layers.push(popupCtl.layer);
-      }
-      popupCtl.setLayer(layers);
-    }
+    addToPopupCtl(l);
 
     logsStore.insert(0,new logsStore.recordType({
        type : 'GetCaps'
@@ -937,6 +875,9 @@ function getObs(layerName,url,property,name,lon,lat,drill,getObsExtra) {
 
 function getProperties(attr) {
   var p = {};
+  if (!attr.offering) {
+    return false;
+  }
   attr.offering.properties.sort();
   for (var i = 0; i < attr.offering.properties.length; i++) {
     p[attr.offering.properties[i]] = attr.offering.getObsUrl(attr.offering.properties[i]) + '&eventtime=' + getEventtimeFromEventsComboBox();
@@ -1122,11 +1063,11 @@ function zeroPad(number,length) {
 
 function addStormTrack(storm,eventtime,year) {
   if (map.getLayersByName('Storm track')[0]) {
-    var lyr = map.getLayersByName('Storm track')[0];
-    map.removeLayer(lyr);
+    var l = map.getLayersByName('Storm track')[0];
+    map.removeLayer(l);
   }
 
-  var lyr = new OpenLayers.Layer.Vector('Storm track',{
+  var l = new OpenLayers.Layer.Vector('Storm track',{
     styleMap   : new OpenLayers.StyleMap({
       'default' : new OpenLayers.Style(
         {
@@ -1159,11 +1100,20 @@ function addStormTrack(storm,eventtime,year) {
           }
         }
       )
+      ,'select' : new OpenLayers.Style(
+        {
+           pointRadius   : 2
+          ,fillColor     : '#333333'
+          ,fillOpacity   : 0.20
+          ,strokeColor   : '#333333'
+          ,strokeOpacity : 0.20
+        }
+      )
     })
   });
-  map.addLayer(lyr);
-
-  addToHiliteCtl(lyr);
+  map.addLayer(l);
+  addToHiliteCtl(l);
+  addToPopupCtl(l);
 
   OpenLayers.Request.issue({
      url      : 'getStormGeoJSON.php?storm=' + storm + '&eventtime=' + eventtime + '&year=' + year
@@ -1173,7 +1123,7 @@ function addStormTrack(storm,eventtime,year) {
         var geojson = new OpenLayers.Format.GeoJSON();
         var f       = geojson.read(json[i])[0];
         f.geometry.transform(proj4326,map.getProjectionObject());
-        lyr.addFeatures(f);
+        l.addFeatures(f);
       }
     }
   });
@@ -1182,9 +1132,9 @@ function addStormTrack(storm,eventtime,year) {
 function addToHiliteCtl(lyr) {
   if (!hiliteCtl) {
     hiliteCtl = new OpenLayers.Control.SelectFeature(lyr,{
-       hover         : true
-      ,highlightOnly : true
-      ,renderIntent  : 'temporary'
+       hover          : true
+      ,highlightOnly  : true
+      ,renderIntent   : 'temporary'
       ,eventListeners : {
         beforefeaturehighlighted : function(e) {
           if (mouseoverObs && mouseoverObs.isVisible()) {
@@ -1229,5 +1179,72 @@ function addToHiliteCtl(lyr) {
       layers.push(hiliteCtl.layer);
     }
     hiliteCtl.setLayer(layers);
+  }
+}
+
+function addToPopupCtl(lyr) {
+  if (!popupCtl) {
+    popupCtl = new OpenLayers.Control.SelectFeature(lyr,{
+      eventListeners : {
+        featurehighlighted : function(e) {
+          if (popupObs && popupObs.isVisible()) {
+            popupObs.hide();
+          }
+          var properties = getProperties(e.feature.attributes);
+          if (!properties) {
+            return;
+          }
+          var propertiesLinks = [];
+          for (p in properties) {
+            var shortP = p.split('/');
+            shortP = shortP[shortP.length-1];
+            shortP = shortP.substr(0,40) + (shortP.length > 40 ? '...' : '');
+            propertiesLinks.push('<a href="#" onclick="getObs(\'' + e.feature.layer.name + '\',\'' + properties[p] + '\',\'' + p + '\',\'' + e.feature.attributes.offering.shortName + ' ' + e.feature.attributes.dataset + '\',' + e.feature.attributes.offering.llon + ',' + e.feature.attributes.offering.llat + ',true,\'' + (e.feature.attributes.targetProperties ? e.feature.attributes.targetProperties.getObsExtra : '') + '\')">' + shortP + '</a>');
+          }
+          var tr = [
+             '<td><b>time&nbsp;range</b></td><td>' + shortDateStringNoTime(isoDateToDate(e.feature.attributes.offering.begin_time)) + '&nbsp;\u2011&nbsp;' + shortDateStringNoTime(isoDateToDate(e.feature.attributes.offering.end_time)) + '</td>'
+            ,'<td><b>properties</b></td><td>' + propertiesLinks.join(', ') + '</td>'
+            ,'<td><b>dataset</b></td><td>' + e.feature.attributes.dataset + '<br><a href="javascript:setCenterOnPoint(' + e.feature.attributes.offering.llon + ',' + e.feature.attributes.offering.llat + ')">zoom & recenter map to this site</a></td>'
+          ];
+          popupObs = new Ext.ToolTip({
+             title     : e.feature.attributes.dataset + ' : ' + e.feature.attributes.offering.shortName
+            ,items     : {bodyCssClass : 'obsPopup',html : '<table><tr>' + tr.join('</tr><tr>') + '</tr></table>'}
+            ,anchor    : 'bottom'
+            ,width     : 345
+            ,target    : 'OpenLayers.Geometry.Point_' + (Number(e.feature.id.split('_')[e.feature.id.split('_').length - 1]) - 1)
+            ,autoHide  : false
+            ,closable  : true
+            ,style     : {
+              'z-index' : 5000 // keep the popup below any subsequent form 'popups'
+            }
+            ,listeners : {
+              hide : function(tt) {
+                if (!tt.isDestroyed) {
+                  tt.destroy();
+                }
+                if (e.feature.layer) {
+                  popupCtl.unselect(e.feature);
+                }
+              }
+            }
+          });
+          popupObs.show();
+        }
+      }
+    });
+    map.addControl(popupCtl);
+    popupCtl.activate();
+  }
+  else {
+    var layers = [lyr];
+    if (popupCtl.layers) {
+      for (var i = 0; i < popupCtl.layers.length; i++) {
+        layers.push(popupCtl.layers[i]);
+      }
+    }
+    else {
+      layers.push(popupCtl.layer);
+    }
+    popupCtl.setLayer(layers);
   }
 }
