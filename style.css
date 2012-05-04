@@ -141,3 +141,8 @@ div.olLayerGoogleCopyright, div.olLayerGooglePoweredBy {
   font            : 11px tahoma,helvetica,sans-serif;
   color           : rgb(74,134,214);
 }
+
+.alert {
+  color       : red;
+  font-weight : bold;
+}

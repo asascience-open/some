@@ -1,4 +1,6 @@
 var map;
+var lyrQueryPts;
+
 var proj3857   = new OpenLayers.Projection("EPSG:3857");
 var proj900913 = new OpenLayers.Projection("EPSG:900913");
 var proj4326   = new OpenLayers.Projection("EPSG:4326");
@@ -15,6 +17,11 @@ var logsStore = new Ext.data.ArrayStore({
     pendingTransactions[recs[0].get('url')] = true;
   }}
 });
+
+var lastMapClick = {
+   layer : ''
+  ,xy    : ''
+};
 
 var pendingTransactions = {};
 var viewsReady = 0;
@@ -222,7 +229,7 @@ function init() {
     ,id          : 'gridsGridPanel'
     ,store : new Ext.data.JsonStore({
        url       : 'query.php?type=grids&providers=eds'
-      ,fields    : ['name','url','lyr','stl','sgl','leg','minT']
+      ,fields    : ['name','url','lyr','stl','sgl','leg','minT','varName','varUnits']
       ,root      : 'data'
       ,listeners : {
         beforeload : function(sto) {
@@ -262,7 +269,7 @@ function init() {
      height      : 50
     ,id          : 'legendsGridPanel'
     ,store       : new Ext.data.ArrayStore({
-       fields : ['name','displayName','status']
+       fields : ['name','displayName','status','timestamp','jsDate']
      })
     ,columns     : [
        {id : 'status',dataIndex : 'status',renderer : renderLayerStatus,width : 30}
@@ -364,6 +371,7 @@ function init() {
                 ,resizeTabs : true
                 ,tabWidth   : 135
                 ,bodyStyle  : 'padding:5px 5px 0'
+                ,id         : 'stationGridTabPanel'
                 ,items      : [
                   {
                      title : 'Available stations'
@@ -405,7 +413,14 @@ function init() {
                   }
                 ]
                 ,listeners : {tabchange : function(tabPanel,tab) {
-                  tab.id == 'gridsTab' ? Ext.getCmp('mapBbar').show() : Ext.getCmp('mapBbar').hide();
+                  if (tab.id == 'gridsTab') {
+                    Ext.getCmp('mapBbar').show();
+                    Ext.getCmp('requery').show();
+                  }
+                  else {
+                    Ext.getCmp('mapBbar').hide();
+                    Ext.getCmp('requery').hide();
+                  }
                   Ext.getCmp('mapPanel').doLayout();
                 }}
               })
@@ -427,6 +442,7 @@ function init() {
                   var lyr = map.getLayersByName('hiliteMarkers')[0];
                   lyr.removeFeatures(lyr.features);
                   lyr.redraw();
+                  lyrQueryPts.removeFeatures(lyrQueryPts.features);
                 }
               }
             ]}
@@ -640,12 +656,24 @@ function init() {
                 }
               }
               ,{
-                 text    : 'Clear highlighted sites'
+                 text    : 'Clear highlighted / queried sites'
                 ,icon    : 'img/draw_eraser.png'
                 ,handler : function() {
                   var lyr = map.getLayersByName('hiliteMarkers')[0];
                   lyr.removeFeatures(lyr.features);
                   lyr.redraw();
+                  lyrQueryPts.removeFeatures(lyrQueryPts.features);
+                }
+              }
+              ,{
+                 text    : 'Requery'
+                ,icon    : 'img/arrow_refresh.png'
+                ,id      : 'requery'
+                ,hidden  : true
+                ,handler : function() {
+                  if (lyrQueryPts.features.length > 0) {
+                    mapClick(lastMapClick['xy'],true,true);
+                  }
                 }
               }
               ,'->'
@@ -756,6 +784,19 @@ function initMap() {
     OpenLayers.Layer.Google.v3.setGMapVisibility_old.apply(this,arguments);
   };
 
+  lyrQueryPts = new OpenLayers.Layer.Vector(
+     'Query points'
+    ,{styleMap : new OpenLayers.StyleMap({
+      'default' : new OpenLayers.Style(OpenLayers.Util.applyDefaults({
+         externalGraphic : 'img/${img}'
+        ,pointRadius     : 10
+        ,graphicOpacity  : 1
+        ,graphicWidth    : 16
+        ,graphicHeight   : 16
+      }))
+    })}
+  );
+
   map = new OpenLayers.Map('map',{
     layers            : [
       new OpenLayers.Layer.XYZ(
@@ -788,6 +829,7 @@ function initMap() {
         ,visibility    : false
         ,minZoomLevel  : 2
       })
+      ,lyrQueryPts
     ]
     ,projection        : proj900913
     ,displayProjection : proj4326
@@ -838,6 +880,14 @@ function initMap() {
 
   map.setCenter(new OpenLayers.LonLat(-10536302.833765,3885808.4963698),4);
 
+  map.events.register('click',this,function(e) {
+    mapClick(e.xy);
+  });
+
+  map.events.register('addlayer',this,function() {
+    map.setLayerIndex(lyrQueryPts,map.layers.length - 1);
+  });
+
   map.events.register('moveend',this,function() {
     if (popupObs && !popupObs.isDestroyed) {
       popupObs.show();
@@ -866,7 +916,11 @@ function renderLayerStatus(val,metadata,rec) {
 }
 
 function renderLegend(val,metadata,rec) {
+  metadata.attr = 'ext:qtip="' + val.split('.').slice(1) + '"';
   var a = [val.split('.').slice(1)];
+  if (rec.get('timestamp') && rec.get('timestamp') != '') {
+    a.push(rec.get('timestamp'));
+  }
   var gridsSto = Ext.getCmp('gridsGridPanel').getStore();
   var gridsRec = gridsSto.getAt(gridsSto.find('name',val));
   if (!legendImages[val]) {
@@ -1259,6 +1313,20 @@ function shortMonthDayStringWithTime(d) {
     + ' UTC';
 }
 
+function shortDateToDate(s) {
+  // 10/22/2011 08:00 UTC-04
+  var p = s.split(' ');
+  var mdy = p[0].split('/');
+  var hm = p[1].split(':');
+  return new Date(
+     mdy[2]
+    ,mdy[0] - 1
+    ,mdy[1]
+    ,hm[0]
+    ,hm[1]
+  );
+}
+
 function refreshTimer() {
   var hits = 0;
   for (i in pendingTransactions) {
@@ -1564,6 +1632,7 @@ function addToPopupCtl(lyr) {
             }
           });
           popupObs.show();
+          mapClick(map.getPixelFromLonLat(new OpenLayers.LonLat(e.feature.geometry.getCentroid().x,e.feature.geometry.getCentroid().y)));
         }
       }
     });
@@ -1740,8 +1809,35 @@ function addGrid(url,lyr,syl,sgl,name,type) {
     var idx = sto.find('name',lyr.name);
     if (idx >= 0) {
       var rec = sto.getAt(idx);
-      rec.set('status','drawn');
-      rec.commit();
+      OpenLayers.Request.GET({
+         url      : 'getTimestamp.php?'
+          + lyr.getFullRequestString({})
+          + '&WIDTH='  + map.getSize().w
+          + '&HEIGHT=' + map.getSize().h
+          + '&BBOX=' +  map.getExtent().toArray().join(',')
+          + '&' + new Date().getTime()
+          + '&drawImg=false'
+        ,callback : function(r) {
+          if (r.responseText == '') {
+            rec.set('timestamp','<span class="alert">There was a problem<br/>drawing this layer.<span>');
+          }
+          else if (r.responseText == 'invalidBbox') {
+            rec.set('timestamp','<span class="alert">This layer\'s domain<br/>is out of bounds.<span>');
+          }
+          else if (r.responseText == 'dateNotAvailable') {
+            rec.set('timestamp','');
+          }
+          else {
+            var prevTs = rec.get('timestamp');
+            var d = new Date(r.responseText * 1000);
+            var newTs  = d.getUTCFullYear() + '-' + String.leftPad(d.getUTCMonth() + 1,2,'0') + '-' + String.leftPad(d.getUTCDate(),2,'0') + ' ' + String.leftPad(d.getUTCHours(),2,'0') + ':00 UTC';
+            rec.set('timestamp',newTs);
+            rec.set('jsDate',d);
+          }
+          rec.set('status','drawn');
+          rec.commit();
+        }
+      });
     }
   });
   lyr.mergeNewParams({TIME : makeTimeParam(dNow)});
@@ -1769,4 +1865,137 @@ function setdNow(d) {
   else {
     dNow.setUTCHours(0);
   }
+}
+
+function mapClick(xy) {
+  lastMapClick['xy'] = xy;
+  lyrQueryPts.removeFeatures(lyrQueryPts.features);
+
+  var l = [];
+  Ext.getCmp('legendsGridPanel').getStore().each(function(rec) {
+    l.push(map.getLayersByName(rec.get('name'))[0]);
+  });
+
+  if (l.length == 0) {
+    if (Ext.getCmp('stationGridTabPanel').getActiveTab().id == 'gridsTab') {
+      Ext.Msg.alert('Query error','Please add at least one gridded dataset to the map before requesting a time series extraction.');
+    }
+  }
+  else {
+    var lonLat       = map.getLonLatFromPixel(xy);
+    var f            = new OpenLayers.Feature.Vector(new OpenLayers.Geometry.Point(lonLat.lon,lonLat.lat));
+    f.attributes.img = 'Delete-icon.png';
+    lyrQueryPts.addFeatures(f);
+    queryWMS(xy,l);
+  }
+}
+
+function queryWMS(xy,a) {
+  lastMapClick['layer'] = a[0].name;
+  var targets = [];
+  var sto = Ext.getCmp('legendsGridPanel').getStore();
+  var grdSto = Ext.getCmp('gridsGridPanel').getStore();
+  for (var i = 0; i < a.length; i++) {
+    var mapTime;
+    var legIdx = sto.find('name',a[i].name);
+    var grdIdx = grdSto.find('name',a[i].name);
+    if (legIdx >= 0 && String(sto.getAt(legIdx).get('timestamp')).indexOf('alert') < 0) {
+      var d = sto.getAt(legIdx).get('jsDate');
+      if (d) {
+        mapTime = '&mapTime=' + d.getTime() / 1000;
+      }
+      else {
+        Ext.Msg.alert('Time series error',"We're sorry, but we could not perform a time series extraction.  If the layer is still loading, please wait until it has finished and retry.");
+        return;
+      }
+    }
+    var paramOrig = OpenLayers.Util.getParameters(a[i].getFullRequestString({}));
+    var d = sto.getAt(legIdx).get('jsDate');
+    var paramNew = {
+       REQUEST       : 'GetFeatureInfo'
+      ,EXCEPTIONS    : 'application/vnd.ogc.se_xml'
+      ,BBOX          : map.getExtent().toBBOX()
+      ,X             : xy.x
+      ,Y             : xy.y
+      ,INFO_FORMAT   : 'text/xml'
+      ,FEATURE_COUNT : 1
+      ,WIDTH         : map.size.w
+      ,HEIGHT        : map.size.h
+      ,QUERY_LAYERS  : OpenLayers.Util.getParameters(a[i].getFullRequestString({}))['LAYERS']
+      ,TIME          : makeTimeParam(new Date(d.getTime() - 3600 * 24 * 1000)) + '/' + makeTimeParam(new Date(d.getTime() + 3600 * 24 * 1000))
+    };
+    targets.push({
+       url   : a[i].getFullRequestString(paramNew,'getFeatureInfo.php?' + a[i].url + '&tz=' + new Date().getTimezoneOffset() + mapTime) + '&varName=' + grdSto.getAt(grdIdx).get('varName') + '&varUnits=' + grdSto.getAt(grdIdx).get('varUnits')
+      ,title : sto.getAt(legIdx).get('displayName')
+      ,type  : 'model'
+    });
+  }
+  addToChart(targets);
+}
+
+function addToChart(a) {
+  for (var j = 0; j < a.length; j++) {
+    graphLoadstartMask(a[j].url);
+    OpenLayers.Request.GET({
+       url      : a[j].url
+      ,callback : OpenLayers.Function.bind(addToChartCallback,null,a[j].title,a[j].url)
+    });
+  }
+  function addToChartCallback(title,url,r) {
+    graphLoadendUnmask(url);
+    var obs = new OpenLayers.Format.JSON().read(r.responseText);
+    if (obs && obs.error) {
+      chartData.push({
+         data   : []
+        ,label  : title.split('||')[0] + ': QUERY ERROR ' + obs.error
+      });
+    }
+    else if (!obs || obs.d == '' || obs.d.length == 0) {
+      chartData.push({
+         data   : []
+        ,label  : title.split('||')[0] + ': QUERY ERROR'
+      });
+    }
+    else {
+      // get rid of any errors if good, new data has arrived
+      if (chartData.length == 1 && String(chartData[0]).indexOf('QUERY ERROR') == 0) {
+        chartData.pop();
+      }
+      for (var v in obs.d) {
+        // get the data
+        chartData.push({
+           data   : []
+          ,label  : title.split('||')[0] + ' : ' + v + ' (' + obs.u[v] + ')'
+          ,lines  : {show : true}
+        });
+        for (var i = 0; i < obs.d[v].length; i++) {
+          chartData[chartData.length-1].data.push([obs.t[i],obs.d[v][i]]);
+        }
+        if (obs.d[v].length == 1) {
+          chartData[chartData.length - 1].points = {show : true};
+        }
+      }
+    }
+    Ext.getCmp('timeseriesPanel').fireEvent('resize',Ext.getCmp('timeseriesPanel'));
+  }
+}
+
+function toEnglish(v) {
+  if (String(v.src).indexOf('Celcius') >= 0) {
+    if (v.typ == 'title') {
+      return v.val.replace('Celcius','Fahrenheit');
+    }
+    else {
+      return v.val * 9/5 + 32;
+    }
+  }
+  else if (String(v.src).indexOf('Meters') >= 0) {
+    if (v.typ == 'title') {
+      return v.val.replace('Meters','Feet');
+    }
+    else {
+      return v.val * 3.281;
+    }
+  }
+  return v.val;
 }
