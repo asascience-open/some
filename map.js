@@ -218,7 +218,7 @@ function init() {
      header    : ''
     ,listeners : {
       rowselect : function(sm,rowIndex,rec) {
-        addGrid(rec.get('url'),rec.get('lyr'),rec.get('stl'),rec.get('name'),'grids');
+        addGrid(rec.get('url'),rec.get('lyr'),rec.get('stl'),rec.get('sgl'),rec.get('name'),'grids');
       }
       ,rowdeselect : function(sm,rowIndex,rec) {
         map.getLayersByName(rec.get('name'))[0].setVisibility(false);
@@ -230,7 +230,7 @@ function init() {
     ,id          : 'gridsGridPanel'
     ,store : new Ext.data.JsonStore({
        url       : 'query.php?type=grids&providers=eds'
-      ,fields    : ['name','url','lyr','stl','leg']
+      ,fields    : ['name','url','lyr','stl','sgl','leg']
       ,root      : 'data'
       ,listeners : {
         beforeload : function(sto) {
@@ -1680,7 +1680,7 @@ function addLayer(lyr,timeSensitive) {
   map.addLayer(lyr);
 }
 
-function addGrid(url,lyr,syl,name,type) {
+function addGrid(url,lyr,syl,sgl,name,type) {
   if (map.getLayersByName(name)[0]) {
     var lyr = map.getLayersByName(name)[0];
     lyr.setVisibility(true);
@@ -1691,13 +1691,14 @@ function addGrid(url,lyr,syl,name,type) {
      name
     ,url
     ,{
-       layers : lyr
-      ,styles : syl
+       layers      : lyr
+      ,styles      : syl
+      ,transparent : true
     }
     ,{
        isBaseLayer  : false
       ,projection   : proj3857
-      ,singleTile   : true
+      ,singleTile   : sgl
       ,wrapDateLine : true
       ,visibility   : true
       ,opacity      : 1
@@ -1749,5 +1750,10 @@ function addGrid(url,lyr,syl,name,type) {
 }
 
 function makeTimeParam(d) {
-  return d.getUTCFullYear() + '-' + String.leftPad(d.getUTCMonth() + 1,2,'0') + '-' + String.leftPad(d.getUTCDate(),2,'0') + 'T' + String.leftPad(d.getUTCHours(),2,'0') + ':00'
+  return d.getUTCFullYear() 
+    + '-' + String.leftPad(d.getUTCMonth() + 1,2,'0') 
+    + '-' + String.leftPad(d.getUTCDate(),2,'0') 
+    + 'T' 
+    + String.leftPad(d.getUTCHours(),2,'0') 
+    + ':00.000Z'
 }

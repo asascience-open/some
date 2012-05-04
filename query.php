@@ -119,10 +119,23 @@
 
   if (in_array('eds',$providers)) {
     array_push($grids,array(
+       'name' => 'grid.SLOSH - Ike - GOM : Water Surface Height Above Reference Datum'
+      ,'url'  => 'http://testbedapps.sura.org/thredds/wms/inundation/mdl/slosh/ike/gom?COLORSCALERANGE=-0.33528,0.54864'
+      ,'lyr'  => 'eta'
+      ,'stl'  => ''
+      ,'sgl'  => false
+      ,'leg'  => 'http://testbedapps.sura.org/thredds/wms/inundation/mdl/slosh/ike/gom?TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&EXCEPTIONS=application/vnd.ogc.se_xml&FORMAT=image/gif&LAYER=eta&TIME=&COLORSCALERANGE=-0.33528,0.54864'
+      ,'minT' => '2008-09-10T09:00:20.000Z'
+      ,'maxT' => '2008-09-13T22:00:00.000Z'
+    ));
+    // http://testbedapps.sura.org/thredds/wms/inundation/mdl/slosh/ike/gom?LAYERS=eta&STYLES=&TRANSPARENT=TRUE&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMetadata&FORMAT=image%2Fpng&TIME=2008-09-11T00%3A00&CRS=EPSG%3A4326&BBOX=-179,-89,179,89&WIDTH=256&HEIGHT=256&item=minmax
+
+    array_push($grids,array(
        'name' => 'grid.FVCOM Mass Bay'
-      ,'url'  => 'http://coastmap.com/ecop/wms.aspx'
+      ,'url'  => 'http://coastmap.com/ecop/wms.aspx?EXCEPTIONS=application/vnd.ogc.se_xml'
       ,'lyr'  => 'FVCOM_MASS_CURRENTS'
       ,'stl'  => 'CURRENTS_RAMP-Jet-False-1-True-0-2-High'
+      ,'sgl'  => true
       ,'leg'  => 'http://coastmap.com/ecop/wms.aspx?FORMAT=image/png&TRANSPARENT=TRUE&STYLES=CURRENTS_RAMP-Jet-False-1-True-0-2-High&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&TIME=&SRS=EPSG:3857&LAYERS=FVCOM_MASS_CURRENTS'
       ,'minT' => date('Y-m-d',$today).'T'.date('H:i:s',$today).'Z'
       ,'maxT' => date('Y-m-d',$today + 3600 * 24 * 2).'T'.date('H:i:s',$today + 3600 * 24 * 2).'Z'
