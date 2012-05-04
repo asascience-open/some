@@ -19,16 +19,8 @@ var logsStore = new Ext.data.ArrayStore({
 var pendingTransactions = {};
 var viewsReady = 0;
 
-var dNow = new Date();
-dNow.setUTCMinutes(0);
-dNow.setUTCSeconds(0);
-dNow.setUTCMilliseconds(0);
-if (dNow.getHours() >= 12) {
-  dNow.setUTCHours(12);
-}
-else {
-  dNow.setUTCHours(0);
-}
+var dNow;
+setdNow(new Date());
 
 var logsWin;
 var legendImages = {};
@@ -230,7 +222,7 @@ function init() {
     ,id          : 'gridsGridPanel'
     ,store : new Ext.data.JsonStore({
        url       : 'query.php?type=grids&providers=eds'
-      ,fields    : ['name','url','lyr','stl','sgl','leg']
+      ,fields    : ['name','url','lyr','stl','sgl','leg','minT']
       ,root      : 'data'
       ,listeners : {
         beforeload : function(sto) {
@@ -243,6 +235,15 @@ function init() {
           if (Ext.getCmp('gridsGridPanel').getEl()) {
             Ext.getCmp('gridsGridPanel').getEl().unmask();
           }
+          var d0 = new Date();
+          sto.each(function(rec) {
+            var d = new Date(rec.get('minT') * 1000);
+            if (d < d0) {
+               d0 = d;
+            }
+          });
+          setdNow(d0);
+          setMapTime();
         }
       }
     })
@@ -1585,11 +1586,10 @@ function addToPopupCtl(lyr) {
 
 function setMapTime() {
   Ext.getCmp('mapTime').setText(dNow.getUTCFullYear() + '-' + String.leftPad(dNow.getUTCMonth() + 1,2,'0') + '-' + String.leftPad(dNow.getUTCDate(),2,'0') + ' ' + String.leftPad(dNow.getUTCHours(),2,'0') + ':00 UTC');
-  var dStr = dNow.getUTCFullYear() + '-' + String.leftPad(dNow.getUTCMonth() + 1,2,'0') + '-' + String.leftPad(dNow.getUTCDate(),2,'0') + 'T' + String.leftPad(dNow.getUTCHours(),2,'0') + ':00';
   for (var i = 0; i < map.layers.length; i++) {
     // WMS layers only
     if (map.layers[i].DEFAULT_PARAMS) {
-      map.layers[i].mergeNewParams({TIME : dStr});
+      map.layers[i].mergeNewParams({TIME : makeTimeParam(dNow)});
     }
   }
 
@@ -1675,7 +1675,7 @@ function addTileCache(l) {
 
 function addLayer(lyr,timeSensitive) {
   if (timeSensitive) {
-    lyr.mergeNewParams({TIME : dNow.getUTCFullYear() + '-' + String.leftPad(dNow.getUTCMonth() + 1,2,'0') + '-' + String.leftPad(dNow.getUTCDate(),2,'0') + 'T' + String.leftPad(dNow.getUTCHours(),2,'0') + ':00'});
+    lyr.mergeNewParams({TIME : makeTimeParam(dNow)});
   }
   map.addLayer(lyr);
 }
@@ -1755,5 +1755,18 @@ function makeTimeParam(d) {
     + '-' + String.leftPad(d.getUTCDate(),2,'0') 
     + 'T' 
     + String.leftPad(d.getUTCHours(),2,'0') 
-    + ':00.000Z'
+    + ':00Z'
+}
+
+function setdNow(d) {
+  dNow = new Date(d.getTime());
+  dNow.setUTCMinutes(0);
+  dNow.setUTCSeconds(0);
+  dNow.setUTCMilliseconds(0);
+  if (dNow.getHours() >= 12) {
+    dNow.setUTCHours(12);
+  }
+  else {
+    dNow.setUTCHours(0);
+  }
 }
