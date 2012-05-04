@@ -227,11 +227,12 @@ function init() {
      height      : 50
     ,id          : 'gridsGridPanel'
     ,store : new Ext.data.JsonStore({
-       url       : 'query.php?'
+       url       : 'query.php?type=grids'
       ,fields    : ['name','url','properties']
       ,root      : 'data'
       ,listeners : {
         beforeload : function(sto) {
+          sto.setBaseParam('eventtime',getEventtimeFromEventsComboBox());
           if (Ext.getCmp('gridsGridPanel').getEl()) {
             Ext.getCmp('gridsGridPanel').getEl().mask('<table><tr><td>Loading...&nbsp;</td><td><img src="js/ext-3.3.0/resources/images/default/grid/loading.gif"></td></tr></table>');
           }
@@ -337,7 +338,7 @@ function init() {
               {
                  border : false
                 ,cls    : 'directionsPanel'
-                ,html   : 'Station data as well as gridded data may be mapped independently. When switching between station and grid tabs, be aware that your map and time series graph will be cleared.'
+                ,html   : 'Station data as well as gridded data may be mapped independently. When switching between station and grid tabs, be aware that your map and time series graph may be cleared.'
               }
               ,new Ext.TabPanel({
                  activeTab  : 0
@@ -731,15 +732,36 @@ function initMap() {
 
   map = new OpenLayers.Map('map',{
     layers            : [
-       new OpenLayers.Layer.XYZ(
-          'ESRI Ocean'
-         ,'http://services.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/${z}/${y}/${x}.jpg'
-         ,{
-            sphericalMercator : true
-           ,isBaseLayer       : true
-           ,wrapDateLine      : true
-         }
-       )
+      new OpenLayers.Layer.XYZ(
+        'ESRI Ocean'
+        ,'http://services.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/${z}/${y}/${x}.jpg'
+        ,{
+           sphericalMercator : true
+          ,isBaseLayer       : true
+          ,wrapDateLine      : true
+        }
+      )
+      ,new OpenLayers.Layer.Google('Google Hybrid',{
+         type          : google.maps.MapTypeId.HYBRID
+        ,projection    : proj900913
+        ,opacity       : 1
+        ,visibility    : false
+        ,minZoomLevel  : 2
+      })
+      ,new OpenLayers.Layer.Google('Google Satellite',{
+         type          : google.maps.MapTypeId.SATELLITE
+        ,projection    : proj900913
+        ,opacity       : 1
+        ,visibility    : false
+        ,minZoomLevel  : 2
+      })
+      ,new OpenLayers.Layer.Google('Google Terrain',{
+         type          : google.maps.MapTypeId.TERRAIN
+        ,projection    : proj900913
+        ,opacity       : 1
+        ,visibility    : false
+        ,minZoomLevel  : 2
+      })
     ]
     ,projection        : proj900913
     ,displayProjection : proj4326
@@ -778,6 +800,15 @@ function initMap() {
       })
     }
   ));
+
+  addTileCache({
+     name       : 'Bathymetry contours'
+    ,url        : 'http://assets.maracoos.org/tilecache/'
+    ,layer      : 'bathy'
+    ,projection : proj900913
+    ,visibility : false
+  });
+
 
   map.setCenter(new OpenLayers.LonLat(-10536302.833765,3885808.4963698),4);
 
@@ -1503,4 +1534,101 @@ function addToPopupCtl(lyr) {
     }
     popupCtl.setLayer(layers);
   }
+}
+
+function setMapTime() {
+  Ext.getCmp('mapTime').setText(dNow.getUTCFullYear() + '-' + String.leftPad(dNow.getUTCMonth() + 1,2,'0') + '-' + String.leftPad(dNow.getUTCDate(),2,'0') + ' ' + String.leftPad(dNow.getUTCHours(),2,'0') + ':00 UTC');
+  var dStr = dNow.getUTCFullYear() + '-' + String.leftPad(dNow.getUTCMonth() + 1,2,'0') + '-' + String.leftPad(dNow.getUTCDate(),2,'0') + 'T' + String.leftPad(dNow.getUTCHours(),2,'0') + ':00';
+  for (var i = 0; i < map.layers.length; i++) {
+    // WMS layers only
+    if (map.layers[i].DEFAULT_PARAMS) {
+      map.layers[i].mergeNewParams({TIME : dStr});
+    }
+  }
+
+  if (Ext.getCmp('datePicker')) {
+    var dp = Ext.getCmp('datePicker');
+    dp.suspendEvents();
+    dp.setValue(new Date(dNow.getTime() + dNow.getTimezoneOffset() * 60000));
+    dp.resumeEvents();
+  }
+}
+
+function addTileCache(l) {
+  var lyr = new OpenLayers.Layer.TileCache(
+     l.name
+    ,l.url
+    ,l.layer
+    ,{
+       visibility        : l.visibility
+      ,isBaseLayer       : false
+      ,wrapDateLine      : true
+      ,projection        : l.projection
+      ,opacity           : 1
+      ,scales            : [
+         55468034.09273208   // ESRI Ocean zoom 3
+        ,27734017.04636604
+        ,13867008.52318302
+        ,6933504.26159151
+        ,3466752.130795755
+        ,1733376.0653978775
+        ,866688.0326989387
+        ,433344.01634946937
+        ,216672.00817473468
+      ]
+    }
+  );
+  lyr.getURL = function(bounds) {
+    var res = this.map.getResolution();
+    var bbox = this.maxExtent;
+    var size = this.tileSize;
+    var tileX = Math.round((bounds.left - bbox.left) / (res * size.w));
+    var tileY = Math.round((bounds.bottom - bbox.bottom) / (res * size.h));
+    var tileZ = this.serverResolutions != null ?
+        OpenLayers.Util.indexOf(this.serverResolutions, res) :
+        this.map.getZoom();
+    // this is the trick
+    tileZ += map.baseLayer.minZoomLevel ? map.baseLayer.minZoomLevel : 0;
+    /**
+     * Zero-pad a positive integer.
+     * number - {Int}
+     * length - {Int}
+     *
+     * Returns:
+     * {String} A zero-padded string
+     */
+    function zeroPad(number, length) {
+        number = String(number);
+        var zeros = [];
+        for(var i=0; i<length; ++i) {
+            zeros.push('0');
+        }
+        return zeros.join('').substring(0, length - number.length) + number;
+    }
+    var components = [
+        this.layername,
+        zeroPad(tileZ, 2),
+        zeroPad(parseInt(tileX / 1000000), 3),
+        zeroPad((parseInt(tileX / 1000) % 1000), 3),
+        zeroPad((parseInt(tileX) % 1000), 3),
+        zeroPad(parseInt(tileY / 1000000), 3),
+        zeroPad((parseInt(tileY / 1000) % 1000), 3),
+        zeroPad((parseInt(tileY) % 1000), 3) + '.' + this.extension
+    ];
+    var path = components.join('/');
+    var url = this.url;
+    if (url instanceof Array) {
+        url = this.selectUrl(path, url);
+    }
+    url = (url.charAt(url.length - 1) == '/') ? url : url + '/';
+    return url + path;
+  };
+  addLayer(lyr,false);
+}
+
+function addLayer(lyr,timeSensitive) {
+  if (timeSensitive) {
+    lyr.mergeNewParams({TIME : dNow.getUTCFullYear() + '-' + String.leftPad(dNow.getUTCMonth() + 1,2,'0') + '-' + String.leftPad(dNow.getUTCDate(),2,'0') + 'T' + String.leftPad(dNow.getUTCHours(),2,'0') + ':00'});
+  }
+  map.addLayer(lyr);
 }
