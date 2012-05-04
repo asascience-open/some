@@ -35,6 +35,7 @@
   }
 
   if (in_array('sura',$providers)) {
+/*
     $q = queryCatalog('Imeds CRMS watlev_CRMS_2008.F.C__IKE_VIMS_3D_WITHWAVE.IMEDS');
     for ($i = 0; $i < count($q); $i++) {
       array_push($models,array(
@@ -65,8 +66,8 @@
         )
       ));
     }
+*/
 
-/*
     $q = fakeQueryCatalog('Simulation');
     for ($i = 0; $i < count($q); $i++) {
       array_push($models,array(
@@ -98,8 +99,6 @@
         )
       ));
     }
-*/
-
   }
 
   if (in_array('coops',$providers)) {

@@ -15,6 +15,20 @@ var logsStore = new Ext.data.ArrayStore({
     pendingTransactions[recs[0].get('url')] = true;
   }}
 });
+var legendsStore = new Ext.data.ArrayStore({
+  fields : [
+     'name'
+    ,'displayName'
+    ,'status'
+    ,'rank'
+    ,'fetchTime'
+    ,'type'
+  ]
+  ,listeners : {update : function() {
+    this.sort('rank','ASC');
+  }}
+});
+
 var pendingTransactions = {};
 var viewsReady = 0;
 
@@ -258,24 +272,13 @@ function init() {
   var legendsGridPanel = new Ext.grid.GridPanel({
      height      : 50
     ,id          : 'legendsGridPanel'
-    ,store : new Ext.data.JsonStore({
-       url       : 'query.php'
-      ,fields    : ['name','url','lyr']
-      ,root      : 'data'
-      ,listeners : {
-        beforeload : function(sto) {
-        }
-        ,load      : function(sto) {
-        }
-      }
-    })
-    ,autoExpandColumn : 'name'
+    ,store       : legendsStore
     ,columns     : [
-      {id : 'name',dataIndex :'name',renderer : renderName}
+       {id : 'status',dataIndex : 'status',renderer : renderLayerStatus}
+      ,{id : 'legend',dataIndex : 'name'  ,renderer : renderLegend}
     ]
-    ,hideHeaders : true
-    ,listeners   : {viewready : function() {
-    }}
+    ,hideHeaders      : true
+    ,disableSelection : true
   });
 
   new Ext.Viewport({
@@ -856,6 +859,34 @@ function renderName(val,metadata,rec) {
 
 function renderUrl(val,metadata,rec) {
   return '<a target=_blank href="' + val + '">' + val + '</a>';
+}
+
+function renderLayerStatus(val,metadata,rec) {
+  if (val == 'loading') {
+    return '<img src="img/loading.gif">';
+  }
+  else {
+    return '<img class="layerIcon" src="img/DEFAULT.drawn.png">';
+  }
+}
+
+function renderLegend(val,metadata,rec) {
+  return val;
+  var idx = mainStore.find('name',rec.get('name'));
+  var a = [rec.get('displayName').split('||')[0]];
+  if (rec.get('timestamp') && rec.get('timestamp') != '') {
+    a.push(rec.get('timestamp'));
+  }
+  if (mainStore.getAt(idx).get('legend') != '') {
+    if (!legendImages[rec.get('name')]) {
+      var img = new Image();
+      img.src = 'getLegend.php?' + mainStore.getAt(idx).get('legend');
+      legendImages[rec.get('name')] = img;
+    }
+
+    a.push('<img src="getLegend.php?' + mainStore.getAt(idx).get('legend') + '">');
+  }
+  return a.join('<br/>');
 }
 
 function getCaps(url,name,type) {
@@ -1684,16 +1715,36 @@ function addGrid(url,lyr,name,type) {
     }
   );
 
+  lyr.events.register('visibilitychanged',this,function(e) {
+    if (!lyr.visibility) {
+      layerLoadendUnmask();
+    }
+  });
   lyr.events.register('loadstart',this,function(e) {
+    layerLoadstartMask();
   });
-
   lyr.events.register('loadend',this,function(e) {
+    layerLoadendUnmask();
   });
-
   lyr.mergeNewParams({TIME : makeTimeParam(dNow)});
+
   map.addLayer(lyr);
 }
 
 function makeTimeParam(d) {
   return d.getUTCFullYear() + '-' + String.leftPad(d.getUTCMonth() + 1,2,'0') + '-' + String.leftPad(d.getUTCDate(),2,'0') + 'T' + String.leftPad(d.getUTCHours(),2,'0') + ':00'
+}
+
+function layerLoadstartMask() {
+  Ext.getCmp('legendsGridPanel').getEl().mask('<table><tr><td>Updating map...&nbsp;</td><td><img src="js/ext-3.3.0/resources/images/default/grid/loading.gif"></td></tr></table>','mask');
+}
+
+function layerLoadendUnmask() {
+  var stillLoading = 0;
+  legendsStore.each(function(rec) {
+    stillLoading += (rec.get('status') != 'drawn' ? 1 : 0);
+  });
+  if (stillLoading == 0) {
+    Ext.getCmp('legendsGridPanel').getEl().unmask();
+  }
 }

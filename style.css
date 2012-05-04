@@ -129,3 +129,6 @@ div.olLayerGoogleCopyright, div.olLayerGooglePoweredBy {
 .x-menu .x-color-palette, .x-menu .x-date-picker {
   margin-left : 4px;
 }
+.mask td {
+  font : 11px/13px tahoma,helvetica,sans-serif;
+}
