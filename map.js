@@ -216,7 +216,7 @@ function init() {
      header    : ''
     ,listeners : {
       rowselect : function(sm,rowIndex,rec) {
-        getCaps(rec.get('url'),rec.get('name'),'grids');
+        addGrid(rec.get('url'),rec.get('lyr'),rec.get('name'),'grids');
       }
       ,rowdeselect : function(sm,rowIndex,rec) {
         map.getLayersByName(rec.get('name'))[0].setVisibility(false);
@@ -227,8 +227,8 @@ function init() {
      height      : 50
     ,id          : 'gridsGridPanel'
     ,store : new Ext.data.JsonStore({
-       url       : 'query.php?type=grids'
-      ,fields    : ['name','url','properties']
+       url       : 'query.php?type=grids&providers=eds'
+      ,fields    : ['name','url','lyr']
       ,root      : 'data'
       ,listeners : {
         beforeload : function(sto) {
@@ -249,6 +249,29 @@ function init() {
     ,columns     : [
        gridsSelModel
       ,{id : 'name',dataIndex :'name',renderer : renderName}
+    ]
+    ,hideHeaders : true
+    ,listeners   : {viewready : function() {
+    }}
+  });
+
+  var legendsGridPanel = new Ext.grid.GridPanel({
+     height      : 50
+    ,id          : 'legendsGridPanel'
+    ,store : new Ext.data.JsonStore({
+       url       : 'query.php'
+      ,fields    : ['name','url','lyr']
+      ,root      : 'data'
+      ,listeners : {
+        beforeload : function(sto) {
+        }
+        ,load      : function(sto) {
+        }
+      }
+    })
+    ,autoExpandColumn : 'name'
+    ,columns     : [
+      {id : 'name',dataIndex :'name',renderer : renderName}
     ]
     ,hideHeaders : true
     ,listeners   : {viewready : function() {
@@ -379,6 +402,10 @@ function init() {
                          title : '&nbsp;Gridded datasets&nbsp;'
                         ,items : gridsGridPanel
                       })
+                      ,new Ext.form.FieldSet({
+                         title : '&nbsp;Active legends&nbsp;'
+                        ,items : legendsGridPanel
+                      })
                     ]
                   }
                 ]
@@ -415,7 +442,8 @@ function init() {
           targetH -= 137;
           Ext.getCmp('observationsGridPanel').setHeight(targetH / 2);
           Ext.getCmp('modelsGridPanel').setHeight(targetH / 2);
-          Ext.getCmp('gridsGridPanel').setHeight(targetH + 46);
+          Ext.getCmp('gridsGridPanel').setHeight(targetH / 2);
+          Ext.getCmp('legendsGridPanel').setHeight(targetH / 2);
         })}}
       }
       ,{
@@ -1631,4 +1659,41 @@ function addLayer(lyr,timeSensitive) {
     lyr.mergeNewParams({TIME : dNow.getUTCFullYear() + '-' + String.leftPad(dNow.getUTCMonth() + 1,2,'0') + '-' + String.leftPad(dNow.getUTCDate(),2,'0') + 'T' + String.leftPad(dNow.getUTCHours(),2,'0') + ':00'});
   }
   map.addLayer(lyr);
+}
+
+function addGrid(url,lyr,name,type) {
+  if (map.getLayersByName(name)[0]) {
+    var lyr = map.getLayersByName(name)[0];
+    lyr.setVisibility(true);
+    return;
+  }
+
+  var lyr = new OpenLayers.Layer.WMS(
+     name
+    ,url
+    ,{
+      layers : lyr
+    }
+    ,{
+       isBaseLayer  : false
+      ,projection   : proj3857
+      ,singleTile   : true
+      ,wrapDateLine : true
+      ,visibility   : true
+      ,opacity      : 1
+    }
+  );
+
+  lyr.events.register('loadstart',this,function(e) {
+  });
+
+  lyr.events.register('loadend',this,function(e) {
+  });
+
+  lyr.mergeNewParams({TIME : makeTimeParam(dNow)});
+  map.addLayer(lyr);
+}
+
+function makeTimeParam(d) {
+  return d.getUTCFullYear() + '-' + String.leftPad(d.getUTCMonth() + 1,2,'0') + '-' + String.leftPad(d.getUTCDate(),2,'0') + 'T' + String.leftPad(d.getUTCHours(),2,'0') + ':00'
 }

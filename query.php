@@ -16,6 +16,7 @@
 
   $models = array();
   $obs    = array();
+  $grids  = array();
 
   if (in_array('gomaine',$providers)) {
     array_push($models,array(
@@ -34,7 +35,6 @@
   }
 
   if (in_array('sura',$providers)) {
-/*
     $q = queryCatalog('Imeds CRMS watlev_CRMS_2008.F.C__IKE_VIMS_3D_WITHWAVE.IMEDS');
     for ($i = 0; $i < count($q); $i++) {
       array_push($models,array(
@@ -65,7 +65,8 @@
         )
       ));
     }
-*/
+
+/*
     $q = fakeQueryCatalog('Simulation');
     for ($i = 0; $i < count($q); $i++) {
       array_push($models,array(
@@ -97,6 +98,8 @@
         )
       ));
     }
+*/
+
   }
 
   if (in_array('coops',$providers)) {
@@ -115,6 +118,17 @@
     ));
   }
 
+  if (in_array('eds',$providers)) {
+    array_push($grids,array(
+       'name' => 'grid.Waves'
+      ,'url'  => 'http://coastmap.com/ecop/wms.aspx'
+      ,'lyr'  => 'WW3_WAVE_HEIGHT'
+      ,'minT' => date('Y-m-d',$today).'T'.date('H:i:s',$today).'Z'
+      ,'maxT' => date('Y-m-d',$today + 3600 * 24 * 2).'T'.date('H:i:s',$today + 3600 * 24 * 2).'Z'
+    ));
+  }
+
+
   $data = array();
   if ($_REQUEST['type'] == 'models') {
     for ($i = 0; $i < count($models); $i++) {
@@ -127,6 +141,13 @@
     for ($i = 0; $i < count($obs); $i++) {
       if ((strtotime($eventTime[0]) <= strtotime($obs[$i]['maxT'])) && (strtotime($eventTime[1]) >= strtotime($obs[$i]['minT']))) {
         array_push($data,$obs[$i]);
+      }
+    }
+  }
+  if ($_REQUEST['type'] == 'grids') {
+    for ($i = 0; $i < count($grids); $i++) {
+      if ((strtotime($eventTime[0]) <= strtotime($grids[$i]['maxT'])) && (strtotime($eventTime[1]) >= strtotime($grids[$i]['minT']))) {
+        array_push($data,$grids[$i]);
       }
     }
   }
