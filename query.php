@@ -119,11 +119,11 @@
 
   if (in_array('eds',$providers)) {
     array_push($grids,array(
-       'name' => 'grid.Waves'
+       'name' => 'grid.FVCOM Mass Bay'
       ,'url'  => 'http://coastmap.com/ecop/wms.aspx'
-      ,'lyr'  => 'WW3_WAVE_HEIGHT'
-      ,'stl'  => ''
-      ,'leg'  => 'http://coastmap.com/ecop/wms.aspx?FORMAT=image/png&TRANSPARENT=TRUE&STYLES=&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&TIME=&SRS=EPSG:3857&LAYERS=WW3_WAVE_HEIGHT'
+      ,'lyr'  => 'FVCOM_MASS_CURRENTS'
+      ,'stl'  => 'CURRENTS_RAMP-Jet-False-1-True-0-2-High'
+      ,'leg'  => 'http://coastmap.com/ecop/wms.aspx?FORMAT=image/png&TRANSPARENT=TRUE&STYLES=CURRENTS_RAMP-Jet-False-1-True-0-2-High&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&TIME=&SRS=EPSG:3857&LAYERS=FVCOM_MASS_CURRENTS'
       ,'minT' => date('Y-m-d',$today).'T'.date('H:i:s',$today).'Z'
       ,'maxT' => date('Y-m-d',$today + 3600 * 24 * 2).'T'.date('H:i:s',$today + 3600 * 24 * 2).'Z'
     ));

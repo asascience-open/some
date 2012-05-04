@@ -267,6 +267,7 @@ function init() {
        {id : 'status',dataIndex : 'status',renderer : renderLayerStatus,width : 30}
       ,{id : 'legend',dataIndex : 'name'  ,renderer : renderLegend}
     ]
+    ,autoExpandColumn : 'legend'
     ,hideHeaders      : true
     ,disableSelection : true
   });
