@@ -15,19 +15,6 @@ var logsStore = new Ext.data.ArrayStore({
     pendingTransactions[recs[0].get('url')] = true;
   }}
 });
-var legendsStore = new Ext.data.ArrayStore({
-  fields : [
-     'name'
-    ,'displayName'
-    ,'status'
-    ,'rank'
-    ,'fetchTime'
-    ,'type'
-  ]
-  ,listeners : {update : function() {
-    this.sort('rank','ASC');
-  }}
-});
 
 var pendingTransactions = {};
 var viewsReady = 0;
@@ -44,6 +31,7 @@ else {
 }
 
 var logsWin;
+var legendImages = {};
 
 function init() {
   var loadingMask = Ext.get('loading-mask');
@@ -230,7 +218,7 @@ function init() {
      header    : ''
     ,listeners : {
       rowselect : function(sm,rowIndex,rec) {
-        addGrid(rec.get('url'),rec.get('lyr'),rec.get('name'),'grids');
+        addGrid(rec.get('url'),rec.get('lyr'),rec.get('stl'),rec.get('name'),'grids');
       }
       ,rowdeselect : function(sm,rowIndex,rec) {
         map.getLayersByName(rec.get('name'))[0].setVisibility(false);
@@ -242,7 +230,7 @@ function init() {
     ,id          : 'gridsGridPanel'
     ,store : new Ext.data.JsonStore({
        url       : 'query.php?type=grids&providers=eds'
-      ,fields    : ['name','url','lyr']
+      ,fields    : ['name','url','lyr','stl','leg']
       ,root      : 'data'
       ,listeners : {
         beforeload : function(sto) {
@@ -272,9 +260,11 @@ function init() {
   var legendsGridPanel = new Ext.grid.GridPanel({
      height      : 50
     ,id          : 'legendsGridPanel'
-    ,store       : legendsStore
+    ,store       : new Ext.data.ArrayStore({
+       fields : ['name','displayName','status']
+     })
     ,columns     : [
-       {id : 'status',dataIndex : 'status',renderer : renderLayerStatus}
+       {id : 'status',dataIndex : 'status',renderer : renderLayerStatus,width : 30}
       ,{id : 'legend',dataIndex : 'name'  ,renderer : renderLegend}
     ]
     ,hideHeaders      : true
@@ -426,6 +416,9 @@ function init() {
                 ,handler : function() {
                   Ext.getCmp('modelsGridPanel').getSelectionModel().clearSelections();
                   Ext.getCmp('observationsGridPanel').getSelectionModel().clearSelections();
+                  if (Ext.getCmp('gridsGridPanel').getEl()) {
+                    Ext.getCmp('gridsGridPanel').getSelectionModel().clearSelections();
+                  }
                   if (popupObs && popupObs.isVisible()) {
                     popupObs.hide();
                   }
@@ -871,21 +864,15 @@ function renderLayerStatus(val,metadata,rec) {
 }
 
 function renderLegend(val,metadata,rec) {
-  return val;
-  var idx = mainStore.find('name',rec.get('name'));
-  var a = [rec.get('displayName').split('||')[0]];
-  if (rec.get('timestamp') && rec.get('timestamp') != '') {
-    a.push(rec.get('timestamp'));
+  var a = [val.split('.').slice(1)];
+  var gridsSto = Ext.getCmp('gridsGridPanel').getStore();
+  var gridsRec = gridsSto.getAt(gridsSto.find('name',val));
+  if (!legendImages[val]) {
+    var img = new Image();
+    img.src = gridsRec.get('leg');
+    legendImages[val] = img;
   }
-  if (mainStore.getAt(idx).get('legend') != '') {
-    if (!legendImages[rec.get('name')]) {
-      var img = new Image();
-      img.src = 'getLegend.php?' + mainStore.getAt(idx).get('legend');
-      legendImages[rec.get('name')] = img;
-    }
-
-    a.push('<img src="getLegend.php?' + mainStore.getAt(idx).get('legend') + '">');
-  }
+  a.push('<img src="' + gridsRec.get('leg') + '">');
   return a.join('<br/>');
 }
 
@@ -997,13 +984,13 @@ function getCaps(url,name,type) {
       }
     );
     l.events.register('loadstart',this,function(e) {
-      layerLoadstartMask(l.name);
+      mapLoadstartMask(l.name);
     });
     l.events.register('loadend',this,function(e) {
-      layerLoadendUnmask(l.name);
+      mapLoadendUnmask(l.name);
     });
     l.events.register('visibilitychanged',this,function(e) {
-      layerLoadendUnmask(l.name);
+      mapLoadendUnmask(l.name);
     });
     map.addLayer(l);
     addToHiliteCtl(l);
@@ -1368,12 +1355,12 @@ function graphLoadendUnmask(url) {
   }
 }
 
-function layerLoadstartMask(url) {
+function mapLoadstartMask(url) {
   layerUrls[url] = true;
   Ext.getCmp('mapPanel').getEl().mask('<table><tr><td>Updating map...&nbsp;</td><td><img src="js/ext-3.3.0/resources/images/default/grid/loading.gif"></td></tr></table>','mask');
 }
 
-function layerLoadendUnmask(url) {
+function mapLoadendUnmask(url) {
   delete layerUrls[url];
   var hits = 0;
   for (var i in layerUrls) {
@@ -1692,7 +1679,7 @@ function addLayer(lyr,timeSensitive) {
   map.addLayer(lyr);
 }
 
-function addGrid(url,lyr,name,type) {
+function addGrid(url,lyr,syl,name,type) {
   if (map.getLayersByName(name)[0]) {
     var lyr = map.getLayersByName(name)[0];
     lyr.setVisibility(true);
@@ -1703,7 +1690,8 @@ function addGrid(url,lyr,name,type) {
      name
     ,url
     ,{
-      layers : lyr
+       layers : lyr
+      ,styles : syl
     }
     ,{
        isBaseLayer  : false
@@ -1717,14 +1705,42 @@ function addGrid(url,lyr,name,type) {
 
   lyr.events.register('visibilitychanged',this,function(e) {
     if (!lyr.visibility) {
-      layerLoadendUnmask();
+      var sto = Ext.getCmp('legendsGridPanel').getStore();
+      var idx = sto.find('name',lyr.name);
+      if (idx >= 0) {
+        sto.removeAt(idx);
+      }
+      mapLoadendUnmask(lyr.name);
     }
   });
   lyr.events.register('loadstart',this,function(e) {
-    layerLoadstartMask();
+    mapLoadstartMask(lyr.name);
+    var sto = Ext.getCmp('legendsGridPanel').getStore();
+    var idx = sto.find('name',lyr.name);
+    if (idx >= 0) {
+      var rec = sto.getAt(idx);
+      rec.set('status','loading');
+      rec.commit();
+    }
+    else {
+      var gridsStore = Ext.getCmp('gridsGridPanel').getStore();
+      var rec = gridsStore.getAt(gridsStore.find('name',lyr.name));
+      sto.add(new sto.recordType({
+         name        : lyr.name
+        ,displayName : rec.get('name')
+        ,status      : 'loading'
+      }));
+    }
   });
   lyr.events.register('loadend',this,function(e) {
-    layerLoadendUnmask();
+    mapLoadendUnmask(lyr.name);
+    var sto = Ext.getCmp('legendsGridPanel').getStore();
+    var idx = sto.find('name',lyr.name);
+    if (idx >= 0) {
+      var rec = sto.getAt(idx);
+      rec.set('status','drawn');
+      rec.commit();
+    }
   });
   lyr.mergeNewParams({TIME : makeTimeParam(dNow)});
 
@@ -1733,18 +1749,4 @@ function addGrid(url,lyr,name,type) {
 
 function makeTimeParam(d) {
   return d.getUTCFullYear() + '-' + String.leftPad(d.getUTCMonth() + 1,2,'0') + '-' + String.leftPad(d.getUTCDate(),2,'0') + 'T' + String.leftPad(d.getUTCHours(),2,'0') + ':00'
-}
-
-function layerLoadstartMask() {
-  Ext.getCmp('legendsGridPanel').getEl().mask('<table><tr><td>Updating map...&nbsp;</td><td><img src="js/ext-3.3.0/resources/images/default/grid/loading.gif"></td></tr></table>','mask');
-}
-
-function layerLoadendUnmask() {
-  var stillLoading = 0;
-  legendsStore.each(function(rec) {
-    stillLoading += (rec.get('status') != 'drawn' ? 1 : 0);
-  });
-  if (stillLoading == 0) {
-    Ext.getCmp('legendsGridPanel').getEl().unmask();
-  }
 }

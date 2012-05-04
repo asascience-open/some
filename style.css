@@ -132,3 +132,12 @@ div.olLayerGoogleCopyright, div.olLayerGooglePoweredBy {
 .mask td {
   font : 11px/13px tahoma,helvetica,sans-serif;
 }
+
+#legendsGridPanel .x-grid3-row {
+  border-color   : #ffffff;
+}
+#legendsGridPanel a:link {
+  text-decoration : none;
+  font            : 11px tahoma,helvetica,sans-serif;
+  color           : rgb(74,134,214);
+}
