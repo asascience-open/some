@@ -1342,6 +1342,9 @@ function refreshTimer() {
 }
 
 function hilitePoint(lon,lat,color) {
+  if (!lon || !lat) {
+    return;
+  }
   var f = new OpenLayers.Feature.Vector(new OpenLayers.Geometry.Point(lon,lat).transform(proj4326,map.getProjectionObject()));
   f.attributes = {
     fillColor : color
@@ -1352,6 +1355,9 @@ function hilitePoint(lon,lat,color) {
 }
 
 function setCenterOnPoint(lon,lat) {
+  if (!lon || !lat) {
+    return;
+  }
   map.setCenter(new OpenLayers.LonLat(lon,lat).transform(proj4326,map.getProjectionObject()),map.getZoom() > 9 ? map.getZoom() : 9);
 }
 
