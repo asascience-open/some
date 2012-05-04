@@ -119,12 +119,23 @@
 
   if (in_array('eds',$providers)) {
     array_push($grids,array(
+       'name' => 'grid.NOAA NGOM'
+      ,'url'  => 'http://testbedapps.sura.org/ncWMS/wms?COLORSCALERANGE=-0.5,1.0'
+      ,'lyr'  => 'noaa_ngom/zeta'
+      ,'stl'  => 'boxfill/rainbow'
+      ,'sgl'  => true
+      ,'leg'  => 'http://testbedapps.sura.org/ncWMS/wms??TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&EXCEPTIONS=application/vnd.ogc.se_xml&FORMAT=image/gif&LAYER=noaa_ngom/zeta&TIME=&COLORSCALERANGE=-0.5,1.0&STYLES=boxfill/rainbow'
+      ,'minT' => strtotime('2008-09-11T00:00:00.000Z')
+      ,'maxT' => strtotime('2008-09-13T22:00:00.000Z')
+    ));
+
+    array_push($grids,array(
        'name' => 'grid.SLOSH - Ike - GOM : Water Surface Height Above Reference Datum'
-      ,'url'  => 'http://testbedapps.sura.org/thredds/wms/inundation/mdl/slosh/ike/gom?COLORSCALERANGE=-1.5,1.5'
+      ,'url'  => 'http://testbedapps.sura.org/thredds/wms/inundation/mdl/slosh/ike/gom?COLORSCALERANGE=-0.5,1.0'
       ,'lyr'  => 'eta'
       ,'stl'  => ''
       ,'sgl'  => false
-      ,'leg'  => 'http://testbedapps.sura.org/thredds/wms/inundation/mdl/slosh/ike/gom?TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&EXCEPTIONS=application/vnd.ogc.se_xml&FORMAT=image/gif&LAYER=eta&TIME=&COLORSCALERANGE=-1.5,1.5'
+      ,'leg'  => 'http://testbedapps.sura.org/thredds/wms/inundation/mdl/slosh/ike/gom?TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&EXCEPTIONS=application/vnd.ogc.se_xml&FORMAT=image/gif&LAYER=eta&TIME=&COLORSCALERANGE=-0.5,1.0'
       ,'minT' => strtotime('2008-09-11T00:00:00.000Z')
       ,'maxT' => strtotime('2008-09-13T22:00:00.000Z')
     ));
