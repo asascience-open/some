@@ -125,3 +125,7 @@ div.olLayerGoogleCopyright, div.olLayerGooglePoweredBy {
 #mapPanel td {
   font : 11px/13px tahoma,helvetica,sans-serif;
 }
+
+.x-menu .x-color-palette, .x-menu .x-date-picker {
+  margin-left : 4px;
+}

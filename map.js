@@ -18,6 +18,17 @@ var logsStore = new Ext.data.ArrayStore({
 var pendingTransactions = {};
 var viewsReady = 0;
 
+var dNow = new Date();
+dNow.setUTCMinutes(0);
+dNow.setUTCSeconds(0);
+dNow.setUTCMilliseconds(0);
+if (dNow.getHours() >= 12) {
+  dNow.setUTCHours(12);
+}
+else {
+  dNow.setUTCHours(0);
+}
+
 var logsWin;
 
 function init() {
@@ -370,6 +381,10 @@ function init() {
                     ]
                   }
                 ]
+                ,listeners : {tabchange : function(tabPanel,tab) {
+                  tab.id == 'gridsTab' ? Ext.getCmp('mapBbar').show() : Ext.getCmp('mapBbar').hide();
+                  Ext.getCmp('mapPanel').doLayout();
+                }}
               })
             ]
             ,tbar        : {items : [
@@ -412,6 +427,161 @@ function init() {
             ,region    : 'center'
             ,id        : 'mapPanel'
             ,html      : '<div id="map"></div>'
+            ,bbar      : {id : 'mapBbar',hidden : true,items : [
+              {
+                 xtype     : 'buttongroup'
+                ,autoWidth : true
+                ,columns   : 1
+                ,title     : 'Map date & time'
+                ,items     : [{
+                   id    : 'mapTime'
+                  ,text  : dNow.getUTCFullYear() + '-' + String.leftPad(dNow.getUTCMonth() + 1,2,'0') + '-' + String.leftPad(dNow.getUTCDate(),2,'0') + ' ' + String.leftPad(dNow.getUTCHours(),2,'0') + ':00 UTC'
+                  ,width : 135
+                }]
+              }
+              ,{
+                 xtype     : 'buttongroup'
+                ,autoWidth : true
+                ,columns   : 5
+                ,title     : 'Change map date & time'
+                ,items     : [
+                   {
+                     text    : 'Date'
+                    ,tooltip : 'Change the map\'s date and time'
+                    ,icon    : 'img/calendar_view_day16.png'
+                    ,menu    : new Ext.menu.Menu({showSeparator : false,items : [
+                      new Ext.DatePicker({
+                         value     : new Date(dNow.getTime() + dNow.getTimezoneOffset() * 60000)
+                        ,id        : 'datePicker'
+                        ,listeners : {
+                          select : function(picker,d) {
+                            d.setUTCHours(0);
+                            d.setUTCMinutes(0);
+                            d.setUTCSeconds(0);
+                            d.setUTCMilliseconds(0);
+                            dNow = d;
+                            setMapTime();
+                          }
+                        }
+                      })
+                    ]})
+                  }
+                  ,{
+                     text    : '-6h'
+                    ,icon    : 'img/ButtonRewind.png'
+                    ,handler : function() {dNow = new Date(dNow.getTime() - 6 * 3600000);setMapTime();}
+                  }
+                  ,{
+                     text    : '-1h'
+                    ,icon    : 'img/ButtonPlayBack.png'
+                    ,handler : function() {dNow = new Date(dNow.getTime() - 1 * 3600000);setMapTime();}
+                  }
+                  ,{
+                     text    : '+1h'
+                    ,icon    : 'img/ButtonPlay.png'
+                    ,handler : function() {dNow = new Date(dNow.getTime() + 1 * 3600000);setMapTime();}
+                  }
+                  ,{
+                     text    : '+6h'
+                    ,icon    : 'img/ButtonForward.png'
+                    ,handler : function() {dNow = new Date(dNow.getTime() + 6 * 3600000);setMapTime();}
+                  }
+                ]
+              }
+              ,'->'
+              ,{
+                 xtype     : 'buttongroup'
+                ,autoWidth : true
+                ,columns   : 2
+                ,title     : 'Map options'
+                ,items     : [
+                  {text : 'Bathymetry',icon : 'img/map16.png',menu : {items : [
+                    {
+                       text         : 'Hide bathymetry contours'
+                      ,checked      : true
+                      ,group        : 'bathy'
+                      ,handler      : function() {
+                        var lyr = map.getLayersByName('Bathymetry contours')[0];
+                        if (!lyr) {
+                          Ext.Msg.alert('Bathymetry contours',"We're sorry, but this layer is not available.");
+                        }
+                        else {
+                          lyr.setVisibility(false);
+                        }
+                      }
+                    }
+                    ,{
+                       text         : 'Show bathymetry contours'
+                      ,checked      : false
+                      ,group        : 'bathy'
+                      ,handler      : function() {
+                        var lyr = map.getLayersByName('Bathymetry contours')[0];
+                        if (!lyr) {
+                          Ext.Msg.alert('Bathymetry contours',"We're sorry, but this layer is not available.");
+                        }
+                        else {
+                          lyr.setVisibility(true);
+                        }
+                      }
+                    }
+                  ]}}
+                  ,{text : 'Basemap',icon : 'img/world16.png',menu : {items : [
+                    {
+                       text         : 'Show ESRI Ocean basemap'
+                      ,checked      : true
+                      ,group        : 'basemap'
+                      ,handler      : function() {
+                        var lyr = map.getLayersByName('ESRI Ocean')[0];
+                        if (lyr.isBaseLayer) {
+                          lyr.setOpacity(1);
+                          map.setBaseLayer(lyr);
+                          lyr.redraw();
+                        }
+                      }
+                    }
+                    ,{
+                       text         : 'Show Google Hybrid basemap'
+                      ,checked      : false
+                      ,group        : 'basemap'
+                      ,handler      : function() {
+                        var lyr = map.getLayersByName('Google Hybrid')[0];
+                        if (lyr.isBaseLayer) {
+                          lyr.setOpacity(1);
+                          map.setBaseLayer(lyr);
+                          lyr.redraw();
+                        }
+                      }
+                    }
+                    ,{
+                       text         : 'Show Google Satellite basemap'
+                      ,checked      : false
+                      ,group        : 'basemap'
+                      ,handler      : function() {
+                        var lyr = map.getLayersByName('Google Satellite')[0];
+                        if (lyr.isBaseLayer) {
+                          lyr.setOpacity(1);
+                          map.setBaseLayer(lyr);
+                          lyr.redraw();
+                        }
+                      }
+                    }
+                    ,{
+                       text         : 'Show Google Terrain basemap'
+                      ,checked      : false
+                      ,group        : 'basemap'
+                      ,handler      : function() {
+                        var lyr = map.getLayersByName('Google Terrain')[0];
+                        if (lyr.isBaseLayer) {
+                          lyr.setOpacity(1);
+                          map.setBaseLayer(lyr);
+                          lyr.redraw();
+                        }
+                      }
+                    }
+                  ]}}
+                ]
+              }
+            ]}
             ,listeners : {
               afterrender : function(p) {
                 initMap();
