@@ -33,6 +33,7 @@ var logsWin;
 var legendImages = {};
 
 var activeSettingsWindows = {};
+var activeInfoWindows     = {};
 
 function init() {
   var loadingMask = Ext.get('loading-mask');
@@ -236,7 +237,7 @@ function init() {
     ,id          : 'gridsGridPanel'
     ,store : new Ext.data.JsonStore({
        url       : 'query.php?type=grids&providers=eds'
-      ,fields    : ['name','url','lyr','stl','sgl','leg','minT','varName','varUnits','customize']
+      ,fields    : ['name','url','lyr','stl','sgl','leg','minT','varName','varUnits','customize','bbox','abstract']
       ,root      : 'data'
       ,listeners : {
         beforeload : function(sto) {
@@ -2105,10 +2106,35 @@ function destroyLayerCallout(name) {
 
 function zoomToBbox(name) {
   destroyLayerCallout(name);
+  var sto = Ext.getCmp('gridsGridPanel').getStore();
+  var idx = sto.find('name',name);
+  if (idx >= 0) {
+    var p = sto.getAt(idx).get('bbox').split(',');
+    map.zoomToExtent(new OpenLayers.Bounds(p[0],p[1],p[2],p[3]).transform(proj4326,map.getProjectionObject()));
+  }
 }
 
 function showLayerInfo(name) {
   destroyLayerCallout(name);
+  if (!activeInfoWindows[name]) {
+    var sto = Ext.getCmp('gridsGridPanel').getStore();
+    var idx = sto.find('name',name);
+    if (idx >= 0) {
+      var pos = getOffset(document.getElementById('info.' + name));
+      activeInfoWindows[name] = new Ext.Window({
+         width      : 400
+        ,x          : pos.left
+        ,y          : pos.top
+        ,autoScroll : true
+        ,constrainHeader : true
+        ,title      : name.split('.').slice(1) + ' :: info'
+        ,items      : {border : false,bodyCssClass : 'popup',html : sto.getAt(idx).get('abstract')}
+        ,listeners  : {hide : function() {
+          activeInfoWindows[name] = null;
+        }}
+      }).show();
+    }
+  }
 }
 
 function setLayerSettings(name) {
