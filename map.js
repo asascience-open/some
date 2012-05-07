@@ -2175,15 +2175,15 @@ function setLayerSettings(name) {
           ,width          : 130
           ,forceSelection : true
           ,listeners      : {
-            afterrender : function() {
+            afterrender : function(el) {
               new Ext.ToolTip({
                  id     : 'tooltip.' + id + '.imageQuality'
                 ,target : id + '.imageQuality'
                 ,html   : "Selecting high quality may result in longer download times."
               });
-            }
-            ,select : function(comboBox,rec) {
-              setCustomStyle(lyr,{imageQuality : rec.get('value')});
+              this.addListener('select',function(el,rec) {
+                setCustomStyle(lyr,{imageQuality : rec.get('value')},customize);
+              });
             }
           }
         })
@@ -2225,21 +2225,21 @@ function setLayerSettings(name) {
             beforerender : function(cb) {
               cb.getStore().filter('type',styles[customize.baseStyle].split('_')[0]);
             }
-            ,afterrender : function() {
+            ,afterrender : function(el) {
               new Ext.ToolTip({
                  id     : 'tooltip.' + id + '.baseStyle'
                 ,target : id + '.baseStyle'
                 ,html   : "In general, the Black base style has a better appearance if high resolution is also selected."
               });
-            }
-            ,select : function(comboBox,rec) {
-              if (rec.get('value') == 'CURRENTS_STATIC_BLACK' && Ext.getCmp('colorMap.') + id) {
-                Ext.getCmp('colorMap.' + id).disable();
-              }
-              else if (Ext.getCmp('colorMap.') + id) {
-                Ext.getCmp('colorMap.' + id).enable();
-              }
-              setCustomStyle(lyr,{baseStyle : rec.get('value')});
+              this.addListener('select',function(el,rec) {
+                if (rec.get('value') == 'CURRENTS_STATIC_BLACK' && Ext.getCmp('colorMap.') + id) {
+                  Ext.getCmp('colorMap.' + id).disable();
+                }
+                else if (Ext.getCmp('colorMap.') + id) {
+                  Ext.getCmp('colorMap.' + id).enable();
+                }
+                setCustomStyle(lyr,{baseStyle : rec.get('value')},customize);
+              });
             }
           }
         })
@@ -2279,15 +2279,15 @@ function setLayerSettings(name) {
           ,width          : 130
           ,forceSelection : true
           ,listeners      : {
-            afterrender : function() {
+            afterrender : function(el) {
               new Ext.ToolTip({
                  id     : 'tooltip.' + id + '.colormap'
                 ,target : id + '.colormap'
                 ,html   : "Feature contrasts may become more obvious based on the selected colormap."
               });
-            }
-            ,select : function(comboBox,rec) {
-              setCustomStyle(lyr,{colorMap : rec.get('value')});
+              this.addListener('select',function(el,rec) {
+                setCustomStyle(lyr,{colorMap : rec.get('value')},customize);
+              });
             }
           }
         })
@@ -2311,15 +2311,15 @@ function setLayerSettings(name) {
             }
           })
           ,listeners : {
-            afterrender : function() {
+            afterrender : function(el) {
               new Ext.ToolTip({
                  id     : 'tooltip.' + id + '.minMax'
                 ,target : id + '.minMax'
                 ,html   : "Use the slider to adjust the layer's minimum and maximum values."
               });
-            }
-            ,change : function(slider) {
-              setCustomStyle(lyr,{'min' : slider.getValues()[0],'max' : slider.getValues()[1]});
+              this.addListener('change',function(el) {
+                setCustomStyle(lyr,{'min' : el.getValues()[0],'max' : el.getValues()[1]},customize);
+              });
             }
           }
         })
@@ -2375,15 +2375,15 @@ function setLayerSettings(name) {
             }
           })
           ,listeners : {
-            afterrender : function() {
+            afterrender : function(el) {
               new Ext.ToolTip({
                  id     : 'tooltip.' + id + '.striding'
                 ,target : id + '.striding'
                 ,html   : "Adjust the space between vectors with the data density factor.  The impact of this value varies based on the zoom level."
               });
-            }
-            ,change : function(slider,val) {
-              setCustomStyle(lyr,{'striding' : sto.getAt(val).get('param')});
+              this.addListener('change',function(el,val) {
+                setCustomStyle(lyr,{'striding' : sto.getAt(val).get('param')},customize);
+              });
             }
           }
         })
@@ -2414,15 +2414,15 @@ function setLayerSettings(name) {
           ,width          : 130
           ,forceSelection : true
           ,listeners      : {
-            afterrender : function() {
+            afterrender : function(el) {
               new Ext.ToolTip({
                  id     : 'tooltip.' + id + '.tailMagnitude'
                 ,target : id + '.tailMagnitude'
                 ,html   : "Choose whether or not the vector tail length will vary based on its magnitude.  The difference may be subtle in layers with small magnitude variability." 
               });
-            }
-            ,select : function(comboBox,rec) {
-              setCustomStyle(lyr,{'tailMag' : rec.get('name')});
+              this.addListener('select',function(el,rec) {
+                setCustomStyle(lyr,{'tailMag' : rec.get('name')},customize);
+              });
             }
           }
         })
@@ -2453,15 +2453,15 @@ function setLayerSettings(name) {
           ,width          : 130
           ,forceSelection : true
           ,listeners      : {
-            afterrender : function() {
+            afterrender : function(el) {
               new Ext.ToolTip({
                  id     : 'tooltip.' + id + '.magnitudeLabel'
                 ,target : id + '.magnitudeLabel'
                 ,html   : "Choose whether or not a text label should be drawn by each vector to identify its magnitude."
               });
-            }
-            ,select : function(comboBox,rec) {
-              setCustomStyle(lyr,{'barbLabel' : rec.get('name')});
+              this.addListener('select',function(el,rec) {
+                setCustomStyle(lyr,{'barbLabel' : rec.get('name')},customize);
+              });
             }
           }
         })
@@ -2491,8 +2491,12 @@ function setLayerSettings(name) {
   destroyLayerCallout(name);
 }
 
-function setCustomStyle(lyr,style) {
-
+function setCustomStyle(lyr,style,customize) {
+  var styles = OpenLayers.Util.getParameters(lyr.getFullRequestString({}))['STYLES'].split('-');
+  for (var s in style) {
+    styles[customize[s]] = style[s];
+  }
+  lyr.mergeNewParams({STYLES : styles.join('-')});
 }
 
 function restoreDefaultStyles(name,items,id) {
