@@ -655,7 +655,7 @@ function init() {
             ,html      : '<div id="chart"></div>'
             ,tbar      : [
               {
-                 text    : 'New graph'
+                 text    : 'Clear graph'
                 ,icon    : 'img/document_empty.png'
                 ,tooltip : 'Clear current graph'
                 ,handler : function() {
@@ -752,9 +752,12 @@ function init() {
                            show           : Ext.getCmp('legendPositionComboBox').getValue() != 'Off'
                           ,position       : Ext.getCmp('legendPositionComboBox').getValue().toLowerCase(),backgroundOpacity : 0.3
                           ,labelFormatter : function(label,series) {
-                            return label
-                              + ' <a href="javascript:hilitePoint(' + series.lon + ',' + series.lat + ',\'' + series.color + '\')"><img style="margin-bottom:-3px" title="Hilight this site" src="img/flashlight_shine.png"></a>'
-                              + ' <a href="javascript:setCenterOnPoint(' + series.lon + ',' + series.lat + ')"><img style="margin-bottom:-3px" title="Zoom & recenter map to this site" src="img/zoom.png"></a>';
+                            var lbl = [label];
+                            if (!new RegExp(/^grid./).test(label)) {
+                              lbl.push('<a href="javascript:hilitePoint(' + series.lon + ',' + series.lat + ',\'' + series.color + '\')"><img style="margin-bottom:-3px" title="Hilight this site" src="img/flashlight_shine.png"></a>');
+                              lbl.push('<a href="javascript:setCenterOnPoint(' + series.lon + ',' + series.lat + ')"><img style="margin-bottom:-3px" title="Zoom & recenter map to this site" src="img/zoom.png"></a>');
+                            }
+                            return lbl.join(' ');
                           }
                         }
                       }
@@ -1929,7 +1932,6 @@ function queryWMS(xy,a) {
     var d = sto.getAt(legIdx).get('jsDate');
     var paramNew = {
        REQUEST       : 'GetFeatureInfo'
-      ,EXCEPTIONS    : 'application/vnd.ogc.se_xml'
       ,BBOX          : map.getExtent().toBBOX()
       ,X             : xy.x
       ,Y             : xy.y
@@ -1937,11 +1939,18 @@ function queryWMS(xy,a) {
       ,FEATURE_COUNT : 1
       ,WIDTH         : map.size.w
       ,HEIGHT        : map.size.h
-      ,QUERY_LAYERS  : OpenLayers.Util.getParameters(a[i].getFullRequestString({}))['LAYERS']
+      ,QUERY_LAYERS  : paramOrig['LAYERS']
       ,TIME          : makeTimeParam(new Date(d.getTime() - 3600 * 24 * 1000)) + '/' + makeTimeParam(new Date(d.getTime() + 3600 * 24 * 1000))
     };
     targets.push({
-       url   : a[i].getFullRequestString(paramNew,'getFeatureInfo.php?' + a[i].url + '&tz=' + new Date().getTimezoneOffset() + mapTime) + '&varName=' + grdSto.getAt(grdIdx).get('varName') + '&varUnits=' + grdSto.getAt(grdIdx).get('varUnits')
+       url   : a[i].getFullRequestString(
+          paramNew
+         ,'getFeatureInfo.php?' + a[i].url 
+           + '&tz=' + new Date().getTimezoneOffset() 
+           + mapTime 
+           + '&varName=' + grdSto.getAt(grdIdx).get('varName') 
+           + '&varUnits=' + grdSto.getAt(grdIdx).get('varUnits')
+       )
       ,title : sto.getAt(legIdx).get('displayName')
       ,type  : 'model'
     });
