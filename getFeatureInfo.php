@@ -23,12 +23,15 @@
       array_push($data['t'],$t * 1000);
       foreach ($p->{'Value'} as $v) {
         $vStr = sprintf("%s",$v->attributes()->{'Var'});
-        if (!array_key_exists($vStr,$data['d'])) {
-          $data['d'][$vStr] = array(sprintf("%f",$v));
-          $data['u'][$vStr] = sprintf("%s",$v->attributes()->{'Unit'});
-        }
-        else {
-          array_push($data['d'][$vStr],sprintf("%f",$v));
+        // don't allow direction (degrees) for now
+        if (sprintf("%s",$v->attributes()->{'Unit'}) != 'Degrees') {
+          if (!array_key_exists($vStr,$data['d'])) {
+            $data['d'][$vStr] = array(sprintf("%f",$v));
+            $data['u'][$vStr] = sprintf("%s",$v->attributes()->{'Unit'});
+          }
+          else {
+            array_push($data['d'][$vStr],sprintf("%f",$v));
+          }
         }
       }
     }
