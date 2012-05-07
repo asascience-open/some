@@ -757,6 +757,7 @@ function init() {
                               lbl.push('<a href="javascript:hilitePoint(' + series.lon + ',' + series.lat + ',\'' + series.color + '\')"><img style="margin-bottom:-3px" title="Hilight this site" src="img/flashlight_shine.png"></a>');
                               lbl.push('<a href="javascript:setCenterOnPoint(' + series.lon + ',' + series.lat + ')"><img style="margin-bottom:-3px" title="Zoom & recenter map to this site" src="img/zoom.png"></a>');
                             }
+                            lbl.push('<a href="javascript:removeChartLayer(\'' + series.id + '\')"><img style="margin-bottom:-3px" title="Remove from graph" src="img/delete-round.png"></a>');
                             return lbl.join(' ');
                           }
                         }
@@ -1139,6 +1140,7 @@ function getObsCallback(property,name,url,lon,lat,r) {
       ,lines : {show : true}
       ,lon   : lon
       ,lat   : lat
+      ,id    : Ext.id()
     });
   }
   Ext.getCmp('timeseriesPanel').fireEvent('resize',Ext.getCmp('timeseriesPanel'));
@@ -1372,6 +1374,19 @@ function setCenterOnPoint(lon,lat) {
     return;
   }
   map.setCenter(new OpenLayers.LonLat(lon,lat).transform(proj4326,map.getProjectionObject()),map.getZoom() > 9 ? map.getZoom() : 9);
+}
+
+function removeChartLayer(id) {
+  var idx;
+  for (var i = 0; i < chartData.length; i++) {
+    if (chartData[i].id == id) {
+      idx = i;
+    }
+  }
+  if (idx >= 0) {
+    chartData.splice(0,1);
+    Ext.getCmp('timeseriesPanel').fireEvent('resize',Ext.getCmp('timeseriesPanel'));
+  }
 }
 
 function getEventtimeFromEventsComboBox() {
@@ -1973,12 +1988,14 @@ function addToChart(a) {
       chartData.push({
          data   : []
         ,label  : title.split('||')[0] + ': QUERY ERROR ' + obs.error
+        ,id     : Ext.id()
       });
     }
     else if (!obs || obs.d == '' || obs.d.length == 0) {
       chartData.push({
          data   : []
         ,label  : title.split('||')[0] + ': QUERY ERROR'
+        ,id     : Ext.id()
       });
     }
     else {
@@ -1992,6 +2009,7 @@ function addToChart(a) {
            data   : []
           ,label  : title.split('||')[0] + ' : ' + v + ' (' + obs.u[v] + ')'
           ,lines  : {show : true}
+          ,id     : Ext.id()
         });
         for (var i = 0; i < obs.d[v].length; i++) {
           chartData[chartData.length-1].data.push([obs.t[i],obs.d[v][i]]);
