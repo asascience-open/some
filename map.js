@@ -315,6 +315,7 @@ function init() {
               {
                  text    : 'View transaction logs'
                 ,icon    : 'img/file_extension_log.png'
+                ,tooltip : 'View transaction logs'
                 ,handler : function() {
                   if (!logsWin || !logsWin.isVisible()) {
                     logsWin = new Ext.Window({
@@ -341,6 +342,7 @@ function init() {
                         {
                            text    : 'Clear transactions'
                           ,icon    : 'img/trash-icon.png'
+                          ,tooltip : 'Clear transactions'
                           ,handler : function() {
                             logsStore.removeAll();
                             pendingTransactions = {};
@@ -431,6 +433,7 @@ function init() {
               {
                  text    : 'Remove all mapped datasets'
                 ,icon    : 'img/trash-icon.png'
+                ,tooltip : 'Remove all mapped datasets'
                 ,id      : 'removeDatasetsButton'
                 ,handler : function() {
                   Ext.getCmp('modelsGridPanel').getSelectionModel().clearSelections();
