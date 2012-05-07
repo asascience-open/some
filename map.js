@@ -654,7 +654,7 @@ function init() {
               {
                  text    : 'New graph'
                 ,icon    : 'img/document_empty.png'
-                ,tip     : 'Clear current graph'
+                ,tooltip : 'Clear current graph'
                 ,handler : function() {
                   chartData = [];
                   Ext.getCmp('timeseriesPanel').fireEvent('resize',Ext.getCmp('timeseriesPanel'));
@@ -663,7 +663,7 @@ function init() {
               ,{
                  text    : 'Clear sites'
                 ,icon    : 'img/draw_eraser.png'
-                ,tip     : 'Clear query sites and highlights'
+                ,tooltip : 'Clear query sites and highlights'
                 ,handler : function() {
                   var lyr = map.getLayersByName('hiliteMarkers')[0];
                   lyr.removeFeatures(lyr.features);
@@ -674,7 +674,7 @@ function init() {
               ,{
                  text    : 'Requery'
                 ,icon    : 'img/arrow_refresh.png'
-                ,tip     : 'Rerun the query at the current query site'
+                ,tooltip : 'Rerun the query at the current query site'
                 ,id      : 'requery'
                 ,hidden  : true
                 ,handler : function() {
