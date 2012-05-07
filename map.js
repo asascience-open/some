@@ -923,7 +923,14 @@ function renderName(val,metadata,rec) {
 }
 
 function renderLayerCalloutButton(val,metadata,rec) {
-  return '<a id="info.' + rec.get('name') + '" href="javascript:goLayerCallout(\'' + rec.get('name')  + '\')"><img title="Customize layer appearance" style="margin-top:-2px" src="img/page_go.png"></a>';
+  var img = 'img/page_go.png';
+  if (!new RegExp(/^grid\./).test(rec.get('name'))) {
+    img = 'img/page_go_disabled.png';
+    return '<img title="Layer customization not available for this data type" style="margin-top:-2px" src="' + img + '">';
+  }
+  else {
+    return '<a id="info.' + rec.get('name') + '" href="javascript:goLayerCallout(\'' + rec.get('name')  + '\')"><img title="Customize layer appearance" style="margin-top:-2px" src="' + img + '"></a>';
+  }
 }
 
 
@@ -2074,8 +2081,9 @@ function goLayerCallout(name) {
         ,height   : 75
         ,bodyStyle : 'padding:6'
         ,items    :  [
-           {columnWidth : 0.50,items : {xtype : 'container',autoEl : {tag : 'center'},items : {border : false,html : customize}}}
-          ,{columnWidth : 0.50,items : {xtype : 'container',autoEl : {tag : 'center'},items : {border : false,html : '<a class="blue-href-only" href="javascript:showLayerInfo(\'' + name + '\');setLayerInfo(\'' + name + '\')"><img width=32 height=32 src="img/document_image.png"><br>Layer<br>information</a>'}}}
+           {columnWidth : 0.33,items : {xtype : 'container',autoEl : {tag : 'center'},items : {border : false,html : '<a class="blue-href-only" href="javascript:zoomToBbox(\'' + name + '\')"><img width=32 height=32 src="img/find_globe_big.png"><br>Zoom<br>to layer</a>'}}}
+          ,{columnWidth : 0.34,items : {xtype : 'container',autoEl : {tag : 'center'},items : {border : false,html : customize}}}
+          ,{columnWidth : 0.33,items : {xtype : 'container',autoEl : {tag : 'center'},items : {border : false,html : '<a class="blue-href-only" href="javascript:showLayerInfo(\'' + name + '\')"><img width=32 height=32 src="img/document_image.png"><br>Layer<br>information</a>'}}}
         ]
       }
       ,listeners : {
@@ -2085,4 +2093,16 @@ function goLayerCallout(name) {
       }
     }).show();
   }
+}
+
+function zoomToBbox(name) {
+
+}
+
+function showLayerInfo(name) {
+
+}
+
+function setLayerSettings(name) {
+
 }
