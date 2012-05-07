@@ -134,6 +134,7 @@ function init() {
 
   var observationsSelModel = new Ext.grid.CheckboxSelectionModel({
      header    : ''
+    ,checkOnly : true
     ,listeners : {
       rowselect : function(sm,rowIndex,rec) {
         getCaps(rec.get('url'),rec.get('name'),'observations');
@@ -165,6 +166,7 @@ function init() {
     ,columns     : [
        observationsSelModel
       ,{id : 'name',dataIndex :'name',renderer : renderName}
+      ,{id : 'info'                  ,renderer : renderLayerCalloutButton,width : 25}
     ]
     ,hideHeaders : true
     ,listeners   : {viewready : function() {
@@ -174,6 +176,7 @@ function init() {
 
   var modelsSelModel = new Ext.grid.CheckboxSelectionModel({
      header    : ''
+    ,checkOnly : true
     ,listeners : {
       rowselect : function(sm,rowIndex,rec) {
         getCaps(rec.get('url'),rec.get('name'),'models');
@@ -206,6 +209,7 @@ function init() {
     ,columns     : [
        modelsSelModel
       ,{id : 'name',dataIndex :'name',renderer : renderName}
+      ,{id : 'info'                  ,renderer : renderLayerCalloutButton,width : 25} 
     ]
     ,hideHeaders : true
     ,listeners   : {viewready : function() {
@@ -215,6 +219,7 @@ function init() {
 
   var gridsSelModel = new Ext.grid.CheckboxSelectionModel({
      header    : ''
+    ,checkOnly : true
     ,listeners : {
       rowselect : function(sm,rowIndex,rec) {
         addGrid(rec.get('url'),rec.get('lyr'),rec.get('stl'),rec.get('sgl'),rec.get('name'),'grids');
@@ -259,6 +264,7 @@ function init() {
     ,columns     : [
        gridsSelModel
       ,{id : 'name',dataIndex :'name',renderer : renderName}
+      ,{id : 'info'                  ,renderer : renderLayerCalloutButton,width : 25}
     ]
     ,hideHeaders : true
     ,listeners   : {viewready : function() {
@@ -915,6 +921,11 @@ function renderName(val,metadata,rec) {
   metadata.attr = 'ext:qtip="' + lab.join('.') + '"';
   return lab.join('.');
 }
+
+function renderLayerCalloutButton(val,metadata,rec) {
+  return '<a id="info.' + rec.get('name') + '" href="javascript:setLayerInfo(\'' + rec.get('name')  + '\')"><img title="Customize layer appearance" style="margin-top:-2px" src="img/page_go.png"></a>';
+}
+
 
 function renderUrl(val,metadata,rec) {
   return '<a target=_blank href="' + val + '">' + val + '</a>';
@@ -2041,4 +2052,8 @@ function toEnglish(v) {
     }
   }
   return v.val;
+}
+
+function setLayerInfo(lyr) {
+  alert(lyr);
 }
