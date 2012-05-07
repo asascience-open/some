@@ -124,7 +124,7 @@
       ,'lyr'  => 'noaa_ngom/zeta'
       ,'stl'  => 'boxfill/rainbow'
       ,'sgl'  => true
-      ,'leg'  => 'http://testbedapps.sura.org/ncWMS/wms??TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&EXCEPTIONS=application/vnd.ogc.se_xml&FORMAT=image/gif&LAYER=noaa_ngom/zeta&TIME=&COLORSCALERANGE=-0.5,1.0&STYLES=boxfill/rainbow'
+      ,'leg'  => 'http://testbedapps.sura.org/ncWMS/wms?TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&EXCEPTIONS=application/vnd.ogc.se_xml&FORMAT=image/gif&LAYER=noaa_ngom/zeta&TIME=&COLORSCALERANGE=-0.5,1.0&STYLES=boxfill/rainbow'
       ,'minT' => strtotime('2008-09-11T00:00:00.000Z')
       ,'maxT' => strtotime('2008-09-13T22:00:00.000Z')
       ,'varName'  => 'Sea surface elevation'
@@ -140,6 +140,17 @@
       ,'leg'  => 'http://coastmap.com/ecop/wms.aspx?FORMAT=image/png&TRANSPARENT=TRUE&STYLES=CURRENTS_RAMP-Jet-False-1-True-0-2-High&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&TIME=&SRS=EPSG:3857&LAYERS=FVCOM_MASS_CURRENTS'
       ,'minT' => strtotime(date('Y-m-d',$today).'T'.date('H:i:s',$today).'Z')
       ,'maxT' => strtotime(date('Y-m-d',$today + 3600 * 24 * 2).'T'.date('H:i:s',$today + 3600 * 24 * 2).'Z')
+      ,'customize' => array(
+         'imageQuality' => 7
+        ,'baseStyle'    => 0
+        ,'colorMap'     => 1
+        ,'striding'     => 3
+        ,'barbLabel'    => 2
+        ,'tailMag'      => 4
+        ,'min'          => 5
+        ,'max'          => 6
+        ,'minMaxBounds' => '0-6'
+      )
     ));
   }
 
