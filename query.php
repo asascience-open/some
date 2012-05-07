@@ -134,6 +134,21 @@
     ));
 
     array_push($grids,array(
+       'name' => 'grid.SLOSH - Ike - GOM : Water Surface Height Above Reference Datum'
+      ,'url'  => 'http://testbedapps.sura.org/thredds/wms/inundation/mdl/slosh/ike/gom?COLORSCALERANGE=-0.5,1.0'
+      ,'lyr'  => 'eta'
+      ,'stl'  => ''
+      ,'sgl'  => true
+      ,'leg'  => 'http://testbedapps.sura.org/thredds/wms/inundation/mdl/slosh/ike/gom?TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&EXCEPTIONS=application/vnd.ogc.se_xml&FORMAT=image/gif&LAYER=eta&TIME=&COLORSCALERANGE=-0.5,1.0'
+      ,'minT' => strtotime('2008-09-11T00:00:00.000Z')
+      ,'maxT' => strtotime('2008-09-13T22:00:00.000Z')
+      ,'varName'  => 'Sea surface elevation'
+      ,'varUnits' => 'm'
+      ,'abstract' => 'No information available.'
+      ,'bbox'    => '-180,-90,180,90'
+    ));
+
+    array_push($grids,array(
        'name' => 'grid.FVCOM Mass Bay'
       ,'url'  => 'http://coastmap.com/ecop/wms.aspx?EXCEPTIONS=application/vnd.ogc.se_xml'
       ,'lyr'  => 'FVCOM_MASS_CURRENTS'

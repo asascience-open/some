@@ -237,7 +237,7 @@ function init() {
     ,id          : 'gridsGridPanel'
     ,store : new Ext.data.JsonStore({
        url       : 'query.php?type=grids&providers=eds'
-      ,fields    : ['name','url','lyr','stl','sgl','leg','minT','varName','varUnits','customize','bbox','abstract']
+      ,fields    : ['name','url','lyr','stl','sgl','leg','minT','maxT','varName','varUnits','customize','bbox','abstract']
       ,root      : 'data'
       ,listeners : {
         beforeload : function(sto) {
@@ -1965,7 +1965,13 @@ function queryWMS(xy,a) {
       }
     }
     var paramOrig = OpenLayers.Util.getParameters(a[i].getFullRequestString({}));
+    var minT = new Date(grdSto.getAt(grdIdx).get('minT') * 1000);
+    var maxT = new Date(grdSto.getAt(grdIdx).get('maxT') * 1000);
     var d = sto.getAt(legIdx).get('jsDate');
+    if (d) {
+      minT = new Date(d.getTime() - 3600 * 24 * 1000);
+      maxT = new Date(d.getTime() + 3600 * 24 * 1000);
+    }
     var paramNew = {
        REQUEST       : 'GetFeatureInfo'
       ,BBOX          : map.getExtent().toBBOX()
@@ -1976,7 +1982,7 @@ function queryWMS(xy,a) {
       ,WIDTH         : map.size.w
       ,HEIGHT        : map.size.h
       ,QUERY_LAYERS  : paramOrig['LAYERS']
-      ,TIME          : makeTimeParam(new Date(d.getTime() - 3600 * 24 * 1000)) + '/' + makeTimeParam(new Date(d.getTime() + 3600 * 24 * 1000))
+      ,TIME          : makeTimeParam(minT) + '/' + makeTimeParam(maxT)
     };
     targets.push({
        url   : a[i].getFullRequestString(
