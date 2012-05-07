@@ -2477,7 +2477,7 @@ function setLayerSettings(name) {
       ,constrainHeader : true
       ,title     : name.split('.').slice(1) + ' :: settings'
       ,items     : [
-         new Ext.FormPanel({buttonAlign : 'center',border : false,bodyStyle : 'background:transparent',width : 240,height : height + 35,labelWidth : 100,labelSeparator : '',items : items,buttons : [{text : 'Restore default settings',width : 150,handler : function() {restoreDefaultStyles(name,items,id)}}]})
+         new Ext.FormPanel({buttonAlign : 'center',border : false,bodyStyle : 'background:transparent',width : 240,height : height + 35,labelWidth : 100,labelSeparator : '',items : items,buttons : [{text : 'Restore default settings',width : 150,handler : function() {restoreDefaultStyles(lyr)}}]})
       ]
       ,listeners : {hide : function() {
         activeSettingsWindows[name] = null;
@@ -2497,10 +2497,29 @@ function setCustomStyle(lyr,style,customize) {
     styles[customize[s]] = style[s];
   }
   lyr.mergeNewParams({STYLES : styles.join('-')});
+  var sto = Ext.getCmp('gridsGridPanel').getStore();
+  var idx = sto.find('name',lyr.name);
+  if (idx >= 0) {
+    var rec = sto.getAt(idx);
+    var p = OpenLayers.Util.getParameters(sto.getAt(idx).get('leg'));
+    p['STYLES'] = styles.join('-');
+    var a = [];
+    for (var i in p) {
+      a.push(i + '=' + p[i]);
+    }
+    rec.set('leg',sto.getAt(idx).get('leg').split('?')[0] + '?' + a.join('&'));
+    rec.commit();
+  }
 }
 
-function restoreDefaultStyles(name,items,id) {
-
+function restoreDefaultStyles(lyr,winId) {
+  var sto = Ext.getCmp('gridsGridPanel').getStore();
+  var idx = sto.find('name',lyr.name);
+  if (idx >= 0) {
+    lyr.mergeNewParams({STYLES : sto.getAt(idx).get('stl')});
+  }
+  activeSettingsWindows[lyr.name].hide();
+  setLayerSettings(lyr.name);
 }
 
 function getOffset(el) {
