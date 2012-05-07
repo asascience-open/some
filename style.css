@@ -146,3 +146,8 @@ div.olLayerGoogleCopyright, div.olLayerGooglePoweredBy {
   color       : red;
   font-weight : bold;
 }
+
+.blue-href-only {
+  text-decoration : none;
+  color : rgb(74,134,214);
+}

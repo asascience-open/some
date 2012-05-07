@@ -759,7 +759,7 @@ function init() {
                           ,position       : Ext.getCmp('legendPositionComboBox').getValue().toLowerCase(),backgroundOpacity : 0.3
                           ,labelFormatter : function(label,series) {
                             var lbl = [label];
-                            if (!new RegExp(/^grid./).test(label)) {
+                            if (!new RegExp(/^grid\./).test(label)) {
                               lbl.push('<a href="javascript:hilitePoint(' + series.lon + ',' + series.lat + ',\'' + series.color + '\')"><img style="margin-bottom:-3px" title="Hilight this site" src="img/flashlight_shine.png"></a>');
                               lbl.push('<a href="javascript:setCenterOnPoint(' + series.lon + ',' + series.lat + ')"><img style="margin-bottom:-3px" title="Zoom & recenter map to this site" src="img/zoom.png"></a>');
                             }
@@ -923,7 +923,7 @@ function renderName(val,metadata,rec) {
 }
 
 function renderLayerCalloutButton(val,metadata,rec) {
-  return '<a id="info.' + rec.get('name') + '" href="javascript:setLayerInfo(\'' + rec.get('name')  + '\')"><img title="Customize layer appearance" style="margin-top:-2px" src="img/page_go.png"></a>';
+  return '<a id="info.' + rec.get('name') + '" href="javascript:goLayerCallout(\'' + rec.get('name')  + '\')"><img title="Customize layer appearance" style="margin-top:-2px" src="img/page_go.png"></a>';
 }
 
 
@@ -2054,6 +2054,35 @@ function toEnglish(v) {
   return v.val;
 }
 
-function setLayerInfo(lyr) {
-  alert(lyr);
+function goLayerCallout(name) {
+  if (!Ext.getCmp('info.popup.' + name) || !Ext.getCmp('info.popup.' + name).isVisible()) {
+    var customize = '<a class="blue-href-only" href="javascript:setLayerSettings(\'' + name + '\');setLayerInfo(\'' + name + '\')"><img width=32 height=32 src="img/settings_tools_big.png"><br>Customize<br>appearance</a>';
+    if (!new RegExp(/^grid\./).test(name)) {
+      customize = '<img width=32 height=32 src="img/settings_tools_big_disabled.png"><br><font color="lightgray">Customize<br>appearance</font>';
+    }
+    new Ext.ToolTip({
+       id        : 'info.popup.' + name
+      ,title     : name
+      ,anchor    : 'right'
+      ,target    : 'info.' + name
+      ,autoHide  : false
+      ,closable  : true
+      ,width     : 250
+      ,items     : {
+         layout   : 'column'
+        ,defaults : {border : false}
+        ,height   : 75
+        ,bodyStyle : 'padding:6'
+        ,items    :  [
+           {columnWidth : 0.50,items : {xtype : 'container',autoEl : {tag : 'center'},items : {border : false,html : customize}}}
+          ,{columnWidth : 0.50,items : {xtype : 'container',autoEl : {tag : 'center'},items : {border : false,html : '<a class="blue-href-only" href="javascript:showLayerInfo(\'' + name + '\');setLayerInfo(\'' + name + '\')"><img width=32 height=32 src="img/document_image.png"><br>Layer<br>information</a>'}}}
+        ]
+      }
+      ,listeners : {
+        hide : function() {
+          this.destroy();
+        }
+      }
+    }).show();
+  }
 }
