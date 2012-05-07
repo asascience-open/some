@@ -926,10 +926,10 @@ function renderLayerCalloutButton(val,metadata,rec) {
   var img = 'img/page_go.png';
   if (!new RegExp(/^grid\./).test(rec.get('name'))) {
     img = 'img/page_go_disabled.png';
-    return '<img title="Layer customization not available for this data type" style="margin-top:-2px" src="' + img + '">';
+    return '<img title="Layer details and customization not available for this data type" style="margin-top:-2px" src="' + img + '">';
   }
   else {
-    return '<a id="info.' + rec.get('name') + '" href="javascript:goLayerCallout(\'' + rec.get('name')  + '\')"><img title="Customize layer appearance" style="margin-top:-2px" src="' + img + '"></a>';
+    return '<a id="info.' + rec.get('name') + '" href="javascript:goLayerCallout(\'' + rec.get('name')  + '\')"><img title="Layer details and customization" style="margin-top:-2px" src="' + img + '"></a>';
   }
 }
 
@@ -2063,7 +2063,7 @@ function toEnglish(v) {
 
 function goLayerCallout(name) {
   if (!Ext.getCmp('info.popup.' + name) || !Ext.getCmp('info.popup.' + name).isVisible()) {
-    var customize = '<a class="blue-href-only" href="javascript:setLayerSettings(\'' + name + '\');setLayerInfo(\'' + name + '\')"><img width=32 height=32 src="img/settings_tools_big.png"><br>Customize<br>appearance</a>';
+    var customize = '<a class="blue-href-only" href="javascript:setLayerSettings(\'' + name + '\')"><img width=32 height=32 src="img/settings_tools_big.png"><br>Customize<br>appearance</a>';
     if (!new RegExp(/^grid\./).test(name)) {
       customize = '<img width=32 height=32 src="img/settings_tools_big_disabled.png"><br><font color="lightgray">Customize<br>appearance</font>';
     }
@@ -2095,14 +2095,20 @@ function goLayerCallout(name) {
   }
 }
 
-function zoomToBbox(name) {
+function destroyLayerCallout(name) {
+  if (Ext.getCmp('info.popup.' + name) && Ext.getCmp('info.popup.' + name).isVisible()) {
+     Ext.getCmp('info.popup.' + name).destroy();
+  }
+}
 
+function zoomToBbox(name) {
+  destroyLayerCallout(name);
 }
 
 function showLayerInfo(name) {
-
+  destroyLayerCallout(name);
 }
 
 function setLayerSettings(name) {
-
+  destroyLayerCallout(name);
 }
