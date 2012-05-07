@@ -2475,7 +2475,7 @@ function setLayerSettings(name) {
       ,resizable : false
       ,width     : 270
       ,constrainHeader : true
-      ,title     : name + ' :: settings'
+      ,title     : name.split('.').slice(1) + ' :: settings'
       ,items     : [
          new Ext.FormPanel({buttonAlign : 'center',border : false,bodyStyle : 'background:transparent',width : 240,height : height + 35,labelWidth : 100,labelSeparator : '',items : items,buttons : [{text : 'Restore default settings',width : 150,handler : function() {restoreDefaultStyles(name,items,id)}}]})
       ]
