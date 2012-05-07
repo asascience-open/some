@@ -414,11 +414,13 @@ function init() {
                 ]
                 ,listeners : {tabchange : function(tabPanel,tab) {
                   if (tab.id == 'gridsTab') {
-                    Ext.getCmp('mapBbar').show();
+                    Ext.getCmp('mapTimeButtonGroup').enable();
+                    Ext.getCmp('changeMapDateTimeButtonGroup').enable();
                     Ext.getCmp('requery').show();
                   }
                   else {
-                    Ext.getCmp('mapBbar').hide();
+                    Ext.getCmp('mapTimeButtonGroup').disable();
+                    Ext.getCmp('changeMapDateTimeButtonGroup').disable();
                     Ext.getCmp('requery').hide();
                   }
                   Ext.getCmp('mapPanel').doLayout();
@@ -470,9 +472,10 @@ function init() {
             ,region    : 'center'
             ,id        : 'mapPanel'
             ,html      : '<div id="map"></div>'
-            ,bbar      : {id : 'mapBbar',hidden : true,items : [
+            ,bbar      : {items : [
               {
                  xtype     : 'buttongroup'
+                ,id        : 'mapTimeButtonGroup'
                 ,autoWidth : true
                 ,columns   : 1
                 ,title     : 'Map date & time'
@@ -484,6 +487,7 @@ function init() {
               }
               ,{
                  xtype     : 'buttongroup'
+                ,id        : 'changeMapDateTimeButtonGroup'
                 ,autoWidth : true
                 ,columns   : 5
                 ,title     : 'Change map date & time'
@@ -650,14 +654,16 @@ function init() {
               {
                  text    : 'New graph'
                 ,icon    : 'img/document_empty.png'
+                ,tip     : 'Clear current graph'
                 ,handler : function() {
                   chartData = [];
                   Ext.getCmp('timeseriesPanel').fireEvent('resize',Ext.getCmp('timeseriesPanel'));
                 }
               }
               ,{
-                 text    : 'Clear highlighted / queried sites'
+                 text    : 'Clear sites'
                 ,icon    : 'img/draw_eraser.png'
+                ,tip     : 'Clear query sites and highlights'
                 ,handler : function() {
                   var lyr = map.getLayersByName('hiliteMarkers')[0];
                   lyr.removeFeatures(lyr.features);
@@ -668,6 +674,7 @@ function init() {
               ,{
                  text    : 'Requery'
                 ,icon    : 'img/arrow_refresh.png'
+                ,tip     : 'Rerun the query at the current query site'
                 ,id      : 'requery'
                 ,hidden  : true
                 ,handler : function() {
