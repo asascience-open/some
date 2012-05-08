@@ -2318,7 +2318,7 @@ function setLayerSettings(name) {
                 ,html   : "Feature contrasts may become more obvious based on the selected colormap."
               });
               this.addListener('select',function(el,rec) {
-                setCustomStyle(lyr,{colorMap : rec.get('value')},customize);
+                setCustomStyle(lyr,{colorMap : rec.get('name')},customize);
               });
             }
           }
