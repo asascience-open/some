@@ -25,17 +25,22 @@
   <csw:Query typeNames="gmd:MD_Metadata">
     <csw:ElementSetName typeNames="gmd:MD_Metadata">full</csw:ElementSetName>
     <csw:Constraint version="1.1.0">
+<!--
+  We want a date OVERLAP, but there is no such thing available, at least
+  in this CSW.  So, do it ourselves.
+    TempExtent_begin <= DATEEND && TempExtent_end >= DATEBEGIN
+-->
       <ogc:Filter>
         <ogc:And>
-          <ogc:PropertyIsGreaterThanOrEqualTo>
+          <ogc:PropertyIsLessThanOrEqualTo>
             <ogc:PropertyName>apiso:TempExtent_begin</ogc:PropertyName>
-            <ogc:Literal>___DATEBEGIN___</ogc:Literal>
-          </ogc:PropertyIsGreaterThanOrEqualTo>
+            <ogc:Literal>___DATEEND___</ogc:Literal>
+          </ogc:PropertyIsLessThanOrEqualTo>
           <ogc:And>
-            <ogc:PropertyIsLessThanOrEqualTo>
+            <ogc:PropertyIsGreaterThanOrEqualTo>
               <ogc:PropertyName>apiso:TempExtent_end</ogc:PropertyName>
-              <ogc:Literal>___DATEEND___</ogc:Literal>
-            </ogc:PropertyIsLessThanOrEqualTo>
+              <ogc:Literal>___DATEBEGIN___</ogc:Literal>
+            </ogc:PropertyIsGreaterThanOrEqualTo>
             <ogc:And>
               <ogc:PropertyIsEqualTo>
                 <ogc:PropertyName>apiso:CoverageContentTypeCode</ogc:PropertyName>
