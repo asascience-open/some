@@ -1,6 +1,6 @@
 <?php
 
-  function queryCatalog($title) {
+  function queryCatalog($organization,$coverage) {
     $xml = simplexml_load_string(
       file_get_contents(
          'http://testbedapps.sura.org/gi-cat/services/cswiso'
@@ -8,7 +8,15 @@
         ,stream_context_create(array('http' => array(
            'method'  => 'POST'
           ,'header'  => 'Content-type: text/xml'
-          ,'content' => str_replace('__TITLE__',$title,file_get_contents('post_template.xml'))
+          ,'content' => str_replace(
+             '___ORGANIZATION___'
+            ,$organization
+            ,str_replace(
+               '___COVERAGE___'
+              ,$coverage
+              ,file_get_contents('post_template.xml')
+            )
+          )
         )))
       )
     );

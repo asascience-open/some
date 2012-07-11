@@ -20,16 +20,22 @@
   "
   outputSchema="http://www.isotc211.org/2005/gmd"
   startPosition="1"
-  maxRecords="5"
+  maxRecords="1000"
 >
   <csw:Query typeNames="gmd:MD_Metadata">
     <csw:ElementSetName typeNames="gmd:MD_Metadata">full</csw:ElementSetName>
     <csw:Constraint version="1.1.0">
       <ogc:Filter>
-        <ogc:PropertyIsEqualTo>
-          <ogc:PropertyName>apiso:title</ogc:PropertyName>
-          <ogc:Literal>__TITLE__</ogc:Literal>
-        </ogc:PropertyIsEqualTo>
+        <ogc:And>
+          <ogc:PropertyIsEqualTo>
+            <ogc:PropertyName>apiso:CoverageContentTypeCode</ogc:PropertyName>
+            <ogc:Literal>___COVERAGE___</ogc:Literal>
+          </ogc:PropertyIsEqualTo>
+          <ogc:PropertyIsLike wildCard="*" singleChar="#" escapeChar="!">
+            <ogc:PropertyName>OrganisationName</ogc:PropertyName>
+            <ogc:Literal>*___ORGANIZATION___*</ogc:Literal>
+          </ogc:PropertyIsLike>
+        </ogc:And>
       </ogc:Filter>
     </csw:Constraint>
   </csw:Query>

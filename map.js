@@ -157,6 +157,7 @@ function init() {
       ,listeners : {
         beforeload : function(sto) {
           sto.setBaseParam('eventtime',getEventtimeFromEventsComboBox());
+          sto.setBaseParam('modelType',Ext.getCmp('modelTypesComboBox').getValue());
           Ext.getCmp('observationsGridPanel').getEl().mask('<table><tr><td>Loading...&nbsp;</td><td><img src="js/ext-3.3.0/resources/images/default/grid/loading.gif"></td></tr></table>');
         }
         ,load      : function(sto) {
@@ -199,6 +200,7 @@ function init() {
       ,listeners : {
         beforeload : function(sto) {
           sto.setBaseParam('eventtime',getEventtimeFromEventsComboBox());
+          sto.setBaseParam('modelType',Ext.getCmp('modelTypesComboBox').getValue());
           Ext.getCmp('modelsGridPanel').getEl().mask('<table><tr><td>Loading...&nbsp;</td><td><img src="js/ext-3.3.0/resources/images/default/grid/loading.gif"></td></tr></table>');
         }
         ,load      : function(sto) {
