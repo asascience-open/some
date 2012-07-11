@@ -1,6 +1,25 @@
 <?php
 
-  function queryCatalog($organization,$coverage) {
+  function queryCatalog($organization,$coverage,$dateBegin,$dateEnd) {
+
+file_put_contents('/tmp/maplog',str_replace(
+             '___ORGANIZATION___'
+            ,$organization
+            ,str_replace(
+               '___DATEBEGIN___'
+              ,$dateBegin
+              ,str_replace(
+                 '___DATEEND___'
+                ,$dateEnd
+                ,str_replace(
+                   '___COVERAGE___'
+                  ,$coverage
+                  ,file_get_contents('post_template.xml')
+                )
+              )
+            )
+          ),FILE_APPEND);
+
     $xml = simplexml_load_string(
       file_get_contents(
          'http://testbedapps.sura.org/gi-cat/services/cswiso'
@@ -12,9 +31,17 @@
              '___ORGANIZATION___'
             ,$organization
             ,str_replace(
-               '___COVERAGE___'
-              ,$coverage
-              ,file_get_contents('post_template.xml')
+               '___DATEBEGIN___'
+              ,$dateBegin
+              ,str_replace(
+                 '___DATEEND___'
+                ,$dateEnd
+                ,str_replace(
+                   '___COVERAGE___'
+                  ,$coverage
+                  ,file_get_contents('post_template.xml')
+                )
+              )
             )
           )
         )))

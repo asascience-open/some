@@ -6,10 +6,10 @@
   date_default_timezone_set('UTC');
   $today = mktime(0,0,0);
 
-  $eventTime = explode('/',$_REQUEST['eventtime']);
+  $eventtime = explode('/',$_REQUEST['eventtime']);
   $eventTime = array(
-     strtotime($eventTime[0])
-    ,strtotime($eventTime[1])
+     strtotime($eventtime[0])
+    ,strtotime($eventtime[1])
   );
 
   $providers = explode(',',$_REQUEST['providers']);
@@ -37,7 +37,7 @@
 
   if (in_array('sura',$providers)) {
     if ($_REQUEST['type'] == 'models') {
-      $q = queryCatalog($modelType,'modelResult');
+      $q = queryCatalog($modelType,'modelResult',$eventtime[0],$eventtime[1]);
       for ($i = 0; $i < count($q); $i++) {
         array_push($models,array(
            'name' => 'model.'.$q[$i]['title']
@@ -54,7 +54,7 @@
       }
     }
     if ($_REQUEST['type'] == 'obs') {
-      $q = queryCatalog($modelType,'physicalMeasurement');
+      $q = queryCatalog($modelType,'physicalMeasurement',$eventtime[0],$eventtime[1]);
       for ($i = 0; $i < count($q); $i++) {
         array_push($obs,array(
            'name' => 'obs.'.$q[$i]['title']
