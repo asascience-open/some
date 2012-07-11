@@ -1,6 +1,6 @@
 <?php
 
-  function queryCatalog($organization,$coverage,$dateBegin,$dateEnd) {
+  function queryCatalog($organization,$coverage,$dateBegin,$dateEnd,$webService) {
     $xml = simplexml_load_string(
       file_get_contents(
          'http://testbedapps.sura.org/gi-cat/services/cswiso'
@@ -44,7 +44,7 @@
             $m['title'] = sprintf("%s",$dataIdentification->children($gmdNs)->{'citation'}[0]->children($gmdNs)->{'CI_Citation'}[0]->children($gmdNs)->{'title'}[0]->children($gcoNs)->{'CharacterString'});
           }
           foreach ($identificationInfo->children($srvNs)->{'SV_ServiceIdentification'} as $serviceIdentification) {
-            if (sprintf("%s",$serviceIdentification->attributes()->{'id'}) == 'OGC-SOS') {
+            if ($webService == 'SOS' && sprintf("%s",$serviceIdentification->attributes()->{'id'}) == 'OGC-SOS') {
               $m['sosGetCaps'] = sprintf("%s",$serviceIdentification->children($srvNs)->{'containsOperations'}[0]->children($srvNs)->{'SV_OperationMetadata'}->children($srvNs)->{'connectPoint'}->children($gmdNs)->{'CI_OnlineResource'}->children($gmdNs)->{'linkage'}->children($gmdNs)->{'URL'});
               $eXGeographicBoundingBoxChildren = $serviceIdentification->children($srvNs)->{'extent'}[0]->children($gmdNs)->{'EX_Extent'}[0]->children($gmdNs)->{'geographicElement'}[0]->children($gmdNs)->{'EX_GeographicBoundingBox'}[0]->children($gmdNs);
               $m['sosGeographicBbox'] = array(
@@ -55,6 +55,21 @@
               );
               $timePeriodChildren = $serviceIdentification->children($srvNs)->{'extent'}[0]->children($gmdNs)->{'EX_Extent'}[0]->children($gmdNs)->{'temporalElement'}[0]->children($gmdNs)->{'EX_TemporalExtent'}[0]->children($gmdNs)->{'extent'}[0]->children($gmlNs)->{'TimePeriod'}->children($gmlNs);
               $m['sosTemporalBbox'] = array(
+                 sprintf("%s",$timePeriodChildren->{'beginPosition'})
+                ,sprintf("%s",$timePeriodChildren->{'endPosition'})
+              );
+            }
+            else if ($webService == 'WMS' && sprintf("%s",$serviceIdentification->attributes()->{'id'}) == 'OGC-WMS') {
+              $m['wmsGetCaps'] = sprintf("%s",$serviceIdentification->children($srvNs)->{'containsOperations'}[0]->children($srvNs)->{'SV_OperationMetadata'}->children($srvNs)->{'connectPoint'}->children($gmdNs)->{'CI_OnlineResource'}->children($gmdNs)->{'linkage'}->children($gmdNs)->{'URL'});
+              $eXGeographicBoundingBoxChildren = $serviceIdentification->children($srvNs)->{'extent'}[0]->children($gmdNs)->{'EX_Extent'}[0]->children($gmdNs)->{'geographicElement'}[0]->children($gmdNs)->{'EX_GeographicBoundingBox'}[0]->children($gmdNs);
+              $m['wmsGeographicBbox'] = array(
+                 sprintf("%s",$eXGeographicBoundingBoxChildren->{'westBoundLongitude'}->children($gcoNs)->{'Decimal'})
+                ,sprintf("%s",$eXGeographicBoundingBoxChildren->{'southBoundLatitude'}->children($gcoNs)->{'Decimal'})
+                ,sprintf("%s",$eXGeographicBoundingBoxChildren->{'eastBoundLongitude'}->children($gcoNs)->{'Decimal'})
+                ,sprintf("%s",$eXGeographicBoundingBoxChildren->{'northBoundLatitude'}->children($gcoNs)->{'Decimal'})
+              );
+              $timePeriodChildren = $serviceIdentification->children($srvNs)->{'extent'}[0]->children($gmdNs)->{'EX_Extent'}[0]->children($gmdNs)->{'temporalElement'}[0]->children($gmdNs)->{'EX_TemporalExtent'}[0]->children($gmdNs)->{'extent'}[0]->children($gmlNs)->{'TimePeriod'}->children($gmlNs);
+              $m['wmsTemporalBbox'] = array(
                  sprintf("%s",$timePeriodChildren->{'beginPosition'})
                 ,sprintf("%s",$timePeriodChildren->{'endPosition'})
               );

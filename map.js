@@ -73,7 +73,7 @@ function init() {
      height      : 50
     ,id          : 'observationsGridPanel'
     ,store : new Ext.data.JsonStore({
-       url       : 'query.php?type=obs&providers=coops,sura'
+       url       : 'query.php?type=obs&providers=coops,sura&webService=SOS'
       ,fields    : ['name','url','properties']
       ,root      : 'data'
       ,listeners : {
@@ -116,7 +116,7 @@ function init() {
      height      : 50
     ,id          : 'modelsGridPanel'
     ,store : new Ext.data.JsonStore({
-       url       : 'query.php?type=models&providers=gomaine,sura'
+       url       : 'query.php?type=models&providers=gomaine,sura&webService=SOS'
       ,fields    : ['name','url','properties']
       ,root      : 'data'
       ,listeners : {

@@ -12,8 +12,9 @@
     ,strtotime($eventtime[1])
   );
 
-  $providers = explode(',',$_REQUEST['providers']);
-  $modelType = $_REQUEST['modelType'];
+  $providers  = explode(',',$_REQUEST['providers']);
+  $modelType  = $_REQUEST['modelType'];
+  $webService = $_REQUEST['webService'];
 
   $models = array();
   $obs    = array();
@@ -37,7 +38,7 @@
 
   if (in_array('sura',$providers)) {
     if ($_REQUEST['type'] == 'models') {
-      $q = queryCatalog($modelType,'modelResult',$eventtime[0],$eventtime[1]);
+      $q = queryCatalog($modelType,'modelResult',$eventtime[0],$eventtime[1],$webService);
       for ($i = 0; $i < count($q); $i++) {
         array_push($models,array(
            'name' => 'model.'.$q[$i]['title']
@@ -54,7 +55,7 @@
       }
     }
     if ($_REQUEST['type'] == 'obs') {
-      $q = queryCatalog($modelType,'physicalMeasurement',$eventtime[0],$eventtime[1]);
+      $q = queryCatalog($modelType,'physicalMeasurement',$eventtime[0],$eventtime[1],$webService);
       for ($i = 0; $i < count($q); $i++) {
         array_push($obs,array(
            'name' => 'obs.'.$q[$i]['title']
