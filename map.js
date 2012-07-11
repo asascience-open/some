@@ -57,84 +57,6 @@ function init() {
   Ext.QuickTips.init();
   refreshTimer();
 
-  var modelTypesFormPanel = new Ext.FormPanel({
-     id              : 'modelTypesFormPanel'
-    ,layout          : 'fit'
-    ,border          : false
-    ,items           : new Ext.form.ComboBox({
-      store : new Ext.data.ArrayStore({
-         fields : ['id']
-        ,data   : [['Inundation']]
-      })
-      ,id             : 'modelTypesComboBox'
-      ,displayField   : 'id'
-      ,valueField     : 'id'
-      ,mode           : 'local'
-      ,forceSelection : true
-      ,triggerAction  : 'all'
-      ,editable       : false
-      ,value          : 'Inundation'
-      ,listeners      : {
-        select : function(combo,rec) {
-          runQuery();
-        }
-      }
-    })
-  });
-
-  var eventsFormPanel = new Ext.FormPanel({
-     id              : 'eventsFormPanel'
-    ,layout          : 'fit'
-    ,border          : false
-    ,items           : new Ext.form.ComboBox({
-      store : new Ext.data.ArrayStore({
-         fields : ['id','eventtime','year']
-        ,data   : [
-           ['Ike'             ,'2008-09-08T00:30:00Z/2008-09-16T00:00:00Z','2008']
-          ,['Current forecast','current'                                  ,''    ]
-        ]
-      })
-      ,id             : 'eventsComboBox'
-      ,displayField   : 'id'
-      ,valueField     : 'id'
-      ,mode           : 'local'
-      ,forceSelection : true
-      ,triggerAction  : 'all'
-      ,editable       : false
-      ,value          : 'Ike'
-      ,listeners      : {
-        select : function(combo,rec) {
-          runQuery();
-        }
-      }
-    })
-  });
-
-  var parametersFormPanel = new Ext.FormPanel({
-     id              : 'parametersFormPanel'
-    ,layout          : 'fit'
-    ,border          : false
-    ,items           : new Ext.form.ComboBox({
-      store : new Ext.data.ArrayStore({
-         fields : ['id']
-        ,data   : [['Water level']]
-      })
-      ,id             : 'parametersComboBox'
-      ,displayField   : 'id'
-      ,valueField     : 'id'
-      ,mode           : 'local'
-      ,forceSelection : true
-      ,triggerAction  : 'all'
-      ,editable       : false
-      ,value          : 'Water level'
-      ,listeners      : {
-        select : function(combo,rec) {
-          runQuery();
-        }
-      }
-    })
-  });
-
   var observationsSelModel = new Ext.grid.CheckboxSelectionModel({
      header    : ''
     ,checkOnly : true
@@ -298,28 +220,84 @@ function init() {
          region      : 'west'
         ,width       : 275
         ,items       : [
-          {
+          new Ext.FormPanel({
              title     : 'Catalog query filters'
             ,id        : 'queryFiltersPanel'
             ,border    : false
             ,bodyStyle : 'padding:5px 5px 0'
+            ,labelWidth     : 90
+            ,labelSeparator : ''
             ,items     : [
               {
                  border : false
                 ,cls    : 'directionsPanel'
                 ,html   : 'Select a model type, a storm or an event, and a parameter to begin your search.'
               }
-              ,new Ext.form.FieldSet({
-                 title : '&nbsp;Model type&nbsp;'
-                ,items : modelTypesFormPanel
+              ,new Ext.form.ComboBox({
+                store : new Ext.data.ArrayStore({
+                   fields : ['id']
+                  ,data   : [['Inundation']]
+                })
+                ,width          : 165
+                ,id             : 'modelTypesComboBox'
+                ,fieldLabel     : 'Model type'
+                ,displayField   : 'id'
+                ,valueField     : 'id'
+                ,mode           : 'local'
+                ,forceSelection : true
+                ,triggerAction  : 'all'
+                ,editable       : false
+                ,value          : 'Inundation'
+                ,listeners      : {
+                  select : function(combo,rec) {
+                    runQuery();
+                  }
+                }
               })
-              ,new Ext.form.FieldSet({
-                 title : '&nbsp;Storm or event&nbsp;'
-                ,items : eventsFormPanel
+              ,new Ext.form.ComboBox({
+                store : new Ext.data.ArrayStore({
+                   fields : ['id','eventtime','year']
+                  ,data   : [
+                     ['Ike'             ,'2008-09-08T00:30:00Z/2008-09-16T00:00:00Z','2008']
+                    ,['Current forecast','current'                                  ,''    ]
+                  ]
+                })
+                ,width          : 165
+                ,id             : 'eventsComboBox'
+                ,fieldLabel     : 'Storm or event'
+                ,displayField   : 'id'
+                ,valueField     : 'id'
+                ,mode           : 'local'
+                ,forceSelection : true
+                ,triggerAction  : 'all'
+                ,editable       : false
+                ,value          : 'Ike'
+                ,listeners      : {
+                  select : function(combo,rec) {
+                    runQuery();
+                  }
+                }
               })
-              ,new Ext.form.FieldSet({
-                 title : '&nbsp;Parameter&nbsp;'
-                ,items : parametersFormPanel
+              ,new Ext.form.ComboBox({
+                store : new Ext.data.ArrayStore({
+                   fields : ['id']
+                  ,data   : [['Water level']]
+                })
+                ,width          : 165
+                ,id             : 'parametersComboBox'
+                ,fieldLabel     : 'Parameter'
+                ,displayField   : 'id'
+                ,valueField     : 'id'
+                ,mode           : 'local'
+                ,forceSelection : true
+                ,triggerAction  : 'all'
+                ,editable       : false
+                ,value          : 'Water level'
+                ,listeners      : {
+                  select : function(combo,rec) {
+                    runQuery();
+                  }
+                }
               })
             ]
             ,tbar        : {items : [
@@ -366,7 +344,7 @@ function init() {
                 }
               }
             ]}
-          }
+          })
           ,{
              id        : 'queryResultsPanel'
             ,title     : 'Catalog query results'
