@@ -42,9 +42,9 @@
       for ($i = 0; $i < count($q); $i++) {
         array_push($models,array(
            'name' => 'model.'.$q[$i]['title']
-          ,'url'  => $q[$i]['sosGetCaps'].'&useCache=true'
-          ,'minT' => strtotime($q[$i]['sosTemporalBbox'][0])
-          ,'maxT' => strtotime($q[$i]['sosTemporalBbox'][1])
+          ,'url'  => $q[$i][strtolower($webService).'GetCaps'].($webService == 'SOS' ? '&useCache=true' : '')
+          ,'minT' => strtotime($q[$i][strtolower($webService).'TemporalBbox'][0])
+          ,'maxT' => strtotime($q[$i][strtolower($webService).'TemporalBbox'][1])
           ,'properties' => array(
             'Water level' => array(
                'prop'        => 'watlev'
@@ -59,9 +59,9 @@
       for ($i = 0; $i < count($q); $i++) {
         array_push($obs,array(
            'name' => 'obs.'.$q[$i]['title']
-          ,'url'  => $q[$i]['sosGetCaps'].'&useCache=true'
-          ,'minT' => strtotime($q[$i]['sosTemporalBbox'][0])
-          ,'maxT' => strtotime($q[$i]['sosTemporalBbox'][1])
+          ,'url'  => $q[$i][strtolower($webService).'GetCaps'].($webService == 'SOS' ? '&useCache=true' : '')
+          ,'minT' => strtotime($q[$i][strtolower($webService).'TemporalBbox'][0])
+          ,'maxT' => strtotime($q[$i][strtolower($webService).'TemporalBbox'][1])
           ,'properties' => array(
             'Water level' => array(
                'prop'        => 'watlev'
@@ -71,38 +71,6 @@
         ));
       }
     }
-/*
-    $q = fakeQueryCatalog('Simulation');
-    for ($i = 0; $i < count($q); $i++) {
-      array_push($models,array(
-         'name' => 'model.'.$q[$i]['title']
-        ,'url'  => $q[$i]['sosGetCaps'].'&useCache=true'
-        ,'minT' => strtotime($q[$i]['sosTemporalBbox'][0])
-        ,'maxT' => strtotime($q[$i]['sosTemporalBbox'][1])
-        ,'properties' => array(
-          'Water level' => array(
-             'prop'        => 'watlev'
-            ,'getObsExtra' => '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
-          )
-        )
-      ));
-    }
-    $q = fakeQueryCatalog('Measurement');
-    for ($i = 0; $i < count($q); $i++) {
-      array_push($obs,array(
-         'name' => 'obs.'.$q[$i]['title']
-        ,'url'  => $q[$i]['sosGetCaps'].'&useCache=true'
-        ,'minT' => strtotime($q[$i]['sosTemporalBbox'][0])
-        ,'maxT' => strtotime($q[$i]['sosTemporalBbox'][1])
-        ,'properties' => array(
-          'Water level' => array(
-             'prop'        => 'watlev'
-            ,'getObsExtra' => '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
-          )
-        )
-      ));
-    }
-*/
   }
 
   if (in_array('coops',$providers)) {

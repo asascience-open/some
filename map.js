@@ -145,9 +145,9 @@ function init() {
   });
 
   var gridsSelModel = new Ext.grid.CheckboxSelectionModel({
-     header    : ''
-    ,checkOnly : true
-    ,listeners : {
+     header     : ''
+    ,checkOnly  : true
+    ,listeners  : {
       rowselect : function(sm,rowIndex,rec) {
         addGrid(rec.get('url'),rec.get('lyr'),rec.get('stl'),rec.get('sgl'),rec.get('name'),'grids');
       }
@@ -160,12 +160,13 @@ function init() {
      height      : 50
     ,id          : 'gridsGridPanel'
     ,store : new Ext.data.JsonStore({
-       url       : 'query.php?type=grids&providers=eds'
-      ,fields    : ['name','url','lyr','stl','sgl','leg','minT','maxT','varName','varUnits','customize','bbox','abstract']
+       url       : 'query.php?type=models&providers=sura&webService=WMS'
+      ,fields    : ['name','url','properties']
       ,root      : 'data'
       ,listeners : {
         beforeload : function(sto) {
           sto.setBaseParam('eventtime',getEventtimeFromEventsComboBox());
+          sto.setBaseParam('modelType',Ext.getCmp('modelTypesComboBox').getValue());
           if (Ext.getCmp('gridsGridPanel').getEl()) {
             Ext.getCmp('gridsGridPanel').getEl().mask('<table><tr><td>Loading...&nbsp;</td><td><img src="js/ext-3.3.0/resources/images/default/grid/loading.gif"></td></tr></table>');
           }
@@ -174,6 +175,7 @@ function init() {
           if (Ext.getCmp('gridsGridPanel').getEl()) {
             Ext.getCmp('gridsGridPanel').getEl().unmask();
           }
+/*
           var d0 = new Date();
           sto.each(function(rec) {
             var d = new Date(rec.get('minT') * 1000);
@@ -183,14 +185,20 @@ function init() {
           });
           setdNow(d0);
           setMapTime();
+*/
         }
       }
     })
-    ,selModel    : gridsSelModel
+//    ,selModel    : gridsSelModel
+    ,selModel      : new Ext.grid.RowSelectionModel({
+       singleSelect : true
+      ,listeners    : {rowselect : function(sm,rowIndex,rec) {Ext.Msg.alert('Debug web service',"<a target=_blank href='" + rec.get('url') + "'>WMS GetCapabilities URL</a>")}}
+    })
+    ,disableSelection : true
     ,autoExpandColumn : 'name'
     ,columns     : [
-       gridsSelModel
-      ,{id : 'name',dataIndex :'name',renderer : renderName}
+//       gridsSelModel
+       {id : 'name',dataIndex :'name',renderer : renderName}
       ,{id : 'info'                  ,renderer : renderLayerCalloutButton,width : 25}
     ]
     ,hideHeaders : true
@@ -363,7 +371,8 @@ function init() {
                 ,tabWidth   : 135
                 ,bodyStyle  : 'padding:5px 5px 0'
                 ,id         : 'stationGridTabPanel'
-                ,items      : [
+                ,deferredRender : false
+                ,items          : [
                   {
                      title : 'Available stations'
                     ,id    : 'stationsTab'
