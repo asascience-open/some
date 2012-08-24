@@ -66,27 +66,25 @@
         $data['nowIdx'] = count($data['t']);
       }
       array_push($data['t'],$t * 1000);
-      if ($t >= time()) {
-        foreach (array_keys($csv[$i]) as $vStr) {
-          if ($vStr != 'time') {
-            preg_match("/(.*)\[(.*)\]/",$vStr,$a);
+      foreach (array_keys($csv[$i]) as $vStr) {
+        if ($vStr != 'time') {
+          preg_match("/(.*)\[(.*)\]/",$vStr,$a);
 /*
-            if (!array_key_exists($a[1],$gfi[$k]['data'])) {
-              $gfi[$k]['data'][$a[1]] = array(
-                 'v' => array()
-                ,'u' => $a[2]
-              );
-            }
-            $gfi[$k]['data'][$a[1]]['v'][$t] = $csv[$i][$vStr];
+          if (!array_key_exists($a[1],$gfi[$k]['data'])) {
+            $gfi[$k]['data'][$a[1]] = array(
+               'v' => array()
+              ,'u' => $a[2]
+            );
+          }
+          $gfi[$k]['data'][$a[1]]['v'][$t] = $csv[$i][$vStr];
 */
-            // need to add check in here because > 1 col could come back
-            if (!array_key_exists($vStr,$data['d'])) {
-              $data['d'][$_REQUEST['varName']] = array(sprintf("%f",$csv[$i][$vStr]));
-              $data['u'][$_REQUEST['varName']] = $_REQUEST['varUnits'];
-            }
-            else {
-              array_push($data['d'][$_REQUEST['varName']],array(sprintf("%f",$csv[$i][$vStr])));
-            }
+          // need to add check in here because > 1 col could come back
+          if (!array_key_exists($_REQUEST['varName'],$data['d'])) {
+            $data['d'][$_REQUEST['varName']] = array(sprintf("%f",$csv[$i][$vStr]));
+            $data['u'][$_REQUEST['varName']] = $_REQUEST['varUnits'];
+          }
+          else {
+            array_push($data['d'][$_REQUEST['varName']],array(sprintf("%f",$csv[$i][$vStr])));
           }
         }
       }
