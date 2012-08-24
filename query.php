@@ -38,20 +38,52 @@
 
   if (in_array('sura',$providers)) {
     if ($_REQUEST['type'] == 'models') {
-      $q = queryCatalog($modelType,'modelResult',$eventtime[0],$eventtime[1],$webService);
-      for ($i = 0; $i < count($q); $i++) {
+      if ($webService == 'WMS') {
         array_push($models,array(
-           'name' => 'model.'.$q[$i]['title']
-          ,'url'  => $q[$i][strtolower($webService).'GetCaps'].($webService == 'SOS' ? '&useCache=true' : '')
-          ,'minT' => strtotime($q[$i][strtolower($webService).'TemporalBbox'][0])
-          ,'maxT' => strtotime($q[$i][strtolower($webService).'TemporalBbox'][1])
-          ,'properties' => array(
-            'Water level' => array(
-               'prop'        => 'watlev'
-              ,'getObsExtra' => '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
-            )
+           'name'      => 'grid.in_und_adcirc_ike_ultralite_lr_vardrag_wave_3d'
+          ,'url'       => 'http://ec2-107-21-136-52.compute-1.amazonaws.com:8080/wms/in_und_adcirc_ike_ultralite_lr_vardrag_wave_3d/?'
+          ,'lyr'       => 'zeta'
+          ,'stl'       => 'filledcontours_average_jet_0_1_node_True'
+          ,'sgl'       => false
+          ,'leg'       => 'img/blank.png'
+          ,'varName'   => 'zeta'
+          ,'varUnits'  => 'm'
+          ,'abstract'  => 'No information available.'
+          ,'bbox'      => '-100,22,-80,32'
+          ,'minT'      => strtotime('2008-09-10 00:00 UTC')
+          ,'maxT'      => strtotime('2008-09-11 00:00 UTC')
+          ,'ele'       => 1
+          ,'customize' => array(
+/*
+             'imageQuality' => 7
+            ,'baseStyle'    => 0
+            ,'colorMap'     => 1
+            ,'striding'     => 3
+            ,'barbLabel'    => 2
+            ,'tailMag'      => 4
+            ,'min'          => 5
+            ,'max'          => 6
+            ,'minMaxBounds' => '0-6'
+*/
           )
         ));
+      }
+      else {
+        $q = queryCatalog($modelType,'modelResult',$eventtime[0],$eventtime[1],$webService);
+        for ($i = 0; $i < count($q); $i++) {
+          array_push($models,array(
+             'name' => 'model.'.$q[$i]['title']
+            ,'url'  => $q[$i][strtolower($webService).'GetCaps'].($webService == 'SOS' ? '&useCache=true' : '')
+            ,'minT' => strtotime($q[$i][strtolower($webService).'TemporalBbox'][0])
+            ,'maxT' => strtotime($q[$i][strtolower($webService).'TemporalBbox'][1])
+            ,'properties' => array(
+              'Water level' => array(
+                 'prop'        => 'watlev'
+                ,'getObsExtra' => '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
+              )
+            )
+          ));
+        }
       }
     }
     if ($_REQUEST['type'] == 'obs') {

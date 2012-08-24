@@ -149,7 +149,7 @@ function init() {
     ,checkOnly  : true
     ,listeners  : {
       rowselect : function(sm,rowIndex,rec) {
-        addGrid(rec.get('url'),rec.get('lyr'),rec.get('stl'),rec.get('sgl'),rec.get('name'),'grids');
+        addGrid(rec.get('url'),rec.get('lyr'),rec.get('stl'),rec.get('sgl'),rec.get('name'),'grids',rec.get('ele'));
       }
       ,rowdeselect : function(sm,rowIndex,rec) {
         map.getLayersByName(rec.get('name'))[0].setVisibility(false);
@@ -161,7 +161,7 @@ function init() {
     ,id          : 'gridsGridPanel'
     ,store : new Ext.data.JsonStore({
        url       : 'query.php?type=models&providers=sura&webService=WMS'
-      ,fields    : ['name','url','properties']
+      ,fields    : ['name','url','lyr','stl','sgl','leg','varName','varUnits','abstract','bbox','minT','maxT','ele','customize']
       ,root      : 'data'
       ,listeners : {
         beforeload : function(sto) {
@@ -175,7 +175,6 @@ function init() {
           if (Ext.getCmp('gridsGridPanel').getEl()) {
             Ext.getCmp('gridsGridPanel').getEl().unmask();
           }
-/*
           var d0 = new Date();
           sto.each(function(rec) {
             var d = new Date(rec.get('minT') * 1000);
@@ -185,20 +184,21 @@ function init() {
           });
           setdNow(d0);
           setMapTime();
-*/
         }
       }
     })
-//    ,selModel    : gridsSelModel
+    ,selModel    : gridsSelModel
+/*
     ,selModel      : new Ext.grid.RowSelectionModel({
        singleSelect : true
       ,listeners    : {rowselect : function(sm,rowIndex,rec) {Ext.Msg.alert('Debug web service',"<a target=_blank href='" + rec.get('url') + "'>WMS GetCapabilities URL</a>")}}
     })
+*/
     ,disableSelection : true
     ,autoExpandColumn : 'name'
     ,columns     : [
-//       gridsSelModel
-       {id : 'name',dataIndex :'name',renderer : renderName}
+       gridsSelModel
+      ,{id : 'name',dataIndex :'name',renderer : renderName}
       ,{id : 'info'                  ,renderer : renderLayerCalloutButton,width : 25}
     ]
     ,hideHeaders : true
@@ -1793,7 +1793,7 @@ function addLayer(lyr,timeSensitive) {
   map.addLayer(lyr);
 }
 
-function addGrid(url,lyr,syl,sgl,name,type) {
+function addGrid(url,lyr,stl,sgl,name,type,ele) {
   if (map.getLayersByName(name)[0]) {
     var lyr = map.getLayersByName(name)[0];
     lyr.setVisibility(true);
@@ -1805,8 +1805,9 @@ function addGrid(url,lyr,syl,sgl,name,type) {
     ,url
     ,{
        layers      : lyr
-      ,styles      : syl
+      ,styles      : stl
       ,transparent : true
+      ,elevation   : ele
     }
     ,{
        isBaseLayer  : false
@@ -1895,7 +1896,7 @@ function makeTimeParam(d) {
     + '-' + String.leftPad(d.getUTCDate(),2,'0') 
     + 'T' 
     + String.leftPad(d.getUTCHours(),2,'0') 
-    + ':00Z'
+    + ':00:00'
 }
 
 function setdNow(d) {
