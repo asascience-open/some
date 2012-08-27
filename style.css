@@ -30,6 +30,7 @@ div.olLayerGoogleCopyright, div.olLayerGooglePoweredBy {
   font       : 11px/13px tahoma,helvetica,sans-serif;
   text-align : justify;
   padding    : 2px 2px 7px 2px;
+  color      : gray;
 }
 
 #queryResultsPanel {
