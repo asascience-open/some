@@ -73,7 +73,7 @@ function init() {
      height      : 50
     ,id          : 'observationsGridPanel'
     ,store       : new Ext.data.ArrayStore({
-       fields : ['name','url','properties']
+      fields : ['name','url','properties']
     })
     ,selModel    : observationsSelModel
     ,loadMask    : true
@@ -105,7 +105,7 @@ function init() {
      height      : 50
     ,id          : 'modelsGridPanel'
     ,store       : new Ext.data.ArrayStore({
-       fields : ['name','url','properties']
+      fields : ['name','url','properties']
     })
     ,selModel    : modelsSelModel
     ,loadMask    : true
@@ -136,34 +136,20 @@ function init() {
   var gridsGridPanel = new Ext.grid.GridPanel({
      height      : 50
     ,id          : 'gridsGridPanel'
-    ,store : new Ext.data.JsonStore({
-       url       : 'query.php?type=models&providers=sura&webService=WMS'
-      ,fields    : ['name','url','lyr','stl','sgl','leg','varName','varUnits','abstract','bbox','minT','maxT','ele','customize']
-      ,root      : 'data'
-      ,listeners : {
-        beforeload : function(sto) {
-          sto.setBaseParam('eventtime',getEventtimeFromEventsComboBox());
-          sto.setBaseParam('modelType',Ext.getCmp('modelTypesComboBox').getValue());
-          if (Ext.getCmp('gridsGridPanel').getEl()) {
-            Ext.getCmp('gridsGridPanel').getEl().mask('<table><tr><td>Loading...&nbsp;</td><td><img src="js/ext-3.3.0/resources/images/default/grid/loading.gif"></td></tr></table>');
+    ,store       : new Ext.data.ArrayStore({
+       fields    : ['name','url','lyr','stl','sgl','leg','varName','varUnits','abstract','bbox','minT','maxT','ele','customize']
+      ,listeners : {load : function(sto) {
+        var d0 = new Date();
+        sto.each(function(rec) {
+          var d = new Date(rec.get('minT') * 1000);
+          if (d < d0) {
+             d0 = d;
           }
-        }
-        ,load      : function(sto) {
-          if (Ext.getCmp('gridsGridPanel').getEl()) {
-            Ext.getCmp('gridsGridPanel').getEl().unmask();
-          }
-          var d0 = new Date();
-          sto.each(function(rec) {
-            var d = new Date(rec.get('minT') * 1000);
-            if (d < d0) {
-               d0 = d;
-            }
-          });
-          setdNow(d0);
-          setMapTime();
-        }
+        });
+        setdNow(d0);
+        setMapTime();
       }
-    })
+    }})
     ,selModel    : gridsSelModel
 /*
     ,selModel      : new Ext.grid.RowSelectionModel({
@@ -235,7 +221,7 @@ function init() {
                 ,value          : 'Inundation'
                 ,listeners      : {
                   select : function(combo,rec) {
-                    runQuery();
+                    prepAndRunQuery();
                   }
                 }
               })
@@ -259,7 +245,7 @@ function init() {
                 ,value          : 'Ike'
                 ,listeners      : {
                   select : function(combo,rec) {
-                    runQuery();
+                    prepAndRunQuery();
                   }
                 }
               })
@@ -280,7 +266,7 @@ function init() {
                 ,value          : 'Water level'
                 ,listeners      : {
                   select : function(combo,rec) {
-                    runQuery();
+                    prepAndRunQuery();
                   }
                 }
               })
@@ -1380,6 +1366,31 @@ function getEventtimeFromEventsComboBox() {
   return eventtime;
 }
 
+function prepAndRunQuery() {
+  var selMod = Ext.getCmp('modelsGridPanel').getSelectionModel();
+  var selObs = Ext.getCmp('observationsGridPanel').getSelectionModel();
+  var selGrd = Ext.getCmp('gridsGridPanel').getSelectionModel();
+
+  if (selMod.getSelections().length + selObs.getSelections().length + selGrd.getSelections().length > 0) {
+    Ext.MessageBox.confirm('Comfirm map reset','You have changed your filter options; the map must be reset.  Are you sure you wish to continue?',function(but) {
+      if (but == 'yes') {
+        selMod.clearSelections();
+        selObs.clearSelections();
+        selGrd.clearSelections();
+        runQuery();
+        if (popupObs && !popupObs.isDestroyed) {
+          popupObs.hide();
+        }
+      }
+    });
+  }
+  else {
+    runQuery();
+    var rec = Ext.getCmp('eventsComboBox').getStore().getAt(Ext.getCmp('eventsComboBox').getStore().find('id',Ext.getCmp('eventsComboBox').getValue()));
+    addStormTrack(rec.get('id'),rec.get('eventtime'),rec.get('year'));
+  }
+}
+
 function runQuery() {
   new Ext.data.XmlStore({
     proxy       : new Ext.data.HttpProxy({
@@ -1449,39 +1460,30 @@ function runQuery() {
         });
         modelsStore.loadData(modelsData);
         obsStore.loadData(obsData);
+
+        // hack for grids
+        Ext.getCmp('gridsGridPanel').getStore().loadData([[
+           'grid.in_und_adcirc_ike_ultralite_lr_vardrag_wave_3d'
+          ,'http://ec2-107-21-136-52.compute-1.amazonaws.com:8080/wms/in_und_adcirc_ike_ultralite_lr_vardrag_wave_3d/?'
+          ,'zeta'
+          ,'filledcontours_average_jet_0_1_node_True'
+          ,true
+          ,'img/blank.png'
+          ,'zeta'
+          ,'m'
+          ,'No information available.'
+          ,'-100,22,-80,32'
+          ,1221004800 // strtotime('2008-09-10 00:00 UTC')
+          ,1221091200 // strtotime('2008-09-11 00:00 UTC')
+          ,1
+          ,{}
+        ]]);
+
         Ext.getCmp('queryResultsPanel').getEl().unmask();
       }
     }
     ,sortInfo  : {field : 'title',direction : 'ASC'}
   });
-  return;
-
-  var selMod = Ext.getCmp('modelsGridPanel').getSelectionModel();
-  var selObs = Ext.getCmp('observationsGridPanel').getSelectionModel();
-  var selGrd = Ext.getCmp('gridsGridPanel').getSelectionModel();
-
-  if (selMod.getSelections().length + selObs.getSelections().length + selGrd.getSelections().length > 0) {
-    Ext.MessageBox.confirm('Comfirm map reset','You have changed your filter options; the map must be reset.  Are you sure you wish to continue?',function(but) {
-      if (but == 'yes') {
-        selMod.clearSelections();
-        selObs.clearSelections(); 
-        selGrd.clearSelections();
-        Ext.getCmp('modelsGridPanel').getStore().load();
-        Ext.getCmp('observationsGridPanel').getStore().load();
-        Ext.getCmp('gridsGridPanel').getStore().load();
-        if (popupObs && !popupObs.isDestroyed) {
-          popupObs.hide();
-        }
-      }
-    });
-  }
-  else {
-    Ext.getCmp('modelsGridPanel').getStore().load();
-    Ext.getCmp('observationsGridPanel').getStore().load();
-    Ext.getCmp('gridsGridPanel').getStore().load();
-    var rec = Ext.getCmp('eventsComboBox').getStore().getAt(Ext.getCmp('eventsComboBox').getStore().find('id',Ext.getCmp('eventsComboBox').getValue()));
-    addStormTrack(rec.get('id'),rec.get('eventtime'),rec.get('year'));
-  }
 }
 
 function buildFilter() {
@@ -1538,7 +1540,7 @@ function buildFilter() {
 function viewReady() {
   viewsReady++;
   if (viewsReady == 2) {
-    runQuery();
+    prepAndRunQuery();
   }
 }
 
