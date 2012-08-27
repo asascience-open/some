@@ -152,3 +152,7 @@ div.olLayerGoogleCopyright, div.olLayerGooglePoweredBy {
   text-decoration : none;
   color : rgb(74,134,214);
 }
+
+.maskText td {
+  font : 11px/13px tahoma,helvetica,sans-serif;
+}

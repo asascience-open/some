@@ -72,22 +72,11 @@ function init() {
   var observationsGridPanel = new Ext.grid.GridPanel({
      height      : 50
     ,id          : 'observationsGridPanel'
-    ,store : new Ext.data.JsonStore({
-       url       : 'query.php?type=obs&providers=coops,sura&webService=SOS'
-      ,fields    : ['name','url','properties']
-      ,root      : 'data'
-      ,listeners : {
-        beforeload : function(sto) {
-          sto.setBaseParam('eventtime',getEventtimeFromEventsComboBox());
-          sto.setBaseParam('modelType',Ext.getCmp('modelTypesComboBox').getValue());
-          Ext.getCmp('observationsGridPanel').getEl().mask('<table><tr><td>Loading...&nbsp;</td><td><img src="js/ext-3.3.0/resources/images/default/grid/loading.gif"></td></tr></table>');
-        }
-        ,load      : function(sto) {
-          Ext.getCmp('observationsGridPanel').getEl().unmask();
-        }
-      }
+    ,store       : new Ext.data.ArrayStore({
+       fields : ['name','url','properties']
     })
     ,selModel    : observationsSelModel
+    ,loadMask    : true
     ,autoExpandColumn : 'name'
     ,columns     : [
        observationsSelModel
@@ -115,23 +104,11 @@ function init() {
   var modelsGridPanel = new Ext.grid.GridPanel({
      height      : 50
     ,id          : 'modelsGridPanel'
-    ,store : new Ext.data.JsonStore({
-       url       : 'query.php?type=models&providers=gomaine,sura&webService=SOS'
-      ,fields    : ['name','url','properties']
-      ,root      : 'data'
-      ,listeners : {
-        beforeload : function(sto) {
-          sto.setBaseParam('eventtime',getEventtimeFromEventsComboBox());
-          sto.setBaseParam('modelType',Ext.getCmp('modelTypesComboBox').getValue());
-          Ext.getCmp('modelsGridPanel').getEl().mask('<table><tr><td>Loading...&nbsp;</td><td><img src="js/ext-3.3.0/resources/images/default/grid/loading.gif"></td></tr></table>');
-        }
-        ,load      : function(sto) {
-          // Ext.getCmp('modelsGridPanel').getSelectionModel().selectAll();
-          Ext.getCmp('modelsGridPanel').getEl().unmask();
-        }
-      }
+    ,store       : new Ext.data.ArrayStore({
+       fields : ['name','url','properties']
     })
     ,selModel    : modelsSelModel
+    ,loadMask    : true
     ,autoExpandColumn : 'name'
     ,columns     : [
        modelsSelModel
@@ -849,20 +826,6 @@ function initMap() {
     ,maxExtent         : new OpenLayers.Bounds(-20037508,-20037508,20037508,20037508.34)
   });
 
-  map.addControl(new OpenLayers.Control.Graticule({
-    labelSymbolizer : {
-       fontColor   : "#666"
-      ,fontSize    : "10px"
-      ,fontFamily  : "tahoma,helvetica,sans-serif"
-    }
-    ,lineSymbolizer  : {
-       strokeWidth     : 0.40
-      ,strokeOpacity   : 0.75
-      ,strokeColor     : "#999999"
-      ,strokeDashstyle : "dash"
-    }
-  }));
-
   map.addLayer(new OpenLayers.Layer.Vector(
      'hiliteMarkers'
     ,{
@@ -1418,6 +1381,81 @@ function getEventtimeFromEventsComboBox() {
 }
 
 function runQuery() {
+  new Ext.data.XmlStore({
+    proxy       : new Ext.data.HttpProxy({
+       method : 'POST'
+      ,url    : 'post.php?ns=csw|gmi|gml|srv|gmd|gco&url=' + encodeURIComponent('http://testbedapps.sura.org/gi-cat/services/cswiso')
+    })
+    ,record     : 'gmd_MD_Metadata'
+    ,autoLoad   : true
+    ,fields     : [
+       {name : 'title'          ,mapping : 'gmd_identificationInfo > gmd_MD_DataIdentification[id=DataIdentification] > gmd_citation > gmd_CI_Citation > gmd_title > gco_CharacterString'}
+      ,{name : 'bboxWest'       ,mapping : 'gmd_identificationInfo > gmd_MD_DataIdentification[id=DataIdentification] > gmd_extent > gmd_EX_Extent > gmd_geographicElement > gmd_EX_GeographicBoundingBox > gmd_westBoundLongitude > gco_Decimal'}
+      ,{name : 'bboxEast'       ,mapping : 'gmd_identificationInfo > gmd_MD_DataIdentification[id=DataIdentification] > gmd_extent > gmd_EX_Extent > gmd_geographicElement > gmd_EX_GeographicBoundingBox > gmd_eastBoundLongitude > gco_Decimal'}
+      ,{name : 'bboxSouth'      ,mapping : 'gmd_identificationInfo > gmd_MD_DataIdentification[id=DataIdentification] > gmd_extent > gmd_EX_Extent > gmd_geographicElement > gmd_EX_GeographicBoundingBox > gmd_southBoundLatitude > gco_Decimal'}
+      ,{name : 'bboxNorth'      ,mapping : 'gmd_identificationInfo > gmd_MD_DataIdentification[id=DataIdentification] > gmd_extent > gmd_EX_Extent > gmd_geographicElement > gmd_EX_GeographicBoundingBox > gmd_northBoundLatitude > gco_Decimal'}
+      ,{name : 'minT'           ,mapping : 'gmd_identificationInfo > gmd_MD_DataIdentification[id=DataIdentification] > gmd_extent > gmd_EX_Extent > gmd_temporalElement > gmd_EX_TemporalExtent > gmd_extent > gml_TimePeriod > gml_beginPosition'}
+      ,{name : 'maxT'           ,mapping : 'gmd_identificationInfo > gmd_MD_DataIdentification[id=DataIdentification] > gmd_extent > gmd_EX_Extent > gmd_temporalElement > gmd_EX_TemporalExtent > gmd_extent > gml_TimePeriod > gml_endPosition'}
+      ,{name : 'services'       ,convert : (function(){
+        return function(v,n) {
+          return new Ext.data.XmlReader({
+             record : 'gmd_identificationInfo > srv_SV_ServiceIdentification'
+            ,fields : [
+               {name : 'type'    ,mapping : 'srv_serviceType > gco_LocalName'}
+              ,{name : 'url'     ,mapping : 'srv_containsOperations > srv_SV_OperationMetadata > srv_connectPoint > gmd_CI_OnlineResource > gmd_linkage > gmd_URL'}
+            ]
+          }).readRecords(n).records;
+        }
+      })()}
+      ,{name : 'coverageType'   ,mapping : 'gmd_contentInfo > gmi_MI_CoverageDescription > gmd_contentType > gmd_MD_CoverageContentTypeCode'}
+    ]
+    ,listeners  : {
+      beforeload : function(sto) {
+        sto.setBaseParam('xmlData',buildFilter());
+        Ext.getCmp('queryResultsPanel').getEl().mask('<table class="maskText"><tr><td>Loading...&nbsp;</td><td><img src="js/ext-3.3.0/resources/images/default/grid/loading.gif"></td></tr></table>');
+      }
+      ,load      : function(sto) {
+        var modelsStore = Ext.getCmp('modelsGridPanel').getStore();
+        var modelsData  = [];
+        var obsStore    = Ext.getCmp('observationsGridPanel').getStore();
+        var obsData     = [];
+        sto.each(function(rec) {
+          var services = rec.get('services');
+          for (var i = 0; i < services.length; i++) {
+            services[services[i].data.type] = services[i].data.url;
+          }
+          if (rec.get('coverageType') == 'modelResult') {
+            modelsData.push([
+               'model.' + rec.get('title')
+              ,services['Open Geospatial Consortium Sensor Observation Service (SOS)'] + '&useCache=true'
+              ,{'Water level' : {
+                  prop        : 'watlev'
+                 ,getObsExtra : '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
+              }}
+            ]);
+          }
+          else if (rec.get('coverageType') == 'physicalMeasurement') {
+            if (rec.get('title') == 'Imeds ADCIRC watlev_IKE.P.UL-Ike3Dh.61.IMEDS' || true) {
+              obsData.push([
+                 'obs.' + rec.get('title')
+                ,services['Open Geospatial Consortium Sensor Observation Service (SOS)'] + '&useCache=true'
+                ,{'Water level' : {
+                    prop        : 'watlev'
+                   ,getObsExtra : '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
+                }}
+              ]);
+            }
+          }
+        });
+        modelsStore.loadData(modelsData);
+        obsStore.loadData(obsData);
+        Ext.getCmp('queryResultsPanel').getEl().unmask();
+      }
+    }
+    ,sortInfo  : {field : 'title',direction : 'ASC'}
+  });
+  return;
+
   var selMod = Ext.getCmp('modelsGridPanel').getSelectionModel();
   var selObs = Ext.getCmp('observationsGridPanel').getSelectionModel();
   var selGrd = Ext.getCmp('gridsGridPanel').getSelectionModel();
@@ -1444,6 +1482,57 @@ function runQuery() {
     var rec = Ext.getCmp('eventsComboBox').getStore().getAt(Ext.getCmp('eventsComboBox').getStore().find('id',Ext.getCmp('eventsComboBox').getValue()));
     addStormTrack(rec.get('id'),rec.get('eventtime'),rec.get('year'));
   }
+}
+
+function buildFilter() {
+  var eventTime = getEventtimeFromEventsComboBox().split('/');
+  var filter = new OpenLayers.Filter.Logical({
+     type    : OpenLayers.Filter.Logical.AND
+    ,filters : [
+      //  We want a date OVERLAP, but there is no such thing available, at least
+      //  in this CSW.  So, do it ourselves.
+      //  TempExtent_begin <= DATEEND && TempExtent_end >= DATEBEGIN
+      new OpenLayers.Filter.Comparison({
+         type     : OpenLayers.Filter.Comparison.LESS_THAN_OR_EQUAL_TO
+        ,property : 'apiso:TempExtent_begin'
+        ,value    : eventTime[0]
+      })
+      ,new OpenLayers.Filter.Comparison({
+         type     : OpenLayers.Filter.Comparison.GREATER_THAN_OR_EQUAL_TO
+        ,property : 'apiso:TempExtent_end'
+        ,value    : eventTime[1]
+      })
+      ,new OpenLayers.Filter.Comparison({
+         type     : OpenLayers.Filter.Comparison.LIKE
+        ,property : 'OrganisationName'
+        ,value    : '*' + Ext.getCmp('modelTypesComboBox').getValue() + '*'
+      })
+      ,new OpenLayers.Filter.Logical({
+         type    : OpenLayers.Filter.Logical.OR
+        ,filters : [
+          new OpenLayers.Filter.Comparison({
+             type     : OpenLayers.Filter.Comparison.EQUAL_TO
+            ,property : 'apiso:CoverageContentTypeCode'
+            ,value    : 'modelResult'
+          })
+          ,new OpenLayers.Filter.Comparison({
+             type     : OpenLayers.Filter.Comparison.EQUAL_TO
+            ,property : 'apiso:CoverageContentTypeCode'
+            ,value    : 'physicalMeasurement'
+          })
+        ]
+      })
+    ]
+  });
+
+  var xml        = new OpenLayers.Format.XML();
+  var filter_1_1 = new OpenLayers.Format.Filter({version: '1.1.0'});
+
+  return [
+     '<?xml version="1.0" encoding="UTF-8"?><csw:GetRecords xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:ogc="http://www.opengis.net/ogc" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:apiso="http://www.opengis.net/cat/csw/apiso/1.0" xmlns:ows="http://www.opengis.net/ows" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="CSW" version="2.0.2" resultType="results" outputFormat="application/xml"  xsi:schemaLocation="http://www.opengis.net/gml http://schemas.opengis.net/gml/3.2.1/gml.xsd http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-discovery.xsd" outputSchema="http://www.isotc211.org/2005/gmd" startPosition="1" maxRecords="1000"><csw:Query typeNames="gmd:MD_Metadata"><csw:ElementSetName typeNames="gmd:MD_Metadata">full</csw:ElementSetName><csw:Constraint version="1.1.0">'
+    ,xml.write(filter_1_1.write(filter))
+    ,'</csw:Constraint> </csw:Query> </csw:GetRecords>'
+  ].join('');
 }
 
 function viewReady() {
