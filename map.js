@@ -1474,7 +1474,7 @@ function runQuery() {
           ,'No information available.'
           ,'-100,22,-80,32'
           ,1221004800 // strtotime('2008-09-10 00:00 UTC')
-          ,1221091200 // strtotime('2008-09-11 00:00 UTC')
+          ,1221436800 // strtotime('2008-09-15 00:00 UTC')
           ,1
           ,{}
         ]]);
