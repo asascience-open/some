@@ -1446,7 +1446,7 @@ function runQuery() {
             ]);
           }
           else if (rec.get('coverageType') == 'physicalMeasurement') {
-            if (rec.get('title') == 'Imeds ADCIRC watlev_IKE.P.UL-Ike3Dh.61.IMEDS' || true) {
+            if (rec.get('title') == 'Imeds UND-CHL watlev_IKE.IMEDS') {
               obsData.push([
                  'obs.' + rec.get('title')
                 ,services['Open Geospatial Consortium Sensor Observation Service (SOS)'] + '&useCache=true'
