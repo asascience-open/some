@@ -229,8 +229,8 @@ function init() {
                 store : new Ext.data.ArrayStore({
                    fields : ['id','eventtime','year']
                   ,data   : [
-                     ['Ike'             ,'2008-09-08T00:30:00Z/2008-09-16T00:00:00Z','2008']
-                    ,['Current forecast','current'                                  ,''    ]
+                     ['Ike'  ,'2008-09-08T00:30:00Z/2008-09-16T00:00:00Z','2008']
+                    ,['Isaac','2012-08-28T00:00:00Z/2012-08-31T00:00:00Z','2012']
                   ]
                 })
                 ,width          : 165
@@ -1462,22 +1462,45 @@ function runQuery() {
         obsStore.loadData(obsData);
 
         // hack for grids
-        Ext.getCmp('gridsGridPanel').getStore().loadData([[
-           'grid.in_und_adcirc_ike_ultralite_lr_vardrag_wave_3d'
-          ,'http://ec2-107-21-136-52.compute-1.amazonaws.com:8080/wms/in_und_adcirc_ike_ultralite_lr_vardrag_wave_3d/?'
-          ,'zeta'
-          ,'filledcontours_average_jet_0_1_node_True'
-          ,true
-          ,'img/blank.png'
-          ,'zeta'
-          ,'m'
-          ,'No information available.'
-          ,'-100,22,-80,32'
-          ,1221004800 // strtotime('2008-09-10 00:00 UTC')
-          ,1221436800 // strtotime('2008-09-15 00:00 UTC')
-          ,1
-          ,{}
-        ]]);
+        var gridsData = [];
+        var eventTime = getEventtimeFromEventsComboBox().split('/');
+        if (eventTime[0] == '2008-09-08T00:30:00Z') {
+          gridsData.push([
+             'grid.in_und_adcirc_ike_ultralite_lr_vardrag_wave_3d'
+            ,'http://ec2-107-21-136-52.compute-1.amazonaws.com:8080/wms/in_und_adcirc_ike_ultralite_lr_vardrag_wave_3d/?'
+            ,'zeta'
+            ,'filledcontours_average_jet_0_1_node_True'
+            ,true
+            ,'img/blank.png'
+            ,'zeta'
+            ,'m'
+            ,'No information available.'
+            ,'-100,22,-80,32'
+            ,1221004800 // strtotime('2008-09-10 00:00 UTC')
+            ,1221436800 // strtotime('2008-09-15 00:00 UTC')
+            ,1
+            ,{}
+          ]); 
+        }
+        else if (eventTime[0] == '2012-08-28T00:00:00Z') {
+          gridsData.push([
+             'grid.NHC_ISAAC_29'
+            ,'http://ec2-107-21-136-52.compute-1.amazonaws.com:8080/wms/NHC_ISAAC_29/?'
+            ,'zeta'
+            ,'filledcontours_average_jet_0_1_node_.5'
+            ,true
+            ,'img/blank.png'
+            ,'zeta'
+            ,'m'
+            ,'No information available.'
+            ,'-100,22,-80,32'
+            ,1346112000 // strtotime('2008-09-10 00:00 UTC')
+            ,1346284800 // strtotime('2008-09-12 00:00 UTC')
+            ,1
+            ,{}
+          ]);
+        }
+        Ext.getCmp('gridsGridPanel').getStore().loadData(gridsData);
 
         Ext.getCmp('queryResultsPanel').getEl().unmask();
       }
