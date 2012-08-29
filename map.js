@@ -1532,6 +1532,9 @@ function runQuery() {
           ,children : gridsData
         }));
 
+        setdNow(isoDateToDate(eventTime[0]));
+        setMapTime();
+
         Ext.getCmp('catalogPanel').getEl().unmask();
       }
     }
@@ -1593,7 +1596,7 @@ function buildFilter() {
 function viewReady() {
   viewsReady++;
   if (viewsReady == 2) {
-    // prepAndRunQuery();
+    prepAndRunQuery();
   }
 }
 
