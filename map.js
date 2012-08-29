@@ -70,8 +70,7 @@ function init() {
     }
   });
   var observationsGridPanel = new Ext.grid.GridPanel({
-     height      : 50
-    ,id          : 'observationsGridPanel'
+     id          : 'observationsGridPanel'
     ,store       : new Ext.data.ArrayStore({
       fields : ['name','url','properties']
     })
@@ -102,8 +101,7 @@ function init() {
     }
   });
   var modelsGridPanel = new Ext.grid.GridPanel({
-     height      : 50
-    ,id          : 'modelsGridPanel'
+     id          : 'modelsGridPanel'
     ,store       : new Ext.data.ArrayStore({
       fields : ['name','url','properties']
     })
@@ -225,10 +223,13 @@ function init() {
       {
          region      : 'west'
         ,width       : 275
+        ,layout      : 'anchor'
+        ,id          : 'catalogPanel'
         ,items       : [
           new Ext.FormPanel({
              title     : 'Catalog query filters'
             ,id        : 'queryFiltersPanel'
+            ,height    : 175
             ,border    : false
             ,bodyStyle : 'padding:5px 5px 0'
             ,labelWidth     : 90
@@ -352,17 +353,14 @@ function init() {
             ]}
           })
           ,{
-             id        : 'queryResultsPanel'
-            ,title     : 'Catalog query results'
+             title     : 'Catalog query results'
+            ,id        : 'queryResultsPanel'
+            ,anchor    : '100% -180'
             ,border    : false
             ,bodyStyle : 'padding:5px 5px 0'
+            ,layout    : 'fit'
             ,items     : [
-              {
-                 border : false
-                ,cls    : 'directionsPanel'
-                ,html   : 'Station data as well as gridded data may be mapped independently. When switching between station and grid tabs, be aware that your map and time series graph may be cleared.'
-              }
-              ,new Ext.TabPanel({
+              new Ext.TabPanel({
                  activeTab  : 0
                 ,plain      : true
                 ,resizeTabs : true
@@ -372,21 +370,27 @@ function init() {
                 ,deferredRender : false
                 ,items          : [
                   {
-                     title : 'Available stations'
-                    ,id    : 'stationsTab'
-                    ,items : [
+                     title  : 'Available stations'
+                    ,id     : 'stationsTab'
+                    ,layout : 'anchor'
+                    ,items  : [
                       {
                          border : false
                         ,cls    : 'directionsPanel'
                         ,html   : 'Select models and observations for time series comparisons.  Click here for more information on how this analysis is performed.'
+                        ,height : 48
                       }
                       ,new Ext.form.FieldSet({
-                         title : '&nbsp;Model datasets&nbsp;'
-                        ,items : modelsGridPanel
+                         title  : '&nbsp;Model datasets&nbsp;'
+                        ,items  : modelsGridPanel
+                        ,anchor : ['100%',-180 - (Ext.isIE ? 22 : 0)].join(' ')
+                        ,layout : 'fit'
                       })
                       ,new Ext.form.FieldSet({
                          title : '&nbsp;Observation datasets&nbsp;'
                         ,items : observationsGridPanel
+                        ,height : 127
+                        ,layout : 'fit'
                       })
                     ]
                   }
@@ -403,7 +407,7 @@ function init() {
                       }
                       ,new Ext.form.FieldSet({
                          title  : '&nbsp;Gridded datasets&nbsp;'
-                        ,anchor : '100% -292'
+                        ,anchor : ['100%',-292 - (Ext.isIE ? 28 : 0)].join(' ')
                         ,layout : 'fit'
                         ,items  : gridsTreePanel
                       })
@@ -446,9 +450,8 @@ function init() {
                 ,handler : function() {
                   Ext.getCmp('modelsGridPanel').getSelectionModel().clearSelections();
                   Ext.getCmp('observationsGridPanel').getSelectionModel().clearSelections();
-                  if (Ext.getCmp('layersGridPanel').getEl()) {
-                    Ext.getCmp('layersGridPanel').getSelectionModel().clearSelections();
-                  }
+                  Ext.getCmp('layersGridPanel').getSelectionModel().clearSelections();
+                  Ext.getCmp('layersGridPanel').getStore().removeAll();
                   if (popupObs && popupObs.isVisible()) {
                     popupObs.hide();
                   }
@@ -461,15 +464,6 @@ function init() {
             ]}
           }
         ]
-        ,listeners        : {afterrender : function() {this.addListener('bodyresize',function(p,w,h) {
-          var targetH = h - Ext.getCmp('queryResultsPanel').getPosition()[1] - 160; 
-          targetH < 100 ? targetH = 100 : null;
-          Ext.getCmp('stationsTab').setHeight(targetH);
-          Ext.getCmp('gridsTab').setHeight(targetH);
-          targetH -= 137;
-          Ext.getCmp('observationsGridPanel').setHeight(targetH / 2);
-          Ext.getCmp('modelsGridPanel').setHeight(targetH / 2);
-        })}}
       }
       ,{
          region    : 'center'
@@ -1468,7 +1462,7 @@ function runQuery() {
     ,listeners  : {
       beforeload : function(sto) {
         sto.setBaseParam('xmlData',buildFilter());
-        Ext.getCmp('queryResultsPanel').getEl().mask('<table class="maskText"><tr><td>Loading...&nbsp;</td><td><img src="js/ext-3.3.0/resources/images/default/grid/loading.gif"></td></tr></table>');
+        Ext.getCmp('catalogPanel').getEl().mask('<table class="maskText"><tr><td>Loading...&nbsp;</td><td><img src="js/ext-3.3.0/resources/images/default/grid/loading.gif"></td></tr></table>');
       }
       ,load      : function(sto) {
         var eventTime   = getEventtimeFromEventsComboBox().split('/');
@@ -1502,8 +1496,8 @@ function runQuery() {
               }}
             ]);
           }
-          if (gridsData.length == 0) {
-            rec.set('title','coastmap');
+          if (gridsData.length == 0 && eventTime[0] == '2012-08-28T00:00:00Z') {
+            rec.set('title','Environmental Data Server');
             services['Open Geospatial Consortium Web Mapping Service (WMS)'] = 'http://coastmap.com/ecop/wms.aspx?service=WMS&version=1.1.1&request=GetCapabilities';
             rec.commit();
             gridsData.push({
@@ -1520,7 +1514,7 @@ function runQuery() {
         // hack for obs
         if (eventTime[0] == '2012-08-28T00:00:00Z') {
           obsData.push([
-             'obs.coops'
+             'obs.COOPS'
             ,'xml/coops.xml'
             ,{'Water level' : {
                prop        : 'http://mmisw.org/ont/cf/parameter/water_surface_height_above_reference_datum'
@@ -1538,7 +1532,7 @@ function runQuery() {
           ,children : gridsData
         }));
 
-        Ext.getCmp('queryResultsPanel').getEl().unmask();
+        Ext.getCmp('catalogPanel').getEl().unmask();
       }
     }
     ,sortInfo  : {field : 'title',direction : 'ASC'}
@@ -1599,7 +1593,7 @@ function buildFilter() {
 function viewReady() {
   viewsReady++;
   if (viewsReady == 2) {
-    prepAndRunQuery();
+    // prepAndRunQuery();
   }
 }
 
@@ -2745,18 +2739,4 @@ function wmsGetCaps(node,cb) {
      url      : 'get.php?u=' + encodeURIComponent(node.attributes.url)
     ,callback : OpenLayers.Function.bind(wmsGetCapsCallback,null,node)
   });
-}
-
-function isoDateToDate(s) {
-  // 2010-01-01T00:00:00Z
-  var p = s.split('T');
-  var ymd = p[0].split('-');
-  var hm = p[1].split(':');
-  return new Date(
-     ymd[0]
-    ,ymd[1] - 1
-    ,ymd[2]
-    ,hm[0]
-    ,hm[1]
-  );
 }
