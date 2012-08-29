@@ -121,7 +121,7 @@ function init() {
     }}
   });
 
-  var gridsSelModel = new Ext.grid.CheckboxSelectionModel({
+  var layersSelModel = new Ext.grid.CheckboxSelectionModel({
      header     : ''
     ,checkOnly  : true
     ,listeners  : {
@@ -133,9 +133,9 @@ function init() {
       }
     }
   });
-  var gridsGridPanel = new Ext.grid.GridPanel({
+  var layersGridPanel = new Ext.grid.GridPanel({
      height      : 50
-    ,id          : 'gridsGridPanel'
+    ,id          : 'layersGridPanel'
     ,store       : new Ext.data.ArrayStore({
        fields    : ['name','url','lyr','stl','sgl','leg','varName','varUnits','abstract','bbox','minT','maxT','ele','customize']
       ,listeners : {load : function(sto) {
@@ -150,7 +150,7 @@ function init() {
         setMapTime();
       }
     }})
-    ,selModel    : gridsSelModel
+    ,selModel    : layersSelModel
 /*
     ,selModel      : new Ext.grid.RowSelectionModel({
        singleSelect : true
@@ -160,7 +160,7 @@ function init() {
     ,disableSelection : true
     ,autoExpandColumn : 'name'
     ,columns     : [
-       gridsSelModel
+       layersSelModel
       ,{id : 'name',dataIndex :'name',renderer : renderName}
       ,{id : 'info'                  ,renderer : renderLayerCalloutButton,width : 25}
     ]
@@ -365,8 +365,8 @@ function init() {
                         ,html   : 'Select gridded datasets for mapping.  Click anywhere on the map to perform a time series extraction.'
                       }
                       ,new Ext.form.FieldSet({
-                         title : '&nbsp;Gridded datasets&nbsp;'
-                        ,items : gridsGridPanel
+                         title : '&nbsp;Active layers&nbsp;'
+                        ,items : layersGridPanel
                       })
                       ,new Ext.form.FieldSet({
                          title : '&nbsp;Active legends&nbsp;'
@@ -399,8 +399,8 @@ function init() {
                 ,handler : function() {
                   Ext.getCmp('modelsGridPanel').getSelectionModel().clearSelections();
                   Ext.getCmp('observationsGridPanel').getSelectionModel().clearSelections();
-                  if (Ext.getCmp('gridsGridPanel').getEl()) {
-                    Ext.getCmp('gridsGridPanel').getSelectionModel().clearSelections();
+                  if (Ext.getCmp('layersGridPanel').getEl()) {
+                    Ext.getCmp('layersGridPanel').getSelectionModel().clearSelections();
                   }
                   if (popupObs && popupObs.isVisible()) {
                     popupObs.hide();
@@ -422,7 +422,7 @@ function init() {
           targetH -= 137;
           Ext.getCmp('observationsGridPanel').setHeight(targetH / 2);
           Ext.getCmp('modelsGridPanel').setHeight(targetH / 2);
-          Ext.getCmp('gridsGridPanel').setHeight(targetH / 2);
+          Ext.getCmp('layersGridPanel').setHeight(targetH / 2);
           Ext.getCmp('legendsGridPanel').setHeight(targetH / 2);
         })}}
       }
@@ -894,7 +894,7 @@ function renderLegend(val,metadata,rec) {
   if (rec.get('timestamp') && rec.get('timestamp') != '') {
     a.push(rec.get('timestamp'));
   }
-  var gridsSto = Ext.getCmp('gridsGridPanel').getStore();
+  var gridsSto = Ext.getCmp('layersGridPanel').getStore();
   var gridsRec = gridsSto.getAt(gridsSto.find('name',val));
   if (!legendImages[val]) {
     var img = new Image();
@@ -1369,7 +1369,7 @@ function getEventtimeFromEventsComboBox() {
 function prepAndRunQuery() {
   var selMod = Ext.getCmp('modelsGridPanel').getSelectionModel();
   var selObs = Ext.getCmp('observationsGridPanel').getSelectionModel();
-  var selGrd = Ext.getCmp('gridsGridPanel').getSelectionModel();
+  var selGrd = Ext.getCmp('layersGridPanel').getSelectionModel();
 
   if (selMod.getSelections().length + selObs.getSelections().length + selGrd.getSelections().length > 0) {
     Ext.MessageBox.confirm('Comfirm map reset','You have changed your filter options; the map must be reset.  Are you sure you wish to continue?',function(but) {
@@ -1511,7 +1511,7 @@ function runQuery() {
             ,{}
           ]);
         }
-        Ext.getCmp('gridsGridPanel').getStore().loadData(gridsData);
+        Ext.getCmp('layersGridPanel').getStore().loadData(gridsData);
 
         Ext.getCmp('queryResultsPanel').getEl().unmask();
       }
@@ -1964,7 +1964,7 @@ function addGrid(url,lyr,stl,sgl,name,type,ele) {
       rec.commit();
     }
     else {
-      var gridsStore = Ext.getCmp('gridsGridPanel').getStore();
+      var gridsStore = Ext.getCmp('layersGridPanel').getStore();
       var rec = gridsStore.getAt(gridsStore.find('name',lyr.name));
       sto.add(new sto.recordType({
          name        : lyr.name
@@ -2064,7 +2064,7 @@ function queryWMS(xy,a) {
   lastMapClick['layer'] = a[0].name;
   var targets = [];
   var sto = Ext.getCmp('legendsGridPanel').getStore();
-  var grdSto = Ext.getCmp('gridsGridPanel').getStore();
+  var grdSto = Ext.getCmp('layersGridPanel').getStore();
   for (var i = 0; i < a.length; i++) {
     var mapTime;
     var legIdx = sto.find('name',a[i].name);
@@ -2227,7 +2227,7 @@ function destroyLayerCallout(name) {
 
 function zoomToBbox(name) {
   destroyLayerCallout(name);
-  var sto = Ext.getCmp('gridsGridPanel').getStore();
+  var sto = Ext.getCmp('layersGridPanel').getStore();
   var idx = sto.find('name',name);
   if (idx >= 0) {
     var p = sto.getAt(idx).get('bbox').split(',');
@@ -2238,7 +2238,7 @@ function zoomToBbox(name) {
 function showLayerInfo(name) {
   destroyLayerCallout(name);
   if (!activeInfoWindows[name]) {
-    var sto = Ext.getCmp('gridsGridPanel').getStore();
+    var sto = Ext.getCmp('layersGridPanel').getStore();
     var idx = sto.find('name',name);
     if (idx >= 0) {
       var pos = getOffset(document.getElementById('info.' + name));
@@ -2259,7 +2259,7 @@ function showLayerInfo(name) {
 }
 
 function setLayerSettings(name) {
-  var sto = Ext.getCmp('gridsGridPanel').getStore();
+  var sto = Ext.getCmp('layersGridPanel').getStore();
   var idx = sto.find('name',name);
   var lyr = map.getLayersByName(name)[0];
   if (lyr && idx >= 0 && !activeSettingsWindows[name]) {
@@ -2644,7 +2644,7 @@ function setCustomStyle(lyr,style,customize) {
     styles[customize[s]] = style[s];
   }
   lyr.mergeNewParams({STYLES : styles.join('-')});
-  var sto = Ext.getCmp('gridsGridPanel').getStore();
+  var sto = Ext.getCmp('layersGridPanel').getStore();
   var idx = sto.find('name',lyr.name);
   if (idx >= 0) {
     var rec = sto.getAt(idx);
@@ -2660,7 +2660,7 @@ function setCustomStyle(lyr,style,customize) {
 }
 
 function restoreDefaultStyles(lyr,winId) {
-  var sto = Ext.getCmp('gridsGridPanel').getStore();
+  var sto = Ext.getCmp('layersGridPanel').getStore();
   var idx = sto.find('name',lyr.name);
   if (idx >= 0) {
     lyr.mergeNewParams({STYLES : sto.getAt(idx).get('stl')});
