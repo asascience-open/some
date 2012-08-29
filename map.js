@@ -154,7 +154,9 @@ function init() {
             ,minT      : node.attributes.minT
             ,maxT      : node.attributes.maxT
             ,ele       : 1
-            ,customize : {}
+            ,customize : {
+              styles : node.attributes.layer.styles
+            }
           }));
           Ext.defer(function() {
             var idx = Ext.getCmp('layersGridPanel').getStore().findExact('name','grid.' + node.attributes.text);
@@ -2270,11 +2272,8 @@ function setLayerSettings(name) {
   var lyr = map.getLayersByName(name)[0];
   if (lyr && idx >= 0 && !activeSettingsWindows[name]) {
     var customize = sto.getAt(idx).get('customize');
-    var styles    = OpenLayers.Util.getParameters(lyr.getFullRequestString({}))['STYLES'].split('-');
     var pos       = getOffset(document.getElementById('info.' + name));
-    var height    = 26;
     var id        = Ext.id();
-
     var items     = [
       new Ext.Slider({
          fieldLabel : 'Opacity<a href="javascript:Ext.getCmp(\'tooltip.' + id + '.opacity' + '\').show()"><img style="margin-left:2px;margin-bottom:2px" id="' + id + '.opacity' + '" src="img/info.png"></a>'
@@ -2303,48 +2302,11 @@ function setLayerSettings(name) {
       })
     ];
 
-    if (typeof customize.imageQuality == 'number') {
-      height += 27;
-      items.push(
-        new Ext.form.ComboBox({
-           fieldLabel     : 'Image quality<a href="javascript:Ext.getCmp(\'tooltip.' + id + '.imageQuality' + '\').show()"><img style="margin-left:2px;margin-bottom:2px" id="' + id + '.imageQuality' + '" src="img/info.png"></a>'
-          ,id             : 'imageType.' + id
-          ,store          : new Ext.data.ArrayStore({
-            fields : [
-              'name'
-             ,'value'
-            ]
-            ,data : [
-               ['Low' ,'Low']
-              ,['High','High']
-            ]
-          })
-          ,displayField   : 'name'
-          ,valueField     : 'value'
-          ,value          : styles[customize.imageQuality]
-          ,editable       : false
-          ,triggerAction  : 'all'
-          ,mode           : 'local'
-          ,width          : 130
-          ,forceSelection : true
-          ,listeners      : {
-            afterrender : function(el) {
-              new Ext.ToolTip({
-                 id     : 'tooltip.' + id + '.imageQuality'
-                ,target : id + '.imageQuality'
-                ,html   : "Selecting high quality may result in longer download times."
-              });
-              this.addListener('select',function(el,rec) {
-                setCustomStyle(lyr,{imageQuality : rec.get('value')},customize);
-              });
-            }
-          }
-        })
-      )
-    }
-
-    if (typeof customize.baseStyle == 'number') {
-      height += 27;
+    if (customize.styles.length > 0) {
+      var data = [];
+      for (var i = 0; i < customize.styles.length; i++) {
+        data.push([customize.styles[i].title,customize.styles[i].name]);
+      }
       items.push(
         new Ext.form.ComboBox({
            fieldLabel     : 'Base style<a href="javascript:Ext.getCmp(\'tooltip.' + id + '.baseStyle' + '\').show()"><img style="margin-left:2px;margin-bottom:2px" id="' + id + '.baseStyle' + '" src="img/info.png"></a>'
@@ -2353,21 +2315,12 @@ function setLayerSettings(name) {
             fields : [
               'name'
              ,'value'
-             ,'type'
 	    ]
-	    ,data : [
-               ['Ramp','CURRENTS_RAMP','CURRENTS']
-              ,['Black','CURRENTS_STATIC_BLACK','CURRENTS']
-              ,['Green','WINDS_VERY_SPARSE_GREEN','WINDS']
-              ,['Purple','WINDS_VERY_SPARSE_PURPLE','WINDS']
-              ,['Yellow','WINDS_VERY_SPARSE_YELLOW','WINDS']
-              ,['Orange','WINDS_VERY_SPARSE_ORANGE','WINDS']
-              ,['Gradient','WINDS_VERY_SPARSE_GRADIENT','WINDS']
-            ]
+	    ,data : data
           })
           ,displayField   : 'name'
           ,valueField     : 'value'
-          ,value          : styles[customize.baseStyle]
+          ,value          : OpenLayers.Util.getParameters(lyr.getFullRequestString({}))['STYLES']
           ,editable       : false
           ,triggerAction  : 'all'
           ,mode           : 'local'
@@ -2375,245 +2328,14 @@ function setLayerSettings(name) {
           ,forceSelection : true
           ,lastQuery      : ''
           ,listeners      : {
-            beforerender : function(cb) {
-              cb.getStore().filter('type',styles[customize.baseStyle].split('_')[0]);
-            }
-            ,afterrender : function(el) {
+            afterrender : function(el) {
               new Ext.ToolTip({
                  id     : 'tooltip.' + id + '.baseStyle'
                 ,target : id + '.baseStyle'
                 ,html   : "In general, the Black base style has a better appearance if high resolution is also selected."
               });
               this.addListener('select',function(el,rec) {
-                if (rec.get('value') == 'CURRENTS_STATIC_BLACK' && Ext.getCmp('colorMap.') + id) {
-                  Ext.getCmp('colorMap.' + id).disable();
-                }
-                else if (Ext.getCmp('colorMap.') + id) {
-                  Ext.getCmp('colorMap.' + id).enable();
-                }
-                setCustomStyle(lyr,{baseStyle : rec.get('value')},customize);
-              });
-            }
-          }
-        })
-      )
-    }
-
-    if (typeof customize.colorMap == 'number') {
-      height += 27;
-      items.push(
-        new Ext.form.ComboBox({
-           fieldLabel     : 'Colormap<a href="javascript:Ext.getCmp(\'tooltip.' + id + '.colormap' + '\').show()"><img style="margin-left:2px;margin-bottom:2px" id="' + id + '.colormap' + '" src="img/info.png"></a>'
-          ,id             : 'colorMap.' + id
-          ,disabled       : styles[customize.baseStyle] == 'CURRENTS_STATIC_BLACK'
-          ,store          : new Ext.data.ArrayStore({
-            fields : [
-              'name'
-            ]
-            ,data : [
-               ['Jet']
-              ,['NoGradient']
-              ,['Gray']
-              ,['Blue']
-              ,['Cool']
-              ,['Hot']
-              ,['Summer']
-              ,['Winter']
-              ,['Spring']
-              ,['Autumn']
-            ]
-          })
-          ,displayField   : 'name'
-          ,valueField     : 'name'
-          ,value          : styles[customize.colorMap]
-          ,editable       : false
-          ,triggerAction  : 'all'
-          ,mode           : 'local'
-          ,width          : 130
-          ,forceSelection : true
-          ,listeners      : {
-            afterrender : function(el) {
-              new Ext.ToolTip({
-                 id     : 'tooltip.' + id + '.colormap'
-                ,target : id + '.colormap'
-                ,html   : "Feature contrasts may become more obvious based on the selected colormap."
-              });
-              this.addListener('select',function(el,rec) {
-                setCustomStyle(lyr,{colorMap : rec.get('name')},customize);
-              });
-            }
-          }
-        })
-      )
-    }
-
-    if (typeof customize.minMaxBounds == 'string') {
-      height += 27;
-      items.push(
-        new Ext.slider.MultiSlider({
-           fieldLabel : 'Min/max<a href="javascript:Ext.getCmp(\'tooltip.' + id + '.minMax' + '\').show()"><img style="margin-left:2px;margin-bottom:2px" id="' + id + '.minMax' + '" src="img/info.png"></a>'
-          ,id       : 'minMax.' + id
-          ,width    : 130
-          ,minValue : customize.minMaxBounds.split('-')[0]
-          ,maxValue : customize.minMaxBounds.split('-')[1]
-          ,decimalPrecision : 1
-          ,values   : [styles[customize.min],styles[customize.max]]
-          ,plugins  : new Ext.slider.Tip({
-            getText : function(thumb) {
-              return String.format('<b>{0}</b>', thumb.value);
-            }
-          })
-          ,listeners : {
-            afterrender : function(el) {
-              new Ext.ToolTip({
-                 id     : 'tooltip.' + id + '.minMax'
-                ,target : id + '.minMax'
-                ,html   : "Use the slider to adjust the layer's minimum and maximum values."
-              });
-              this.addListener('change',function(el) {
-                setCustomStyle(lyr,{'min' : el.getValues()[0],'max' : el.getValues()[1]},customize);
-              });
-            }
-          }
-        })
-      )
-    }
-
-    if (typeof customize.striding == 'number') {
-      height += 27;
-
-      var sto = new Ext.data.ArrayStore({
-        fields : [
-          'index','param'
-        ]
-        ,data : [
-           [0,0.25]
-          ,[1,0.33]
-          ,[2,0.50]
-          ,[3,1.00]
-          ,[4,2.00]
-          ,[5,3.00]
-          ,[6,4.00]
-        ]
-      });
-
-      items.push(
-        new Ext.Slider({
-           fieldLabel : 'Data density<a href="javascript:Ext.getCmp(\'tooltip.' + id + '.striding' + '\').show()"><img style="margin-left:2px;margin-bottom:2px" id="' + id + '.striding' + '" src="img/info.png"></a>'
-          ,id       : 'striding.' + id
-          ,width    : 130
-          ,minValue : 0
-          ,maxValue : sto.getCount() - 1
-          ,value    : styles[customize.striding]
-          ,plugins  : new Ext.slider.Tip({
-            getText : function(thumb) {
-              var pct = sto.getAt(thumb.value).get('param');
-              var s;
-              if (thumb.value == 0) {
-                s = 'sparsest';
-              }
-              else if (pct < 1) {
-                s = 'sparser';
-              }
-              else if (pct == 1) {
-                s = 'normal';
-              }
-              else if (thumb.value < sto.getCount() - 1) {
-                s = 'denser';
-              }
-              else if (thumb.value == sto.getCount() - 1) {
-                s = 'densest';
-              }
-              return String.format('<b>{0}</b>',s);
-            }
-          })
-          ,listeners : {
-            afterrender : function(el) {
-              new Ext.ToolTip({
-                 id     : 'tooltip.' + id + '.striding'
-                ,target : id + '.striding'
-                ,html   : "Adjust the space between vectors with the data density factor.  The impact of this value varies based on the zoom level."
-              });
-              this.addListener('change',function(el,val) {
-                setCustomStyle(lyr,{'striding' : sto.getAt(val).get('param')},customize);
-              });
-            }
-          }
-        })
-      )
-    }
-
-    if (typeof customize.tailMag == 'number') {
-      height += 27;
-      items.push(
-        new Ext.form.ComboBox({
-           fieldLabel     : 'Tail magnitude<a href="javascript:Ext.getCmp(\'tooltip.' + id + '.tailMagnitude' + '\').show()"><img style="margin-left:2px;margin-bottom:2px" id="' + id + '.tailMagnitude' + '" src="img/info.png"></a>'
-          ,id             : 'tailMag.' + id
-          ,store          : new Ext.data.ArrayStore({
-            fields : [
-              'name'
-            ]
-            ,data : [
-               ['True']
-              ,['False']
-            ]
-          })
-          ,displayField   : 'name'
-          ,valueField     : 'name'
-          ,value          : styles[customize.tailMag]
-          ,editable       : false
-          ,triggerAction  : 'all'
-          ,mode           : 'local'
-          ,width          : 130
-          ,forceSelection : true
-          ,listeners      : {
-            afterrender : function(el) {
-              new Ext.ToolTip({
-                 id     : 'tooltip.' + id + '.tailMagnitude'
-                ,target : id + '.tailMagnitude'
-                ,html   : "Choose whether or not the vector tail length will vary based on its magnitude.  The difference may be subtle in layers with small magnitude variability." 
-              });
-              this.addListener('select',function(el,rec) {
-                setCustomStyle(lyr,{'tailMag' : rec.get('name')},customize);
-              });
-            }
-          }
-        })
-      )
-    }
-
-    if (typeof customize.barbLabel == 'number') {
-      height += 27;
-      items.push(
-        new Ext.form.ComboBox({
-           fieldLabel     : 'Magnitude label<a href="javascript:Ext.getCmp(\'tooltip.' + id + '.magnitudeLabel' + '\').show()"><img style="margin-left:2px;margin-bottom:2px" id="' + id + '.magnitudeLabel' + '" src="img/info.png"></a>'
-          ,id             : 'barbLabel.' + id
-          ,store          : new Ext.data.ArrayStore({
-            fields : [
-              'name'
-            ]
-            ,data : [
-               ['True']
-              ,['False']
-            ]
-          })
-          ,displayField   : 'name'
-          ,valueField     : 'name'
-          ,value          : styles[customize.barbLabel]
-          ,editable       : false
-          ,triggerAction  : 'all'
-          ,mode           : 'local'
-          ,width          : 130
-          ,forceSelection : true
-          ,listeners      : {
-            afterrender : function(el) {
-              new Ext.ToolTip({
-                 id     : 'tooltip.' + id + '.magnitudeLabel'
-                ,target : id + '.magnitudeLabel'
-                ,html   : "Choose whether or not a text label should be drawn by each vector to identify its magnitude."
-              });
-              this.addListener('select',function(el,rec) {
-                setCustomStyle(lyr,{'barbLabel' : rec.get('name')},customize);
+                setCustomStyle(lyr,rec.get('value'));
               });
             }
           }
@@ -2628,10 +2350,9 @@ function setLayerSettings(name) {
       ,resizable : false
       ,width     : 270
       ,constrainHeader : true
+      ,layout    : 'fit'
       ,title     : name.split('.').slice(1) + ' :: settings'
-      ,items     : [
-         new Ext.FormPanel({buttonAlign : 'center',border : false,bodyStyle : 'background:transparent',width : 240,height : height + 35,labelWidth : 100,labelSeparator : '',items : items,buttons : [{text : 'Restore default settings',width : 150,handler : function() {restoreDefaultStyles(lyr)}}]})
-      ]
+      ,items     : new Ext.FormPanel({border : false,bodyStyle : 'background:transparent',width : 240,labelWidth : 100,labelSeparator : '',items : items})
       ,listeners : {hide : function() {
         activeSettingsWindows[name] = null;
       }}
@@ -2644,18 +2365,14 @@ function setLayerSettings(name) {
   destroyLayerCallout(name);
 }
 
-function setCustomStyle(lyr,style,customize) {
-  var styles = OpenLayers.Util.getParameters(lyr.getFullRequestString({}))['STYLES'].split('-');
-  for (var s in style) {
-    styles[customize[s]] = style[s];
-  }
-  lyr.mergeNewParams({STYLES : styles.join('-')});
+function setCustomStyle(lyr,style) {
+  lyr.mergeNewParams({STYLES : style});
   var sto = Ext.getCmp('layersGridPanel').getStore();
   var idx = sto.find('name',lyr.name);
   if (idx >= 0) {
     var rec = sto.getAt(idx);
     var p = OpenLayers.Util.getParameters(sto.getAt(idx).get('leg'));
-    p['STYLES'] = styles.join('-');
+    p['STYLES'] = style;
     var a = [];
     for (var i in p) {
       a.push(i + '=' + p[i]);
@@ -2663,16 +2380,6 @@ function setCustomStyle(lyr,style,customize) {
     rec.set('leg',sto.getAt(idx).get('leg').split('?')[0] + '?' + a.join('&'));
     rec.commit();
   }
-}
-
-function restoreDefaultStyles(lyr,winId) {
-  var sto = Ext.getCmp('layersGridPanel').getStore();
-  var idx = sto.find('name',lyr.name);
-  if (idx >= 0) {
-    lyr.mergeNewParams({STYLES : sto.getAt(idx).get('stl')});
-  }
-  activeSettingsWindows[lyr.name].hide();
-  setLayerSettings(lyr.name);
 }
 
 function getOffset(el) {
