@@ -121,6 +121,31 @@ function init() {
     }}
   });
 
+  var gridsTreePanel = new Ext.tree.TreePanel({
+     id          : 'gridsTreePanel'
+    ,width       : 100
+    ,border      : false
+    ,rootVisible : false
+    ,root        : new Ext.tree.AsyncTreeNode()
+    ,loader      : new Ext.tree.TreeLoader({
+      directFn : function(nodeId,callback) {
+        wmsGetCaps(gridsTreePanel.getNodeById(nodeId),callback);
+      }
+    })
+    ,listeners   : {click : function(node,e) {
+      if (node.leaf) {
+        alert(node.attributes.text);
+      }
+    }}
+  });
+
+  new Ext.Window({
+     width  : 640
+    ,height : 480
+    ,layout : 'fit'
+    ,items  : gridsTreePanel
+  }).show();
+
   var layersSelModel = new Ext.grid.CheckboxSelectionModel({
      header     : ''
     ,checkOnly  : true
@@ -1431,6 +1456,7 @@ function runQuery() {
         var modelsData  = [];
         var obsStore    = Ext.getCmp('observationsGridPanel').getStore();
         var obsData     = [];
+        var gridsData   = [];
         sto.each(function(rec) {
           var services = rec.get('services');
           for (var i = 0; i < services.length; i++) {
@@ -1456,6 +1482,17 @@ function runQuery() {
               }}
             ]);
           }
+          if (gridsData.length == 0) {
+            var url = 'http://omglnx1.meas.ncsu.edu:8080/thredds/wms/fmrc/sabgom/SABGOM_Forecast_Model_Run_Collection_best.ncd?service=WMS&version=1.3.0&request=GetCapabilities';
+            gridsData.push({
+               text : 'ROMS/TOMS 3.0 - South-Atlantic Bight and Gulf of Mexico'
+              ,url  : url
+              ,leaf : !new RegExp(/service=wms/i).test(url)
+              ,minT : rec.get('minT')
+              ,maxT : rec.get('maxT')
+              ,bbox : [rec.get('boundsWest'),rec.get('boundsSouth'),rec.get('boundsEast'),rec.get('boundsNorth')].join(',')
+            });
+          }
         });
 
         // hack for obs
@@ -1472,46 +1509,11 @@ function runQuery() {
     
         modelsStore.loadData(modelsData);
         obsStore.loadData(obsData);
-
-        // hack for grids
-        var gridsData = [];
-        if (eventTime[0] == '2008-09-08T00:30:00Z') {
-          gridsData.push([
-             'grid.in_und_adcirc_ike_ultralite_lr_vardrag_wave_3d'
-            ,'http://ec2-107-21-136-52.compute-1.amazonaws.com:8080/wms/in_und_adcirc_ike_ultralite_lr_vardrag_wave_3d/?'
-            ,'zeta'
-            ,'filledcontours_average_jet_0_1_node_True'
-            ,true
-            ,'img/blank.png'
-            ,'zeta'
-            ,'m'
-            ,'No information available.'
-            ,'-100,22,-80,32'
-            ,1221004800 // strtotime('2008-09-10 00:00 UTC')
-            ,1221436800 // strtotime('2008-09-15 00:00 UTC')
-            ,1
-            ,{}
-          ]); 
-        }
-        else if (eventTime[0] == '2012-08-28T00:00:00Z') {
-          gridsData.push([
-             'grid.NHC_ISAAC_29'
-            ,'http://ec2-107-21-136-52.compute-1.amazonaws.com:8080/wms/NHC_ISAAC_29/?'
-            ,'zeta'
-            ,'filledcontours_average_jet_0_1_node_.5'
-            ,true
-            ,'img/blank.png'
-            ,'zeta'
-            ,'m'
-            ,'No information available.'
-            ,'-100,22,-80,32'
-            ,1346112000 // strtotime('2008-09-10 00:00 UTC')
-            ,1346284800 // strtotime('2008-09-12 00:00 UTC')
-            ,1
-            ,{}
-          ]);
-        }
-        Ext.getCmp('layersGridPanel').getStore().loadData(gridsData);
+        Ext.getCmp('gridsTreePanel').setRootNode(new Ext.tree.AsyncTreeNode({
+           expanded : true
+          ,leaf     : false
+          ,children : gridsData
+        }));
 
         Ext.getCmp('queryResultsPanel').getEl().unmask();
       }
@@ -2678,4 +2680,42 @@ function getOffset(el) {
     el = el.offsetParent;
   }
   return {top: _y,left: _x};
+}
+
+function wmsGetCaps(node,cb) {
+  if (!node.attributes.text) {
+    cb([],{status : true});
+    return;
+  }
+  OpenLayers.Request.issue({
+     url      : 'get.php?u=' + encodeURIComponent(node.attributes.url)
+    ,callback : function(r) {
+      var caps = new OpenLayers.Format.WMSCapabilities().read(r.responseText);
+      if (!caps || !caps.capability) {
+        Ext.Msg.alert('WMS exception','There was an error querying this data service.');
+        cb([],{status : true});
+        return;
+      }
+      var nodesByText = {};
+      var nodesText   = [];
+      for (var i = 0; i < caps.capability.layers.length; i++) {
+        nodesByText[(caps.capability.layers[i].title + ' (' + caps.capability.layers[i].name + ')').toLowerCase()] = {
+           id        : caps.capability.layers[i].name
+          ,text      : caps.capability.layers[i].title + ' (' + caps.capability.layers[i].name + ')'
+          ,qtip      : caps.capability.layers[i].title + ' (' + caps.capability.layers[i].name + ')'
+          ,leaf      : true
+          ,icon      : 'img/layer16.png'
+          ,getMapUrl : caps.capability.request.getmap.href
+          ,layer     : caps.capability.layers[i]
+        };
+        nodesText.push(String(caps.capability.layers[i].title + ' (' + caps.capability.layers[i].name + ')').toLowerCase());
+      }
+      nodesText.sort();
+      var nodes = [];
+      for (var i = 0; i < nodesText.length; i++) {
+        nodes.push(nodesByText[nodesText[i]]);
+      }
+      cb(nodes,{status : true});
+    }
+  });
 }
