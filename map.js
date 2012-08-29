@@ -426,19 +426,6 @@ function init() {
                     ]
                   }
                 ]
-                ,listeners : {tabchange : function(tabPanel,tab) {
-                  if (tab.id == 'gridsTab') {
-                    Ext.getCmp('mapTimeButtonGroup').enable();
-                    Ext.getCmp('changeMapDateTimeButtonGroup').enable();
-                    Ext.getCmp('requery').show();
-                  }
-                  else {
-                    Ext.getCmp('mapTimeButtonGroup').disable();
-                    Ext.getCmp('changeMapDateTimeButtonGroup').disable();
-                    Ext.getCmp('requery').hide();
-                  }
-                  Ext.getCmp('mapPanel').doLayout();
-                }}
               })
             ]
             ,tbar        : {items : [
