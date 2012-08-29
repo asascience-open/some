@@ -1446,16 +1446,14 @@ function runQuery() {
             ]);
           }
           else if (rec.get('coverageType') == 'physicalMeasurement') {
-            if (rec.get('title') == 'Imeds UND-CHL watlev_IKE.IMEDS') {
-              obsData.push([
-                 'obs.' + rec.get('title')
-                ,services['Open Geospatial Consortium Sensor Observation Service (SOS)'] + '&useCache=true'
-                ,{'Water level' : {
-                    prop        : 'watlev'
-                   ,getObsExtra : '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
-                }}
-              ]);
-            }
+            obsData.push([
+               'obs.' + rec.get('title')
+              ,services['Open Geospatial Consortium Sensor Observation Service (SOS)'] + '&useCache=true'
+              ,{'Water level' : {
+                  prop        : 'watlev'
+                 ,getObsExtra : '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
+              }}
+            ]);
           }
         });
         modelsStore.loadData(modelsData);
@@ -1542,8 +1540,8 @@ function buildFilter() {
           })
           ,new OpenLayers.Filter.Comparison({
              type     : OpenLayers.Filter.Comparison.EQUAL_TO
-            ,property : 'apiso:CoverageContentTypeCode'
-            ,value    : 'physicalMeasurement'
+            ,property : 'title'
+            ,value    : 'Imeds UND-CHL watlev_IKE.IMEDS'
           })
         ]
       })
