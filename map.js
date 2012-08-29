@@ -2332,7 +2332,7 @@ function setLayerSettings(name) {
               new Ext.ToolTip({
                  id     : 'tooltip.' + id + '.baseStyle'
                 ,target : id + '.baseStyle'
-                ,html   : "In general, the Black base style has a better appearance if high resolution is also selected."
+                ,html   : "Select a styling option that this service has exposed."
               });
               this.addListener('select',function(el,rec) {
                 setCustomStyle(lyr,rec.get('value'));
