@@ -1426,6 +1426,7 @@ function runQuery() {
         Ext.getCmp('queryResultsPanel').getEl().mask('<table class="maskText"><tr><td>Loading...&nbsp;</td><td><img src="js/ext-3.3.0/resources/images/default/grid/loading.gif"></td></tr></table>');
       }
       ,load      : function(sto) {
+        var eventTime   = getEventtimeFromEventsComboBox().split('/');
         var modelsStore = Ext.getCmp('modelsGridPanel').getStore();
         var modelsData  = [];
         var obsStore    = Ext.getCmp('observationsGridPanel').getStore();
@@ -1440,8 +1441,8 @@ function runQuery() {
                'model.' + rec.get('title')
               ,services['Open Geospatial Consortium Sensor Observation Service (SOS)'] + '&useCache=true'
               ,{'Water level' : {
-                  prop        : 'watlev'
-                 ,getObsExtra : '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
+                 prop        : 'watlev'
+                ,getObsExtra : '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
               }}
             ]);
           }
@@ -1450,18 +1451,30 @@ function runQuery() {
                'obs.' + rec.get('title')
               ,services['Open Geospatial Consortium Sensor Observation Service (SOS)'] + '&useCache=true'
               ,{'Water level' : {
-                  prop        : 'watlev'
-                 ,getObsExtra : '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
+                 prop        : 'watlev'
+                ,getObsExtra : '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
               }}
             ]);
           }
         });
+
+        // hack for obs
+        if (eventTime[0] == '2012-08-28T00:00:00Z') {
+          obsData.push([
+             'obs.coops'
+            ,'xml/coops.xml'
+            ,{'Water level' : {
+               prop        : 'http://mmisw.org/ont/cf/parameter/water_surface_height_above_reference_datum'
+              ,getObsExtra : ''
+            }}
+          ]);
+        }
+    
         modelsStore.loadData(modelsData);
         obsStore.loadData(obsData);
 
         // hack for grids
         var gridsData = [];
-        var eventTime = getEventtimeFromEventsComboBox().split('/');
         if (eventTime[0] == '2008-09-08T00:30:00Z') {
           gridsData.push([
              'grid.in_und_adcirc_ike_ultralite_lr_vardrag_wave_3d'
