@@ -62,7 +62,7 @@ function init() {
     ,checkOnly : true
     ,listeners : {
       rowselect : function(sm,rowIndex,rec) {
-        getCaps(rec.get('url'),rec.get('name'),'observations');
+        sosGetCaps(rec.get('url'),rec.get('name'),'observations');
       }
       ,rowdeselect : function(sm,rowIndex,rec) {
         map.getLayersByName(rec.get('name'))[0].setVisibility(false);
@@ -94,7 +94,7 @@ function init() {
     ,checkOnly : true
     ,listeners : {
       rowselect : function(sm,rowIndex,rec) {
-        getCaps(rec.get('url'),rec.get('name'),'models');
+        sosGetCaps(rec.get('url'),rec.get('name'),'models');
       }
       ,rowdeselect : function(sm,rowIndex,rec) {
         map.getLayersByName(rec.get('name'))[0].setVisibility(false);
@@ -134,7 +134,38 @@ function init() {
     })
     ,listeners   : {click : function(node,e) {
       if (node.leaf) {
-        alert(node.attributes.text);
+        var leg = node.attributes.layer.styles[0].legend.href;
+        if (leg == '') {
+          leg = node.attributes.getMapUrl + '&SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=' + node.attributes.version + '&FORMAT=' + node.attributes.layer.styles[0].legend.format + '&STYLES=' + node.attributes.layer.styles[0].name + '&LAYERS=' + node.attributes.layer.name
+        }
+        var sto = Ext.getCmp('layersGridPanel').getStore();
+        if (sto.findExact('name','grid.' + node.attributes.text) >= 0) {
+          Ext.Msg.alert('Add layer error',"We're sorry, but " + node.attributes.text + " cannot be added to your map more than once."); 
+        }
+        else {
+          sto.add(new sto.recordType({
+             name      : 'grid.' + node.attributes.text
+            ,url       : node.attributes.getMapUrl
+            ,lyr       : node.attributes.layer.name
+            ,stl       : node.attributes.layer.styles[0].name
+            ,sgl       : true
+            ,leg       : leg
+            ,varName   : node.attributes.layer.name
+            ,varUnits  : 'm'
+            ,abstract  : node.attributes.layer.abstract
+            ,bbox      : node.attributes.bbox
+            ,minT      : node.attributes.minT
+            ,maxT      : node.attributes.maxT
+            ,ele       : 1
+            ,customize : {}
+          }));
+          Ext.defer(function() {
+            var idx = Ext.getCmp('layersGridPanel').getStore().findExact('name','grid.' + node.attributes.text);
+            if (idx >= 0) {
+              Ext.getCmp('layersGridPanel').getSelectionModel().selectRow(idx,true);
+            }
+          },100);
+        }
       }
     }}
   });
@@ -163,25 +194,14 @@ function init() {
     ,id          : 'layersGridPanel'
     ,store       : new Ext.data.ArrayStore({
        fields    : ['name','url','lyr','stl','sgl','leg','varName','varUnits','abstract','bbox','minT','maxT','ele','customize']
-      ,listeners : {load : function(sto) {
-        var d0 = new Date();
-        sto.each(function(rec) {
-          var d = new Date(rec.get('minT') * 1000);
-          if (d < d0) {
-             d0 = d;
-          }
-        });
-        setdNow(d0);
-        setMapTime();
-      }
-    }})
-    ,selModel    : layersSelModel
-/*
-    ,selModel      : new Ext.grid.RowSelectionModel({
-       singleSelect : true
-      ,listeners    : {rowselect : function(sm,rowIndex,rec) {Ext.Msg.alert('Debug web service',"<a target=_blank href='" + rec.get('url') + "'>WMS GetCapabilities URL</a>")}}
+      ,listeners : {remove : function(sto,rec,idx) {
+        var lyr = map.getLayersByName(rec.get('name'))[0];
+        if (lyr) {
+          map.removeLayer(lyr);
+        }
+      }}
     })
-*/
+    ,selModel    : layersSelModel
     ,disableSelection : true
     ,autoExpandColumn : 'name'
     ,columns     : [
@@ -930,9 +950,9 @@ function renderLegend(val,metadata,rec) {
   return a.join('<br/>');
 }
 
-function getCaps(url,name,type) {
+function sosGetCaps(url,name,type) {
 
-  function getCapsCallback(l,url,type,r) {
+  function sosGetCapsCallback(l,url,type,r) {
     delete pendingTransactions[url];
     var sos = new SOSCapabilities(new OpenLayers.Format.XML().read(r.responseText));
     if (sos.type === 'EXCEPTION') {
@@ -962,7 +982,7 @@ function getCaps(url,name,type) {
       if (plot) {
         var f = new OpenLayers.Feature.Vector(new OpenLayers.Geometry.Point(sos.offerings[i].llon,sos.offerings[i].llat).transform(proj4326,map.getProjectionObject()));
         f.attributes = {
-           type             : 'getCaps'
+           type             : 'sosGetCaps'
           ,offering         : sos.offerings[i]
           ,dataset          : name
           ,targetProperties : tp
@@ -1060,7 +1080,7 @@ function getCaps(url,name,type) {
     l.events.triggerEvent('loadstart');
     OpenLayers.Request.issue({
        url      : 'get.php?u=' + encodeURIComponent(url)
-      ,callback : OpenLayers.Function.bind(getCapsCallback,null,l,url,type)
+      ,callback : OpenLayers.Function.bind(sosGetCapsCallback,null,l,url,type)
     });
   }
   else {
@@ -1483,14 +1503,16 @@ function runQuery() {
             ]);
           }
           if (gridsData.length == 0) {
-            var url = 'http://omglnx1.meas.ncsu.edu:8080/thredds/wms/fmrc/sabgom/SABGOM_Forecast_Model_Run_Collection_best.ncd?service=WMS&version=1.3.0&request=GetCapabilities';
+            rec.set('title','coastmap');
+            services['Open Geospatial Consortium Web Mapping Service (WMS)'] = 'http://coastmap.com/ecop/wms.aspx?service=WMS&version=1.1.1&request=GetCapabilities';
+            rec.commit();
             gridsData.push({
-               text : 'ROMS/TOMS 3.0 - South-Atlantic Bight and Gulf of Mexico'
-              ,url  : url
-              ,leaf : !new RegExp(/service=wms/i).test(url)
+               text : rec.get('title')
+              ,url  : services['Open Geospatial Consortium Web Mapping Service (WMS)']
+              ,leaf : false
               ,minT : rec.get('minT')
               ,maxT : rec.get('maxT')
-              ,bbox : [rec.get('boundsWest'),rec.get('boundsSouth'),rec.get('boundsEast'),rec.get('boundsNorth')].join(',')
+              ,bbox : [rec.get('bboxWest'),rec.get('bboxSouth'),rec.get('bboxEast'),rec.get('bboxNorth')].join(',')
             });
           }
         });
@@ -1509,6 +1531,7 @@ function runQuery() {
     
         modelsStore.loadData(modelsData);
         obsStore.loadData(obsData);
+        Ext.getCmp('layersGridPanel').getStore().removeAll();
         Ext.getCmp('gridsTreePanel').setRootNode(new Ext.tree.AsyncTreeNode({
            expanded : true
           ,leaf     : false
@@ -1990,14 +2013,11 @@ function addGrid(url,lyr,stl,sgl,name,type,ele) {
           + '&' + new Date().getTime()
           + '&drawImg=false'
         ,callback : function(r) {
-          if (r.responseText == '') {
-            rec.set('timestamp','<span class="alert">There was a problem<br/>drawing this layer.<span>');
+          if (r.responseText == '' || r.responseText == 'dateNotAvailable') {
+            rec.set('timestamp','<span class="alert">This layer\'s<br/>timestamp is unknown.</span>');
           }
           else if (r.responseText == 'invalidBbox') {
-            rec.set('timestamp','<span class="alert">This layer\'s domain<br/>is out of bounds.<span>');
-          }
-          else if (r.responseText == 'dateNotAvailable') {
-            rec.set('timestamp','');
+            rec.set('timestamp','<span class="alert">This layer\'s domain<br/>is out of bounds.</span>');
           }
           else {
             var prevTs = rec.get('timestamp');
@@ -2687,35 +2707,56 @@ function wmsGetCaps(node,cb) {
     cb([],{status : true});
     return;
   }
+
+  function wmsGetCapsCallback(node,r) {
+    var caps = new OpenLayers.Format.WMSCapabilities().read(r.responseText);
+    if (!caps || !caps.capability) {
+      Ext.Msg.alert('WMS exception','There was an error querying this data service.');
+      cb([],{status : true});
+      return;
+    }
+    var nodesByText = {};
+    var nodesText   = [];
+    for (var i = 0; i < caps.capability.layers.length; i++) {
+      nodesByText[(caps.capability.layers[i].title + ' (' + caps.capability.layers[i].name + ')').toLowerCase()] = {
+         id        : caps.capability.layers[i].name
+        ,text      : caps.capability.layers[i].title + ' (' + caps.capability.layers[i].name + ')'
+        ,qtip      : caps.capability.layers[i].title + ' (' + caps.capability.layers[i].name + ')'
+        ,leaf      : true
+        ,icon      : 'img/layer16.png'
+        ,getMapUrl : caps.capability.request.getmap.href
+        ,layer     : caps.capability.layers[i]
+        ,minT      : isoDateToDate(node.attributes.minT).getTime() / 1000
+        ,maxT      : isoDateToDate(node.attributes.maxT).getTime() / 1000
+        ,bbox      : node.attributes.bbox
+        ,version   : caps.version
+      };
+      nodesText.push(String(caps.capability.layers[i].title + ' (' + caps.capability.layers[i].name + ')').toLowerCase());
+    }
+    nodesText.sort();
+    var nodes = [];
+    for (var i = 0; i < nodesText.length; i++) {
+      nodes.push(nodesByText[nodesText[i]]);
+    }
+    cb(nodes,{status : true});
+  }
+
   OpenLayers.Request.issue({
      url      : 'get.php?u=' + encodeURIComponent(node.attributes.url)
-    ,callback : function(r) {
-      var caps = new OpenLayers.Format.WMSCapabilities().read(r.responseText);
-      if (!caps || !caps.capability) {
-        Ext.Msg.alert('WMS exception','There was an error querying this data service.');
-        cb([],{status : true});
-        return;
-      }
-      var nodesByText = {};
-      var nodesText   = [];
-      for (var i = 0; i < caps.capability.layers.length; i++) {
-        nodesByText[(caps.capability.layers[i].title + ' (' + caps.capability.layers[i].name + ')').toLowerCase()] = {
-           id        : caps.capability.layers[i].name
-          ,text      : caps.capability.layers[i].title + ' (' + caps.capability.layers[i].name + ')'
-          ,qtip      : caps.capability.layers[i].title + ' (' + caps.capability.layers[i].name + ')'
-          ,leaf      : true
-          ,icon      : 'img/layer16.png'
-          ,getMapUrl : caps.capability.request.getmap.href
-          ,layer     : caps.capability.layers[i]
-        };
-        nodesText.push(String(caps.capability.layers[i].title + ' (' + caps.capability.layers[i].name + ')').toLowerCase());
-      }
-      nodesText.sort();
-      var nodes = [];
-      for (var i = 0; i < nodesText.length; i++) {
-        nodes.push(nodesByText[nodesText[i]]);
-      }
-      cb(nodes,{status : true});
-    }
+    ,callback : OpenLayers.Function.bind(wmsGetCapsCallback,null,node)
   });
+}
+
+function isoDateToDate(s) {
+  // 2010-01-01T00:00:00Z
+  var p = s.split('T');
+  var ymd = p[0].split('-');
+  var hm = p[1].split(':');
+  return new Date(
+     ymd[0]
+    ,ymd[1] - 1
+    ,ymd[2]
+    ,hm[0]
+    ,hm[1]
+  );
 }
