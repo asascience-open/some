@@ -123,7 +123,6 @@ function init() {
 
   var gridsTreePanel = new Ext.tree.TreePanel({
      id          : 'gridsTreePanel'
-    ,width       : 275 - 46
     ,rootVisible : false
     ,autoScroll  : true
     ,root        : new Ext.tree.AsyncTreeNode()
@@ -183,8 +182,7 @@ function init() {
     }
   });
   var layersGridPanel = new Ext.grid.GridPanel({
-     height      : 50
-    ,id          : 'layersGridPanel'
+     id          : 'layersGridPanel'
     ,store       : new Ext.data.ArrayStore({
        fields    : ['name','url','lyr','stl','sgl','leg','varName','varUnits','abstract','bbox','minT','maxT','ele','customize']
       ,listeners : {remove : function(sto,rec,idx) {
@@ -208,8 +206,7 @@ function init() {
   });
 
   var legendsGridPanel = new Ext.grid.GridPanel({
-     height      : 50
-    ,id          : 'legendsGridPanel'
+     id          : 'legendsGridPanel'
     ,store       : new Ext.data.ArrayStore({
        fields : ['name','displayName','status','timestamp','jsDate']
      })
@@ -394,25 +391,33 @@ function init() {
                     ]
                   }
                   ,{
-                     title : 'Available grids'
-                    ,id    : 'gridsTab'
-                    ,items : [
+                     title  : 'Available grids'
+                    ,id     : 'gridsTab'
+                    ,layout : 'anchor'
+                    ,items  : [
                       {
                          border : false
                         ,cls    : 'directionsPanel'
                         ,html   : 'Select gridded datasets for mapping.  Click anywhere on the map to perform a time series extraction.'
+                        ,height : 48
                       }
                       ,new Ext.form.FieldSet({
-                         title : '&nbsp;Gridded datasets&nbsp;'
-                        ,items : gridsTreePanel
+                         title  : '&nbsp;Gridded datasets&nbsp;'
+                        ,anchor : '100% -292'
+                        ,layout : 'fit'
+                        ,items  : gridsTreePanel
                       })
                       ,new Ext.form.FieldSet({
-                         title : '&nbsp;Active layers&nbsp;'
-                        ,items : layersGridPanel
+                         title  : '&nbsp;Active layers&nbsp;'
+                        ,height : 100
+                        ,layout : 'fit'
+                        ,items  : layersGridPanel
                       })
                       ,new Ext.form.FieldSet({
-                         title : '&nbsp;Active legends&nbsp;'
-                        ,items : legendsGridPanel
+                         title  : '&nbsp;Active legends&nbsp;'
+                        ,height : 100
+                        ,layout : 'fit'
+                        ,items  : legendsGridPanel
                       })
                     ]
                   }
@@ -464,9 +469,6 @@ function init() {
           targetH -= 137;
           Ext.getCmp('observationsGridPanel').setHeight(targetH / 2);
           Ext.getCmp('modelsGridPanel').setHeight(targetH / 2);
-          Ext.getCmp('gridsTreePanel').setHeight(targetH * 0.5);
-          Ext.getCmp('layersGridPanel').setHeight(targetH * 0.2);
-          Ext.getCmp('legendsGridPanel').setHeight(targetH * 0.2 + 2);
         })}}
       }
       ,{
