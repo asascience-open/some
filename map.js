@@ -123,9 +123,9 @@ function init() {
 
   var gridsTreePanel = new Ext.tree.TreePanel({
      id          : 'gridsTreePanel'
-    ,width       : 100
-    ,border      : false
+    ,width       : 275 - 46
     ,rootVisible : false
+    ,autoScroll  : true
     ,root        : new Ext.tree.AsyncTreeNode()
     ,loader      : new Ext.tree.TreeLoader({
       directFn : function(nodeId,callback) {
@@ -169,13 +169,6 @@ function init() {
       }
     }}
   });
-
-  new Ext.Window({
-     width  : 640
-    ,height : 480
-    ,layout : 'fit'
-    ,items  : gridsTreePanel
-  }).show();
 
   var layersSelModel = new Ext.grid.CheckboxSelectionModel({
      header     : ''
@@ -410,6 +403,10 @@ function init() {
                         ,html   : 'Select gridded datasets for mapping.  Click anywhere on the map to perform a time series extraction.'
                       }
                       ,new Ext.form.FieldSet({
+                         title : '&nbsp;Gridded datasets&nbsp;'
+                        ,items : gridsTreePanel
+                      })
+                      ,new Ext.form.FieldSet({
                          title : '&nbsp;Active layers&nbsp;'
                         ,items : layersGridPanel
                       })
@@ -467,8 +464,9 @@ function init() {
           targetH -= 137;
           Ext.getCmp('observationsGridPanel').setHeight(targetH / 2);
           Ext.getCmp('modelsGridPanel').setHeight(targetH / 2);
-          Ext.getCmp('layersGridPanel').setHeight(targetH / 2);
-          Ext.getCmp('legendsGridPanel').setHeight(targetH / 2);
+          Ext.getCmp('gridsTreePanel').setHeight(targetH * 0.5);
+          Ext.getCmp('layersGridPanel').setHeight(targetH * 0.2);
+          Ext.getCmp('legendsGridPanel').setHeight(targetH * 0.2 + 2);
         })}}
       }
       ,{
