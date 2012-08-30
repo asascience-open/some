@@ -2419,7 +2419,7 @@ function wmsGetCaps(node,cb) {
         ,layer     : caps.capability.layers[i]
         ,minT      : isoDateToDate(node.attributes.minT).getTime() / 1000
         ,maxT      : isoDateToDate(node.attributes.maxT).getTime() / 1000
-        ,bbox      : node.attributes.bbox
+        ,bbox      : caps.capability.layers[i].llbbox ? caps.capability.layers[i].llbbox.join(',') : node.attributes.bbox
         ,version   : caps.version
       };
       nodesText.push(String(caps.capability.layers[i].title + ' (' + caps.capability.layers[i].name + ')').toLowerCase());
