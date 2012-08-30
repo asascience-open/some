@@ -144,7 +144,7 @@ function init() {
              name      : 'grid.' + node.attributes.text
             ,url       : node.attributes.getMapUrl
             ,lyr       : node.attributes.layer.name
-            ,stl       : node.attributes.layer.styles[0].name
+            ,stl       : ''
             ,sgl       : true
             ,leg       : leg
             ,varName   : node.attributes.layer.name
@@ -2303,7 +2303,7 @@ function setLayerSettings(name) {
     ];
 
     if (customize.styles.length > 0) {
-      var data = [];
+      var data = [['None','']];
       for (var i = 0; i < customize.styles.length; i++) {
         data.push([customize.styles[i].title,customize.styles[i].name]);
       }
