@@ -72,7 +72,7 @@ function init() {
   var observationsGridPanel = new Ext.grid.GridPanel({
      id          : 'observationsGridPanel'
     ,store       : new Ext.data.ArrayStore({
-      fields : ['name','url','properties']
+      fields : ['name','cswId','bbox','url','properties']
     })
     ,selModel    : observationsSelModel
     ,loadMask    : true
@@ -103,7 +103,7 @@ function init() {
   var modelsGridPanel = new Ext.grid.GridPanel({
      id          : 'modelsGridPanel'
     ,store       : new Ext.data.ArrayStore({
-      fields : ['name','url','properties']
+      fields : ['name','cswId','bbox','url','properties']
     })
     ,selModel    : modelsSelModel
     ,loadMask    : true
@@ -892,13 +892,11 @@ function renderName(val,metadata,rec) {
 }
 
 function renderLayerCalloutButton(val,metadata,rec) {
-  var img = 'img/page_go.png';
-  if (!new RegExp(/^grid\./).test(rec.get('name'))) {
-    img = 'img/page_go_disabled.png';
-    return '<img title="Layer details and customization not available for this data type" style="margin-top:-2px" src="' + img + '">';
+  if (rec.get('cswId') || new RegExp(/^grid\./).test(rec.get('name'))) {
+    return '<a id="info.' + rec.get('name') + '" href="javascript:goLayerCallout(\'' + rec.get('name')  + '\')"><img title="Layer details and customization" style="margin-top:-2px" src="img/page_go.png"></a>';
   }
   else {
-    return '<a id="info.' + rec.get('name') + '" href="javascript:goLayerCallout(\'' + rec.get('name')  + '\')"><img title="Layer details and customization" style="margin-top:-2px" src="' + img + '"></a>';
+    return '<img title="Layer details and customization not available for this data type" style="margin-top:-2px" src="img/page_go_disabled.png">';
   }
 }
 
@@ -1429,6 +1427,7 @@ function runQuery() {
     ,autoLoad   : true
     ,fields     : [
        {name : 'title'          ,mapping : 'gmd_identificationInfo > gmd_MD_DataIdentification[id=DataIdentification] > gmd_citation > gmd_CI_Citation > gmd_title > gco_CharacterString'}
+      ,{name : 'cswId'          ,mapping : 'gmd_identificationInfo > gmd_MD_DataIdentification[id=DataIdentification] > gmd_citation > gmd_CI_Citation > gmd_identifier > gmd_MD_Identifier > gmd_code > gco_CharacterString'}
       ,{name : 'bboxWest'       ,mapping : 'gmd_identificationInfo > gmd_MD_DataIdentification[id=DataIdentification] > gmd_extent > gmd_EX_Extent > gmd_geographicElement > gmd_EX_GeographicBoundingBox > gmd_westBoundLongitude > gco_Decimal'}
       ,{name : 'bboxEast'       ,mapping : 'gmd_identificationInfo > gmd_MD_DataIdentification[id=DataIdentification] > gmd_extent > gmd_EX_Extent > gmd_geographicElement > gmd_EX_GeographicBoundingBox > gmd_eastBoundLongitude > gco_Decimal'}
       ,{name : 'bboxSouth'      ,mapping : 'gmd_identificationInfo > gmd_MD_DataIdentification[id=DataIdentification] > gmd_extent > gmd_EX_Extent > gmd_geographicElement > gmd_EX_GeographicBoundingBox > gmd_southBoundLatitude > gco_Decimal'}
@@ -1468,6 +1467,8 @@ function runQuery() {
           if (rec.get('coverageType') == 'modelResult') {
             modelsData.push([
                'model.' + rec.get('title')
+              ,rec.get('cswId')
+              ,[rec.get('bboxWest'),rec.get('bboxSouth'),rec.get('bboxEast'),rec.get('bboxNorth')].join(',')
               ,services['Open Geospatial Consortium Sensor Observation Service (SOS)'] + '&useCache=true'
               ,{'Water level' : {
                  prop        : 'watlev'
@@ -1478,6 +1479,8 @@ function runQuery() {
           else if (rec.get('coverageType') == 'physicalMeasurement') {
             obsData.push([
                'obs.' + rec.get('title')
+              ,rec.get('cswId')
+              ,[rec.get('bboxWest'),rec.get('bboxSouth'),rec.get('bboxEast'),rec.get('bboxNorth')].join(',')
               ,services['Open Geospatial Consortium Sensor Observation Service (SOS)'] + '&useCache=true'
               ,{'Water level' : {
                  prop        : 'watlev'
@@ -1504,6 +1507,8 @@ function runQuery() {
         if (eventTime[0] == '2012-08-28T00:00:00Z') {
           obsData.push([
              'obs.COOPS'
+            ,null
+            ,null
             ,'xml/coops.xml'
             ,{'Water level' : {
                prop        : 'http://mmisw.org/ont/cf/parameter/water_surface_height_above_reference_datum'
@@ -2235,7 +2240,13 @@ function destroyLayerCallout(name) {
 
 function zoomToBbox(name) {
   destroyLayerCallout(name);
-  var sto = Ext.getCmp('layersGridPanel').getStore();
+  // figure out which gp's store to hit
+  var gp = {
+     grid  : 'layersGridPanel'
+    ,model : 'modelsGridPanel'
+    ,obs   : 'observationsGridPanel'
+  };
+  var sto = Ext.getCmp(gp[name.split('.')[0]]).getStore();
   var idx = sto.find('name',name);
   if (idx >= 0) {
     var p = sto.getAt(idx).get('bbox').split(',');
@@ -2246,7 +2257,13 @@ function zoomToBbox(name) {
 function showLayerInfo(name) {
   destroyLayerCallout(name);
   if (!activeInfoWindows[name]) {
-    var sto = Ext.getCmp('layersGridPanel').getStore();
+    // figure out which gp's store to hit
+    var gp = {
+       grid  : 'layersGridPanel'
+      ,model : 'modelsGridPanel'
+      ,obs   : 'observationsGridPanel'
+    };
+    var sto = Ext.getCmp(gp[name.split('.')[0]]).getStore();
     var idx = sto.find('name',name);
     if (idx >= 0) {
       var pos = getOffset(document.getElementById('info.' + name));
