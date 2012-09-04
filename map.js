@@ -72,7 +72,7 @@ function init() {
   var observationsGridPanel = new Ext.grid.GridPanel({
      id          : 'observationsGridPanel'
     ,store       : new Ext.data.ArrayStore({
-      fields : ['name','cswId','bbox','url','properties']
+      fields : ['name','cswId','abstract','bbox','url','properties']
     })
     ,selModel    : observationsSelModel
     ,loadMask    : true
@@ -103,7 +103,7 @@ function init() {
   var modelsGridPanel = new Ext.grid.GridPanel({
      id          : 'modelsGridPanel'
     ,store       : new Ext.data.ArrayStore({
-      fields : ['name','cswId','bbox','url','properties']
+      fields : ['name','cswId','abstract','bbox','url','properties']
     })
     ,selModel    : modelsSelModel
     ,loadMask    : true
@@ -1468,6 +1468,7 @@ function runQuery() {
             modelsData.push([
                'model.' + rec.get('title')
               ,rec.get('cswId')
+              ,'Click <a target=_blank href="http://testbed.sura.org/inventory?id=' + rec.get('cswId') + '">here</a> to access the online metadata record.'
               ,[rec.get('bboxWest'),rec.get('bboxSouth'),rec.get('bboxEast'),rec.get('bboxNorth')].join(',')
               ,services['Open Geospatial Consortium Sensor Observation Service (SOS)'] + '&useCache=true'
               ,{'Water level' : {
@@ -1480,6 +1481,7 @@ function runQuery() {
             obsData.push([
                'obs.' + rec.get('title')
               ,rec.get('cswId')
+              ,'Click <a target=_blank href="http://testbed.sura.org/inventory?id=' + rec.get('cswId') + '">here</a> to access the onlin e metadata record.'
               ,[rec.get('bboxWest'),rec.get('bboxSouth'),rec.get('bboxEast'),rec.get('bboxNorth')].join(',')
               ,services['Open Geospatial Consortium Sensor Observation Service (SOS)'] + '&useCache=true'
               ,{'Water level' : {
@@ -1507,6 +1509,7 @@ function runQuery() {
         if (eventTime[0] == '2012-08-28T00:00:00Z') {
           obsData.push([
              'obs.COOPS'
+            ,null
             ,null
             ,null
             ,'xml/coops.xml'
