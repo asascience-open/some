@@ -133,7 +133,11 @@ function init() {
       if (node.leaf) {
         var leg = node.attributes.layer.styles[0].legend.href;
         if (leg == '') {
-          leg = node.attributes.getMapUrl + '&SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=' + node.attributes.version + '&FORMAT=' + node.attributes.layer.styles[0].legend.format + '&STYLES=' + node.attributes.layer.styles[0].name + '&LAYERS=' + node.attributes.layer.name
+          leg = node.attributes.getMapUrl
+            + '&SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=' + node.attributes.version 
+            + '&FORMAT=' + (node.attributes.layer.styles.length > 0 ? node.attributes.layer.styles[0].legend.format  : '')
+            + '&STYLES=' + (node.attributes.layer.styles.length > 0 ? node.attributes.layer.styles[0].name : '')
+            + '&LAYERS=' + node.attributes.layer.name;
         }
         var sto = Ext.getCmp('layersGridPanel').getStore();
         if (sto.findExact('name','grid.' + node.attributes.text) >= 0) {
@@ -144,7 +148,7 @@ function init() {
              name      : 'grid.' + node.attributes.text
             ,url       : node.attributes.getMapUrl
             ,lyr       : node.attributes.layer.name
-            ,stl       : ''
+            ,stl       : (node.attributes.layer.styles.length > 0 ? node.attributes.layer.styles[0].name : '')
             ,sgl       : true
             ,leg       : leg
             ,varName   : node.attributes.layer.name
@@ -280,7 +284,7 @@ function init() {
                 ,forceSelection : true
                 ,triggerAction  : 'all'
                 ,editable       : false
-                ,value          : 'Ike'
+                ,value          : 'Isaac'
                 ,listeners      : {
                   select : function(combo,rec) {
                     prepAndRunQuery();
@@ -1491,15 +1495,15 @@ function runQuery() {
             ]);
           }
           if (gridsData.length == 0 && eventTime[0] == '2012-08-28T00:00:00Z') {
-            rec.set('title','Environmental Data Server');
-            services['Open Geospatial Consortium Web Mapping Service (WMS)'] = 'http://coastmap.com/ecop/wms.aspx?service=WMS&version=1.1.1&request=GetCapabilities';
+            rec.set('title','ADS (Alex\'s Data Server)');
+            services['Open Geospatial Consortium Web Mapping Service (WMS)'] = 'http://ec2-107-21-136-52.compute-1.amazonaws.com:8080/wms/RENCI_ISAAC_39/?REQUEST=GetCapabilities&SERVICE=WMS&VERSION=1.1.1';
             rec.commit();
             gridsData.push({
                text : rec.get('title')
               ,url  : services['Open Geospatial Consortium Web Mapping Service (WMS)']
               ,leaf : false
-              ,minT : rec.get('minT')
-              ,maxT : rec.get('maxT')
+              ,minT : '2012-08-28T00:00:00Z'
+              ,maxT : '2012-08-30T00:00:00Z'
               ,bbox : [rec.get('bboxWest'),rec.get('bboxSouth'),rec.get('bboxEast'),rec.get('bboxNorth')].join(',')
             });
           }
@@ -2098,6 +2102,7 @@ function queryWMS(xy,a) {
     var paramOrig = OpenLayers.Util.getParameters(a[i].getFullRequestString({}));
     var minT = new Date(grdSto.getAt(grdIdx).get('minT') * 1000);
     var maxT = new Date(grdSto.getAt(grdIdx).get('maxT') * 1000);
+// foo
     var d = sto.getAt(legIdx).get('jsDate');
     if (d) {
       minT = new Date(d.getTime() - 3600 * 24 * 1000);
