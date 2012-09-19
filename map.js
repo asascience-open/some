@@ -132,12 +132,13 @@ function init() {
     ,listeners   : {click : function(node,e) {
       if (node.leaf) {
         var leg = node.attributes.layer.styles[0].legend.href;
-        if (leg == '') {
+        if (!leg || leg == '') {
           leg = node.attributes.getMapUrl
             + '&SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=' + node.attributes.version 
             + '&FORMAT=' + (node.attributes.layer.styles.length > 0 ? node.attributes.layer.styles[0].legend.format  : '')
             + '&STYLES=' + (node.attributes.layer.styles.length > 0 ? node.attributes.layer.styles[0].name : '')
-            + '&LAYERS=' + node.attributes.layer.name;
+            + '&LAYER='  + node.attributes.layer.name
+            + '&TIME='   + makeTimeParam(dNow);
         }
         var sto = Ext.getCmp('layersGridPanel').getStore();
         if (sto.findExact('name','grid.' + node.attributes.text) >= 0) {
