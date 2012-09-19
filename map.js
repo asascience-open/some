@@ -273,7 +273,7 @@ function init() {
                    fields : ['id','eventtime','year']
                   ,data   : [
                      ['Ike'  ,'2008-09-08T00:30:00Z/2008-09-16T00:00:00Z','2008']
-                    ,['Isaac','2012-08-28T00:00:00Z/2012-08-31T00:00:00Z','2012']
+                    ,['Isaac','2012-08-30T19:00:00Z/2012-09-04T18:00:00Z','2012']
                   ]
                 })
                 ,width          : 165
@@ -1503,7 +1503,7 @@ function runQuery() {
               }}
             ]);
           }
-          if (gridsData.length == 0 && eventTime[0] == '2012-08-28T00:00:00Z') {
+          if (gridsData.length == 0 && eventTime[0] == '2012-08-30T19:00:00Z') {
             rec.set('title','ADS (Alex\'s Data Server)');
             services['Open Geospatial Consortium Web Mapping Service (WMS)'] = 'http://ec2-107-21-136-52.compute-1.amazonaws.com:8080/wms/RENCI_ISAAC_39/?REQUEST=GetCapabilities&SERVICE=WMS&VERSION=1.1.1';
             rec.commit();
@@ -1511,15 +1511,15 @@ function runQuery() {
                text : rec.get('title')
               ,url  : services['Open Geospatial Consortium Web Mapping Service (WMS)']
               ,leaf : false
-              ,minT : '2012-08-28T00:00:00Z'
-              ,maxT : '2012-08-30T00:00:00Z'
+              ,minT : '2012-08-30T19:00:00Z'
+              ,maxT : '2012-09-04T18:00:00Z'
               ,bbox : [rec.get('bboxWest'),rec.get('bboxSouth'),rec.get('bboxEast'),rec.get('bboxNorth')].join(',')
             });
           }
         });
 
         // hack for obs
-        if (eventTime[0] == '2012-08-28T00:00:00Z') {
+        if (eventTime[0] == '2012-08-30T19:00:00Z') {
           obsData.push([
              'obs.COOPS'
             ,null
