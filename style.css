@@ -156,3 +156,42 @@ div.olLayerGoogleCopyright, div.olLayerGooglePoweredBy {
 .maskText td {
   font : 11px/13px tahoma,helvetica,sans-serif;
 }
+
+.olControlNavigationItemInactive {
+  visibility : hidden !important;
+  position : absolute;
+  left : -200;
+}
+.olControlNavigationItemActive {
+  visibility : hidden !important;
+  position : absolute;
+  left : -200;
+}
+.olControlNavToolbar {
+  top : 35px !important;
+  left : 5px !important;
+}
+.olControlNavToolbar .olControlZoomBoxItemInactive {
+  background-position: -128px -1px !important;
+  background-image: url("img/editing_tool_bar.png") !important;
+  background-repeat: no-repeat !important;
+  cursor: pointer !important;
+  height: 22px !important;
+  margin: 0 0 5px 5px !important;
+  width: 24px !important;
+  position : absolute;
+  top : 25px;
+}
+.olControlNavToolbar .olControlZoomBoxItemActive {
+  background-position: -128px -24px !important;
+  background-image: url("img/editing_tool_bar.png") !important;
+  background-repeat: no-repeat !important;
+  cursor: pointer !important;
+  height: 22px !important;
+  margin: 0 0 5px 5px !important;
+  width: 24px !important;
+  position : absolute;
+  top : 25px;
+}
+
+.olImageLoadError { display: none; }

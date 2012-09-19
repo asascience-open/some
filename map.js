@@ -772,8 +772,6 @@ function initMap() {
   OpenLayers.Projection.addTransform("EPSG:4326","EPSG:3857",OpenLayers.Layer.SphericalMercator.projectForward);
   OpenLayers.Projection.addTransform("EPSG:3857","EPSG:4326",OpenLayers.Layer.SphericalMercator.projectInverse);
 
-  OpenLayers.Util.onImageLoadError = function() {this.src = 'img/blank.png';}
-
   // patch openlayers 2.11RC to fix problem when switching to a google layer
   // from a non google layer after resizing the map
   // http://osgeo-org.1803224.n2.nabble.com/trunk-google-v3-problem-resizing-and-switching-layers-amp-fix-td6578816.html
@@ -843,6 +841,7 @@ function initMap() {
     ,displayProjection : proj4326
     ,units             : 'm'
     ,maxExtent         : new OpenLayers.Bounds(-20037508,-20037508,20037508,20037508.34)
+    ,controls          : [new OpenLayers.Control.Zoom(),new OpenLayers.Control.Attribution()]
   });
 
   map.addLayer(new OpenLayers.Layer.Vector(
@@ -878,11 +877,20 @@ function initMap() {
     mapClick(e.xy);
   });
 
+  var navToolbarControl = new OpenLayers.Control.NavToolbar();
+  map.addControl(navToolbarControl);
+  navToolbarControl.controls[0].disableZoomBox();
+
   map.events.register('addlayer',this,function() {
     map.setLayerIndex(lyrQueryPts,map.layers.length - 1);
   });
 
   map.events.register('moveend',this,function() {
+    if (navToolbarControl.controls[1].active) {
+      navToolbarControl.controls[1].deactivate();
+      navToolbarControl.controls[0].activate();
+      navToolbarControl.draw();
+    }
     if (popupObs && !popupObs.isDestroyed) {
       popupObs.show();
     }
