@@ -149,6 +149,15 @@ function init() {
           Ext.Msg.alert('Add layer error',"We're sorry, but " + node.attributes.text + " cannot be added to your map more than once."); 
         }
         else {
+          var imageTypes = {};
+          for (var i = 0; i < node.attributes.layer.styles.length; i++) {
+            imageTypes[node.attributes.layer.styles[i].name.split('_')[0]] = true;
+          }
+          var imageTypesData = imageTypes ? [] : [['pcolor','pcolor'],['facets','facets'],['contours','contours'],['filledcontours','filledcontours'],['vectors','vectors'],['barbs','barbs']];
+          for (var i in imageTypes) {
+            imageTypesData.push([i,i]);
+          }
+          
           sto.add(new sto.recordType({
              name      : 'grid.' + node.attributes.text
             ,url       : node.attributes.getMapUrl
@@ -169,7 +178,7 @@ function init() {
               ,customStyles : {
                 imageType : {
                    position : 0
-                  ,data     : [['pcolor','pcolor'],['facets','facets'],['contours','contours'],['filledcontours','filledcontours'],['vectors','vectors'],['barbs','barbs']]
+                  ,data     : imageTypesData
                   ,lbl      : 'Image type'
                   ,tip      : 'This is the type of image to return.'
                   ,anyVal   : false
@@ -829,24 +838,6 @@ function init() {
 function initMap() {
   OpenLayers.Projection.addTransform("EPSG:4326","EPSG:3857",OpenLayers.Layer.SphericalMercator.projectForward);
   OpenLayers.Projection.addTransform("EPSG:3857","EPSG:4326",OpenLayers.Layer.SphericalMercator.projectInverse);
-
-  // patch openlayers 2.11RC to fix problem when switching to a google layer
-  // from a non google layer after resizing the map
-  // http://osgeo-org.1803224.n2.nabble.com/trunk-google-v3-problem-resizing-and-switching-layers-amp-fix-td6578816.html
-  OpenLayers.Layer.Google.v3.onMapResize = function() {
-    var cache = OpenLayers.Layer.Google.cache[this.map.id];
-    cache.resized = true;
-  };
-  OpenLayers.Layer.Google.v3.setGMapVisibility_old =
-  OpenLayers.Layer.Google.v3.setGMapVisibility;
-  OpenLayers.Layer.Google.v3.setGMapVisibility = function(visible) {
-    var cache = OpenLayers.Layer.Google.cache[this.map.id];
-    if (visible && cache && cache.resized) {
-      google.maps.event.trigger(this.mapObject,'resize');
-      delete cache.resized;
-    }
-    OpenLayers.Layer.Google.v3.setGMapVisibility_old.apply(this,arguments);
-  };
 
   lyrQueryPts = new OpenLayers.Layer.Vector(
      'Query points'
