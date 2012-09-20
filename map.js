@@ -2383,6 +2383,39 @@ function setLayerSettings(name,position) {
           }
         }
       })
+      ,new Ext.form.ComboBox({
+         fieldLabel     : 'Tiling' + '<a href="javascript:Ext.getCmp(\'tooltip.' + id + '.' + 'tiling' + '\').show()"><img style="margin-left:2px;margin-bottom:2px" id="' + id + '.' + 'tiling' + '" src="img/info.png"></a>'
+        ,id             : 'tiling' + '.' + id
+        ,store          : new Ext.data.ArrayStore({
+          fields : [
+            'name'
+           ,'value'
+          ]
+          ,data : [['single',true],['multiple',false]]
+        })
+        ,displayField   : 'name'
+        ,valueField     : 'value'
+        ,value          : lyr.singleTile
+        ,editable       : false
+        ,triggerAction  : 'all'
+        ,mode           : 'local'
+        ,width          : 130
+        ,forceSelection : true
+        ,lastQuery      : ''
+        ,listeners      : {
+          afterrender : function(el) {
+            new Ext.ToolTip({
+               id     : 'tooltip.' + id + '.' + 'tiling'
+              ,target : id + '.' + 'tiling'
+              ,html   : 'Multiple tiling may increase performance, but it will not work with autoscaling.'
+            });
+            this.addListener('change',function(el,val) {
+              lyr.singleTile = val;
+              setParam(lyr,'D',new Date().getTime());
+            });
+          }
+        }
+      })
     ];
 
     if (customize.elevation.length > 0) {
@@ -2458,6 +2491,7 @@ function setLayerSettings(name,position) {
         ,{
            text    : 'Revert'
           ,handler : function() {
+            lyr.singleTile = true;
             setParam(lyr,'STYLES',lyr.defaultStyle);
             var pos = activeSettingsWindows[name].getPosition();
             activeSettingsWindows[name].close();
