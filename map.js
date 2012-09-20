@@ -2161,7 +2161,6 @@ function queryWMS(xy,a) {
     var paramOrig = OpenLayers.Util.getParameters(a[i].getFullRequestString({}));
     var minT = new Date(grdSto.getAt(grdIdx).get('minT') * 1000);
     var maxT = new Date(grdSto.getAt(grdIdx).get('maxT') * 1000);
-// foo
     var d = sto.getAt(legIdx).get('jsDate');
     if (d) {
       minT = new Date(d.getTime() - 3600 * 24 * 1000);
