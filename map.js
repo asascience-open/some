@@ -174,6 +174,7 @@ function init() {
                   ,tip      : 'This is the type of image to return.'
                   ,anyVal   : false
                 }
+/*
                 ,processingType : {
                    position : 1
                   ,data     : [['average','average'],['maximum','maximum']]
@@ -181,6 +182,7 @@ function init() {
                   ,tip      : 'This is the type of processing to do if the request has a time range specified instead of one time.'
                   ,anyVal   : false
                 }
+*/
                 ,colormap : {
                    position : 2
                   ,data     : [['Accent','Accent'],['autumn','autumn'],['Blues','Blues'],['bone','bone'],['BrBG','BrBG'],['BuGn','BuGn'],['BuPu','BuPu'],['cool','cool'],['copper','copper'],['Dark2','Dark2'],['flag','flag'],['gist-earth','gist-earth'],['gist-gray','gist-gray'],['gist-heat','gist-heat'],['gist-ncar','gist-ncar'],['gist-rainbow','gist-rainbow'],['gist-stern','gist-stern'],['gist-yarg','gist-yarg'],['GnBu','GnBu'],['gray','gray'],['Greens','Greens'],['Greys','Greys'],['hot','hot'],['hsv','hsv'],['jet','jet'],['Oranges','Oranges'],['OrRd','OrRd'],['Paired','Paired'],['Pastel1','Pastel1'],['Pastel2','Pastel2'],['pink','pink'],['PiYG','PiYG'],['PRGn','PRGn'],['prism','prism'],['PuBuGn','PuBuGn'],['PuBu','PuBu'],['PuOr','PuOr'],['PuRd','PuRd'],['Purples','Purples'],['RdBu','RdBu'],['RdGy','RdGy'],['RdPu','RdPu'],['RdYlBu','RdYlBu'],['RdYlGn','RdYlGn'],['Reds','Reds'],['Set1','Set1'],['Set2','Set2'],['Set3','Set3'],['Spectral','Spectral'],['spring','spring'],['summer','summer'],['winter','winter'],['YlGnBu','YlGnBu'],['YlGn','YlGn'],['YlOrBr','YlOrBr'],['YlOrRd','YlOrRd']]
@@ -2031,6 +2033,7 @@ function addGrid(url,lyr,stl,sgl,name,type,ele) {
       ,opacity      : 1
     }
   );
+  lyr.defaultStyle = stl;
 
   lyr.events.register('visibilitychanged',this,function(e) {
     if (!lyr.visibility) {
@@ -2356,7 +2359,7 @@ function showLayerInfo(name) {
   }
 }
 
-function setLayerSettings(name) {
+function setLayerSettings(name,position) {
   var sto = Ext.getCmp('layersGridPanel').getStore();
   var idx = sto.find('name',name);
   var lyr = map.getLayersByName(name)[0];
@@ -2442,8 +2445,8 @@ function setLayerSettings(name) {
 
     activeSettingsWindows[name] = new Ext.Window({
        bodyStyle : 'background:white;padding:5'
-      ,x         : pos.left
-      ,y         : pos.top
+      ,x         : position ? position[0] : pos.left
+      ,y         : position ? position[1] : pos.top
       ,width     : 270
       ,layout    : 'fit'
       ,constrainHeader : true
@@ -2460,7 +2463,18 @@ function setLayerSettings(name) {
       ,listeners : {hide : function() {
         activeSettingsWindows[name] = null;
       }}
-      ,buttons   : [{text : 'Apply'}]
+      ,buttons   : [
+         {text : 'Apply'}
+        ,{
+           text    : 'Revert'
+          ,handler : function() {
+            setParam(lyr,'STYLES',lyr.defaultStyle);
+            var pos = activeSettingsWindows[name].getPosition();
+            activeSettingsWindows[name].close();
+            Ext.defer(function(){setLayerSettings(name,pos)},100);
+          }
+        }
+      ]
     }).show();
   }
   else {
