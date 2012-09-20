@@ -167,13 +167,55 @@ function init() {
                styles       : node.attributes.layer.styles
               ,elevation    : elevation
               ,customStyles : {
-                 imageType        : ['pcolor','facets','contours','filledcontours','vectors','barbs']
-                ,processingType   : ['average','maximum']
-                ,colormap         : ['Accent','Blues']
-                ,colorScalingMin  : ['None','NUMBER']
-                ,colorScalingMax  : ['None','NUMBER']
-                ,variablePosition : ['cell','node']
-                ,scaling          : ['True','False','NUMBER']
+                imageType : {
+                   position : 0
+                  ,data     : [['pcolor','pcolor'],['facets','facets'],['contours','contours'],['filledcontours','filledcontours'],['vectors','vectors'],['barbs','barbs']]
+                  ,lbl      : 'Image type'
+                  ,tip      : 'This is the type of image to return.'
+                  ,anyVal   : false
+                }
+                ,processingType : {
+                   position : 1
+                  ,data     : [['average','average'],['maximum','maximum']]
+                  ,lbl      : 'Processing type'
+                  ,tip      : 'This is the type of processing to do if the request has a time range specified instead of one time.'
+                  ,anyVal   : false
+                }
+                ,colormap : {
+                   position : 2
+                  ,data     : [['Accent','Accent'],['autumn','autumn'],['Blues','Blues'],['bone','bone'],['BrBG','BrBG'],['BuGn','BuGn'],['BuPu','BuPu'],['cool','cool'],['copper','copper'],['Dark2','Dark2'],['flag','flag'],['gist-earth','gist-earth'],['gist-gray','gist-gray'],['gist-heat','gist-heat'],['gist-ncar','gist-ncar'],['gist-rainbow','gist-rainbow'],['gist-stern','gist-stern'],['gist-yarg','gist-yarg'],['GnBu','GnBu'],['gray','gray'],['Greens','Greens'],['Greys','Greys'],['hot','hot'],['hsv','hsv'],['jet','jet'],['Oranges','Oranges'],['OrRd','OrRd'],['Paired','Paired'],['Pastel1','Pastel1'],['Pastel2','Pastel2'],['pink','pink'],['PiYG','PiYG'],['PRGn','PRGn'],['prism','prism'],['PuBuGn','PuBuGn'],['PuBu','PuBu'],['PuOr','PuOr'],['PuRd','PuRd'],['Purples','Purples'],['RdBu','RdBu'],['RdGy','RdGy'],['RdPu','RdPu'],['RdYlBu','RdYlBu'],['RdYlGn','RdYlGn'],['Reds','Reds'],['Set1','Set1'],['Set2','Set2'],['Set3','Set3'],['Spectral','Spectral'],['spring','spring'],['summer','summer'],['winter','winter'],['YlGnBu','YlGnBu'],['YlGn','YlGn'],['YlOrBr','YlOrBr'],['YlOrRd','YlOrRd']]
+                  ,lbl      : 'Colormap'
+                  ,tip      : 'This is the colormap to be used.'
+                  ,anyVal   : false
+                }
+                ,colorScalingMin : {
+                   position : 3
+                  ,data     : [['None','None']]
+                  ,lbl      : 'Color scale min*'
+                  ,tip      : 'This value is the lower limit or "cmin" and should be entered as an integer or decimal number. If either cmin or cmax are listed as None then the colormap will autoscale to the available data.'
+                  ,anyVal   : true
+                }
+                ,colorScalingMax : {
+                   position : 4
+                  ,data     : [['None','None']]
+                  ,lbl      : 'Color scale max*'
+                  ,tip      : 'This value is the upper limit or "cmax" and should be entered as an integer or decimal number. If either cmin or cmax are listed as None then the colormap will autoscale to the available data.'
+                  ,anyVal   : true
+                }
+                ,variablePosition : {
+                   position : 5
+                  ,data     : [['cell','cell'],['node','node']]
+                  ,lbl      : 'Variable position'
+                  ,tip      : 'This value specifies whether the variable input in LAYERS parameter is in the middle of an unstructured cell or if it is on the node/vertex.'
+                  ,anyVal   : false
+                }
+                ,scaling : {
+                   position : 6
+                  ,data     : [['True','True'],['False','False']]
+                  ,lbl      : 'Scaling*'
+                  ,tip      : 'This is a case-sensitive boolean to say whether or not the absolute value (magnitude) or the actual value should be taken if only one variable is specified in LAYERS=. For instance LAYERS=u will return positive and negative values if the value is set to False, but if it set to True, the magnitude of u will be returned. In the case of vectors, True = autoscaling of vectors, False means no autoscaling of vectors with default scale. If there is a number in this position, the number is taken as the scale. Start with 2 and adjust from there.'
+                  ,anyVal   : true
+                }
               }
             }
           }));
@@ -2350,35 +2392,75 @@ function setLayerSettings(name) {
       })
     ];
 
-    if (customize.styles.length > 0) {
-      var data = [['None','']];
-      for (var i = 0; i < customize.styles.length; i++) {
-        data.push([customize.styles[i].title,customize.styles[i].name]);
-      }
-      items.push(buildSelect('styles',data,'Select a styling option that this service has exposed.',lyr));
-    }
-
     if (customize.elevation.length > 0) {
       var data = [];
       for (var i = 0; i < customize.elevation.length; i++) {
         data.push([customize.elevation[i],customize.elevation[i]]);
       }
-      items.push(buildSelect('elevation',data,'Select an elevation that this service has exposed.',lyr));
+      items.push(buildSelect(
+         'elevation'
+        ,data
+        ,'Elevation'
+        ,'Select an elevation that this service has exposed.'
+        ,lyr
+        ,false
+      ));
+    }
+
+    if (customize.styles.length > 0 && !customize.customStyles) {
+      var data = [['None','']];
+      for (var i = 0; i < customize.styles.length; i++) {
+        data.push([customize.styles[i].title,customize.styles[i].name]);
+      }
+      items.push(buildSelect(
+         'styles'
+        ,data
+        ,'Style'
+        ,'Select a styling option that this service has exposed.'
+        ,lyr
+        ,false
+      ));
+    }
+
+    if (customize.customStyles) {
+      var anyVal = false;
+      for (var i in customize.customStyles) {
+        items.push(buildSelect(
+           'styles_' + customize.customStyles[i].position
+          ,customize.customStyles[i].data
+          ,customize.customStyles[i].lbl
+          ,customize.customStyles[i].tip
+          ,lyr
+          ,customize.customStyles[i].anyVal
+        ));
+        anyVal = anyVal || customize.customStyles[i].anyVal;
+      }
+      if (anyVal) {
+        items.push({border : false,cls : 'directionsPanel',html : 'A (*) indicates that you may enter a custom numeric value for the field.'});
+      }
     }
 
     activeSettingsWindows[name] = new Ext.Window({
        bodyStyle : 'background:white;padding:5'
       ,x         : pos.left
       ,y         : pos.top
-      ,resizable : false
       ,width     : 270
-      ,constrainHeader : true
       ,layout    : 'fit'
+      ,constrainHeader : true
+      ,resizable : false
       ,title     : name.split('.').slice(1) + ' :: settings'
-      ,items     : new Ext.FormPanel({border : false,bodyStyle : 'background:transparent',width : 240,labelWidth : 100,labelSeparator : '',items : items})
+      ,items     : new Ext.FormPanel({
+         border         : false
+        ,bodyStyle      : 'background:transparent'
+        ,width          : 240
+        ,labelWidth     : 100
+        ,labelSeparator : ''
+        ,items          : items
+      })
       ,listeners : {hide : function() {
         activeSettingsWindows[name] = null;
       }}
+      ,buttons   : [{text : 'Apply'}]
     }).show();
   }
   else {
@@ -2388,9 +2470,14 @@ function setLayerSettings(name) {
   destroyLayerCallout(name);
 }
 
-function buildSelect(field,data,tip,lyr) {
+function buildSelect(field,data,lbl,tip,lyr,allowAnyVal) {
+  var fld = field.split('_');
+  var val = OpenLayers.Util.getParameters(lyr.getFullRequestString({}))[fld[0].toUpperCase()];
+  if (fld.length == 2) {
+    val = val.split('_')[fld[1]];
+  }
   return new Ext.form.ComboBox({
-     fieldLabel     : field + '<a href="javascript:Ext.getCmp(\'tooltip.' + id + '.' + field + '\').show()"><img style="margin-left:2px;margin-bottom:2px" id="' + id + '.' + field + '" src="img/info.png"></a>'
+     fieldLabel     : lbl + '<a href="javascript:Ext.getCmp(\'tooltip.' + id + '.' + field + '\').show()"><img style="margin-left:2px;margin-bottom:2px" id="' + id + '.' + field + '" src="img/info.png"></a>'
     ,id             : field + '.' + id
     ,store          : new Ext.data.ArrayStore({
       fields : [
@@ -2401,12 +2488,12 @@ function buildSelect(field,data,tip,lyr) {
     })
     ,displayField   : 'name'
     ,valueField     : 'value'
-    ,value          : OpenLayers.Util.getParameters(lyr.getFullRequestString({}))[field.toUpperCase()]
-    ,editable       : false
+    ,value          : val
+    ,editable       : allowAnyVal
     ,triggerAction  : 'all'
     ,mode           : 'local'
     ,width          : 130
-    ,forceSelection : true
+    ,forceSelection : !allowAnyVal
     ,lastQuery      : ''
     ,listeners      : {
       afterrender : function(el) {
@@ -2415,8 +2502,13 @@ function buildSelect(field,data,tip,lyr) {
           ,target : id + '.' + field
           ,html   : tip
         });
-        this.addListener('select',function(el,rec) {
-          setParam(lyr,field.toUpperCase(),rec.get('value'));
+        this.addListener('change',function(el,val) {
+          if (fld[0] == 'styles') {
+            var s = OpenLayers.Util.getParameters(lyr.getFullRequestString({}))['STYLES'].split('_');
+            s[fld[1]] = val;
+            val = s.join('_');
+          }
+          setParam(lyr,fld[0].toUpperCase(),val);
         });
       }
     }
