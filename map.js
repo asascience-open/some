@@ -131,14 +131,18 @@ function init() {
     })
     ,listeners   : {click : function(node,e) {
       if (node.leaf) {
-        var leg = node.attributes.layer.styles[0].legend.href;
+        var firstStyle     = node.attributes.layer.styles.length ? node.attributes.layer.styles[0] : false;
+        var leg            = firstStyle && firstStyle.legend ? firstStyle.legend.href : false;
+        var elevations     = node.attributes.layer.dimensions && node.attributes.layer.dimensions.elevation ? node.attributes.layer.dimensions.elevation.values : false;
+        var firstElevation = elevations ? elevations[0] : false;
         if (!leg || leg == '') {
           leg = node.attributes.getMapUrl
             + '&SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=' + node.attributes.version 
-            + '&FORMAT=' + (node.attributes.layer.styles.length > 0 ? node.attributes.layer.styles[0].legend.format  : '')
-            + '&STYLES=' + (node.attributes.layer.styles.length > 0 ? node.attributes.layer.styles[0].name : '')
+            + '&FORMAT=' + (firstStyle ? firstStyle.legend.format  : '')
+            + '&STYLES=' + (firstStyle ? firstStyle.name : '')
             + '&LAYER='  + node.attributes.layer.name
-            + '&TIME='   + makeTimeParam(dNow);
+            + '&TIME='   + makeTimeParam(dNow)
+            + (firstElevation ? '&ELEVATION=' + firstElevation : '');
         }
         var sto = Ext.getCmp('layersGridPanel').getStore();
         if (sto.findExact('name','grid.' + node.attributes.text) >= 0) {
@@ -149,7 +153,7 @@ function init() {
              name      : 'grid.' + node.attributes.text
             ,url       : node.attributes.getMapUrl
             ,lyr       : node.attributes.layer.name
-            ,stl       : (node.attributes.layer.styles.length > 0 ? node.attributes.layer.styles[0].name : '')
+            ,stl       : (firstStyle ? firstStyle.name : '')
             ,sgl       : true
             ,leg       : leg
             ,varName   : node.attributes.layer.name
@@ -158,9 +162,10 @@ function init() {
             ,bbox      : node.attributes.bbox
             ,minT      : node.attributes.minT
             ,maxT      : node.attributes.maxT
-            ,ele       : 1
+            ,ele       : firstElevation
             ,customize : {
-              styles : node.attributes.layer.styles
+               styles     : node.attributes.layer.styles
+              ,elevations : elevations
             }
           }));
           Ext.defer(function() {
@@ -2343,8 +2348,8 @@ function setLayerSettings(name) {
       }
       items.push(
         new Ext.form.ComboBox({
-           fieldLabel     : 'Base style<a href="javascript:Ext.getCmp(\'tooltip.' + id + '.baseStyle' + '\').show()"><img style="margin-left:2px;margin-bottom:2px" id="' + id + '.baseStyle' + '" src="img/info.png"></a>'
-          ,id             : 'baseStyle.' + id
+           fieldLabel     : 'Style<a href="javascript:Ext.getCmp(\'tooltip.' + id + '.style' + '\').show()"><img style="margin-left:2px;margin-bottom:2px" id="' + id + '.style' + '" src="img/info.png"></a>'
+          ,id             : 'style.' + id
           ,store          : new Ext.data.ArrayStore({
             fields : [
               'name'
@@ -2364,12 +2369,53 @@ function setLayerSettings(name) {
           ,listeners      : {
             afterrender : function(el) {
               new Ext.ToolTip({
-                 id     : 'tooltip.' + id + '.baseStyle'
-                ,target : id + '.baseStyle'
+                 id     : 'tooltip.' + id + '.style'
+                ,target : id + '.style'
                 ,html   : "Select a styling option that this service has exposed."
               });
               this.addListener('select',function(el,rec) {
-                setCustomStyle(lyr,rec.get('value'));
+                setStyle(lyr,rec.get('value'));
+              });
+            }
+          }
+        })
+      )
+    }
+
+    if (customize.elevations.length > 0) {
+      var data = [];
+      for (var i = 0; i < customize.elevations.length; i++) {
+        data.push([customize.elevations[i],customize.elevations[i]]);
+      }
+      items.push(
+        new Ext.form.ComboBox({
+           fieldLabel     : 'Elevation<a href="javascript:Ext.getCmp(\'tooltip.' + id + '.elevation' + '\').show()"><img style="margin-left:2px;margin-bottom:2px" id="' + id + '.elevation' + '" src="img/info.png"></a>'
+          ,id             : 'elevation.' + id
+          ,store          : new Ext.data.ArrayStore({
+            fields : [
+              'name'
+             ,'value'
+            ]
+            ,data : data
+          })
+          ,displayField   : 'name'
+          ,valueField     : 'value'
+          ,value          : OpenLayers.Util.getParameters(lyr.getFullRequestString({}))['ELEVATION']
+          ,editable       : false
+          ,triggerAction  : 'all'
+          ,mode           : 'local'
+          ,width          : 130
+          ,forceSelection : true
+          ,lastQuery      : ''
+          ,listeners      : {
+            afterrender : function(el) {
+              new Ext.ToolTip({
+                 id     : 'tooltip.' + id + '.elevation'
+                ,target : id + '.elevation'
+                ,html   : "Select an elevation that this service has exposed."
+              });
+              this.addListener('select',function(el,rec) {
+                setElevation(lyr,rec.get('value'));
               });
             }
           }
@@ -2399,14 +2445,31 @@ function setLayerSettings(name) {
   destroyLayerCallout(name);
 }
 
-function setCustomStyle(lyr,style) {
-  lyr.mergeNewParams({STYLES : style});
+function setStyle(lyr,val) {
+  lyr.mergeNewParams({STYLES : val});
   var sto = Ext.getCmp('layersGridPanel').getStore();
   var idx = sto.find('name',lyr.name);
   if (idx >= 0) {
     var rec = sto.getAt(idx);
     var p = OpenLayers.Util.getParameters(sto.getAt(idx).get('leg'));
-    p['STYLES'] = style;
+    p['STYLES'] = val;
+    var a = [];
+    for (var i in p) {
+      a.push(i + '=' + p[i]);
+    }
+    rec.set('leg',sto.getAt(idx).get('leg').split('?')[0] + '?' + a.join('&'));
+    rec.commit();
+  }
+}
+
+function setElevation(lyr,val) {
+  lyr.mergeNewParams({ELEVATION : val});
+  var sto = Ext.getCmp('layersGridPanel').getStore();
+  var idx = sto.find('name',lyr.name);
+  if (idx >= 0) {
+    var rec = sto.getAt(idx);
+    var p = OpenLayers.Util.getParameters(sto.getAt(idx).get('leg'));
+    p['ELEVATION'] = val;
     var a = [];
     for (var i in p) {
       a.push(i + '=' + p[i]);
