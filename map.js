@@ -131,10 +131,10 @@ function init() {
     })
     ,listeners   : {click : function(node,e) {
       if (node.leaf) {
-        var firstStyle     = node.attributes.layer.styles.length ? node.attributes.layer.styles[0] : false;
+        var firstStyle     = node.attributes.layer.styles.length > 0 ? node.attributes.layer.styles[0] : false;
         var leg            = firstStyle && firstStyle.legend ? firstStyle.legend.href : false;
-        var elevations     = node.attributes.layer.dimensions && node.attributes.layer.dimensions.elevation ? node.attributes.layer.dimensions.elevation.values : false;
-        var firstElevation = elevations ? elevations[0] : false;
+        var elevation      = node.attributes.layer.dimensions && node.attributes.layer.dimensions.elevation ? node.attributes.layer.dimensions.elevation.values : false;
+        var firstElevation = elevation ? elevation[0] : false;
         if (!leg || leg == '') {
           leg = node.attributes.getMapUrl
             + '&SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=' + node.attributes.version 
@@ -164,8 +164,17 @@ function init() {
             ,maxT      : node.attributes.maxT
             ,ele       : firstElevation
             ,customize : {
-               styles     : node.attributes.layer.styles
-              ,elevations : elevations
+               styles    : node.attributes.layer.styles
+              ,elevation : elevation
+              ,custom    : {
+                 imageType        : ['pcolor','facets','contours','filledcontours','vectors','barbs']
+                ,processingType   : ['average','maximum']
+                ,colormap         : ['Accent','Blues']
+                ,colorScalingMin  : ['None','NUMBER']
+                ,colorScalingMax  : ['None','NUMBER']
+                ,variablePosition : ['cell','node']
+                ,scaling          : ['True','False','NUMBER']
+              }
             }
           }));
           Ext.defer(function() {
@@ -2374,7 +2383,7 @@ function setLayerSettings(name) {
                 ,html   : "Select a styling option that this service has exposed."
               });
               this.addListener('select',function(el,rec) {
-                setStyle(lyr,rec.get('value'));
+                setParam(lyr,'STYLES',rec.get('value'));
               });
             }
           }
@@ -2382,10 +2391,10 @@ function setLayerSettings(name) {
       )
     }
 
-    if (customize.elevations.length > 0) {
+    if (customize.elevation.length > 0) {
       var data = [];
-      for (var i = 0; i < customize.elevations.length; i++) {
-        data.push([customize.elevations[i],customize.elevations[i]]);
+      for (var i = 0; i < customize.elevation.length; i++) {
+        data.push([customize.elevation[i],customize.elevation[i]]);
       }
       items.push(
         new Ext.form.ComboBox({
@@ -2415,7 +2424,7 @@ function setLayerSettings(name) {
                 ,html   : "Select an elevation that this service has exposed."
               });
               this.addListener('select',function(el,rec) {
-                setElevation(lyr,rec.get('value'));
+                setParam(lyr,'ELEVATION',rec.get('value'));
               });
             }
           }
@@ -2445,31 +2454,16 @@ function setLayerSettings(name) {
   destroyLayerCallout(name);
 }
 
-function setStyle(lyr,val) {
-  lyr.mergeNewParams({STYLES : val});
+function setParam(lyr,param,val) {
+  var h = {};
+  h[param] = val;
+  lyr.mergeNewParams(h);
   var sto = Ext.getCmp('layersGridPanel').getStore();
   var idx = sto.find('name',lyr.name);
   if (idx >= 0) {
     var rec = sto.getAt(idx);
     var p = OpenLayers.Util.getParameters(sto.getAt(idx).get('leg'));
-    p['STYLES'] = val;
-    var a = [];
-    for (var i in p) {
-      a.push(i + '=' + p[i]);
-    }
-    rec.set('leg',sto.getAt(idx).get('leg').split('?')[0] + '?' + a.join('&'));
-    rec.commit();
-  }
-}
-
-function setElevation(lyr,val) {
-  lyr.mergeNewParams({ELEVATION : val});
-  var sto = Ext.getCmp('layersGridPanel').getStore();
-  var idx = sto.find('name',lyr.name);
-  if (idx >= 0) {
-    var rec = sto.getAt(idx);
-    var p = OpenLayers.Util.getParameters(sto.getAt(idx).get('leg'));
-    p['ELEVATION'] = val;
+    p[param] = val;
     var a = [];
     for (var i in p) {
       a.push(i + '=' + p[i]);
