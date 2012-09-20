@@ -164,9 +164,9 @@ function init() {
             ,maxT      : node.attributes.maxT
             ,ele       : firstElevation
             ,customize : {
-               styles    : node.attributes.layer.styles
-              ,elevation : elevation
-              ,custom    : {
+               styles       : node.attributes.layer.styles
+              ,elevation    : elevation
+              ,customStyles : {
                  imageType        : ['pcolor','facets','contours','filledcontours','vectors','barbs']
                 ,processingType   : ['average','maximum']
                 ,colormap         : ['Accent','Blues']
@@ -2355,40 +2355,7 @@ function setLayerSettings(name) {
       for (var i = 0; i < customize.styles.length; i++) {
         data.push([customize.styles[i].title,customize.styles[i].name]);
       }
-      items.push(
-        new Ext.form.ComboBox({
-           fieldLabel     : 'Style<a href="javascript:Ext.getCmp(\'tooltip.' + id + '.style' + '\').show()"><img style="margin-left:2px;margin-bottom:2px" id="' + id + '.style' + '" src="img/info.png"></a>'
-          ,id             : 'style.' + id
-          ,store          : new Ext.data.ArrayStore({
-            fields : [
-              'name'
-             ,'value'
-	    ]
-	    ,data : data
-          })
-          ,displayField   : 'name'
-          ,valueField     : 'value'
-          ,value          : OpenLayers.Util.getParameters(lyr.getFullRequestString({}))['STYLES']
-          ,editable       : false
-          ,triggerAction  : 'all'
-          ,mode           : 'local'
-          ,width          : 130
-          ,forceSelection : true
-          ,lastQuery      : ''
-          ,listeners      : {
-            afterrender : function(el) {
-              new Ext.ToolTip({
-                 id     : 'tooltip.' + id + '.style'
-                ,target : id + '.style'
-                ,html   : "Select a styling option that this service has exposed."
-              });
-              this.addListener('select',function(el,rec) {
-                setParam(lyr,'STYLES',rec.get('value'));
-              });
-            }
-          }
-        })
-      )
+      items.push(buildSelect('styles',data,'Select a styling option that this service has exposed.',lyr));
     }
 
     if (customize.elevation.length > 0) {
@@ -2396,40 +2363,7 @@ function setLayerSettings(name) {
       for (var i = 0; i < customize.elevation.length; i++) {
         data.push([customize.elevation[i],customize.elevation[i]]);
       }
-      items.push(
-        new Ext.form.ComboBox({
-           fieldLabel     : 'Elevation<a href="javascript:Ext.getCmp(\'tooltip.' + id + '.elevation' + '\').show()"><img style="margin-left:2px;margin-bottom:2px" id="' + id + '.elevation' + '" src="img/info.png"></a>'
-          ,id             : 'elevation.' + id
-          ,store          : new Ext.data.ArrayStore({
-            fields : [
-              'name'
-             ,'value'
-            ]
-            ,data : data
-          })
-          ,displayField   : 'name'
-          ,valueField     : 'value'
-          ,value          : OpenLayers.Util.getParameters(lyr.getFullRequestString({}))['ELEVATION']
-          ,editable       : false
-          ,triggerAction  : 'all'
-          ,mode           : 'local'
-          ,width          : 130
-          ,forceSelection : true
-          ,lastQuery      : ''
-          ,listeners      : {
-            afterrender : function(el) {
-              new Ext.ToolTip({
-                 id     : 'tooltip.' + id + '.elevation'
-                ,target : id + '.elevation'
-                ,html   : "Select an elevation that this service has exposed."
-              });
-              this.addListener('select',function(el,rec) {
-                setParam(lyr,'ELEVATION',rec.get('value'));
-              });
-            }
-          }
-        })
-      )
+      items.push(buildSelect('elevation',data,'Select an elevation that this service has exposed.',lyr));
     }
 
     activeSettingsWindows[name] = new Ext.Window({
@@ -2452,6 +2386,41 @@ function setLayerSettings(name) {
   }
 
   destroyLayerCallout(name);
+}
+
+function buildSelect(field,data,tip,lyr) {
+  return new Ext.form.ComboBox({
+     fieldLabel     : field + '<a href="javascript:Ext.getCmp(\'tooltip.' + id + '.' + field + '\').show()"><img style="margin-left:2px;margin-bottom:2px" id="' + id + '.' + field + '" src="img/info.png"></a>'
+    ,id             : field + '.' + id
+    ,store          : new Ext.data.ArrayStore({
+      fields : [
+        'name'
+       ,'value'
+      ]
+      ,data : data
+    })
+    ,displayField   : 'name'
+    ,valueField     : 'value'
+    ,value          : OpenLayers.Util.getParameters(lyr.getFullRequestString({}))[field.toUpperCase()]
+    ,editable       : false
+    ,triggerAction  : 'all'
+    ,mode           : 'local'
+    ,width          : 130
+    ,forceSelection : true
+    ,lastQuery      : ''
+    ,listeners      : {
+      afterrender : function(el) {
+        new Ext.ToolTip({
+           id     : 'tooltip.' + id + '.' + field
+          ,target : id + '.' + field
+          ,html   : tip
+        });
+        this.addListener('select',function(el,rec) {
+          setParam(lyr,field.toUpperCase(),rec.get('value'));
+        });
+      }
+    }
+  });
 }
 
 function setParam(lyr,param,val) {
