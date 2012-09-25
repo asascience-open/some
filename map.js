@@ -314,11 +314,12 @@ function init() {
         ,id          : 'catalogPanel'
         ,items       : [
           new Ext.FormPanel({
-             title     : 'Catalog query filters'
-            ,id        : 'queryFiltersPanel'
-            ,height    : 150
-            ,border    : false
-            ,bodyStyle : 'padding:5px 5px 0'
+             title          : 'Catalog query filters'
+            ,id             : 'queryFiltersPanel'
+            ,height         : 150
+            ,border         : false
+            ,bodyStyle      : 'padding:5px 5px 0'
+            ,collapsible    : true
             ,labelWidth     : 90
             ,labelSeparator : ''
             ,items     : [
@@ -453,6 +454,20 @@ function init() {
               }
             ]}
 */
+            ,listeners : {
+              collapse : function(p) {
+                var queryResultsPanel = Ext.getCmp('queryResultsPanel');
+                delete queryResultsPanel.anchorSpec;
+                queryResultsPanel.anchor = '100% -27';
+                Ext.getCmp('catalogPanel').doLayout();
+              }
+              ,expand : function(p) {
+                var queryResultsPanel = Ext.getCmp('queryResultsPanel');
+                delete queryResultsPanel.anchorSpec;
+                queryResultsPanel.anchor = '100% -155';
+                Ext.getCmp('catalogPanel').doLayout();
+              }
+            }
           })
           ,{
              title     : 'Catalog query results'
@@ -509,19 +524,19 @@ function init() {
                       }
                       ,new Ext.form.FieldSet({
                          title  : '&nbsp;Gridded datasets&nbsp;'
-                        ,anchor : ['100%',-392 - (Ext.isIE ? 28 : 0)].join(' ')
+                        ,anchor : ['100%',-317 - (Ext.isIE ? 28 : 0)].join(' ')
                         ,layout : 'fit'
                         ,items  : gridsTreePanel
                       })
                       ,new Ext.form.FieldSet({
                          title  : '&nbsp;Active layers&nbsp;'
-                        ,height : 100
+                        ,height : 75
                         ,layout : 'fit'
                         ,items  : layersGridPanel
                       })
                       ,new Ext.form.FieldSet({
                          title  : '&nbsp;Active legends&nbsp;'
-                        ,height : 200
+                        ,height : 150
                         ,layout : 'fit'
                         ,items  : legendsGridPanel
                       })
@@ -739,6 +754,7 @@ function init() {
              split     : true
             ,id        : 'timeseriesPanel'
             ,title     : 'Time series analysis'
+            ,collapsible : true
             ,height    : 250
             ,region    : 'south' 
             ,html      : '<div id="chart"></div>'
