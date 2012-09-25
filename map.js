@@ -803,7 +803,7 @@ function init() {
                       if (item) {
                         var x = new Date(item.datapoint[0] + new Date().getTimezoneOffset() * 60 * 1000);
                         var y = item.datapoint[1];
-                        if (prevPoint != item.dataIndex) {
+                        if (prevPoint && prevPoint != item.dataIndex) {
                           $('#tooltip').remove();
                           showToolTip(item.pageX,item.pageY,item.series.label + '<br/>' + y + ' @ ' + shortMonthDayStringWithTime(x));
                         }
