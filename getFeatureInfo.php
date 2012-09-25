@@ -47,7 +47,7 @@
         array_push($data['t'],$t * 1000);
         $vStr = $_REQUEST['varName'];
         if (!array_key_exists($vStr,$data['d'])) {
-          $data['d'][$vStr] = array(sprintf("%f",$p->{'value'}[0]));
+          $data['d'][$vStr] = array(array(sprintf("%f",$p->{'value'}[0])));
           $data['u'][$vStr] = $_REQUEST['varUnits'];
         }
         else {
@@ -69,24 +69,43 @@
       foreach (array_keys($csv[$i]) as $vStr) {
         if ($vStr != 'time') {
           preg_match("/(.*)\[(.*)\]/",$vStr,$a);
-/*
-          if (!array_key_exists($a[1],$gfi[$k]['data'])) {
-            $gfi[$k]['data'][$a[1]] = array(
-               'v' => array()
-              ,'u' => $a[2]
-            );
-          }
-          $gfi[$k]['data'][$a[1]]['v'][$t] = $csv[$i][$vStr];
-*/
-          // need to add check in here because > 1 col could come back
-          if (!array_key_exists($_REQUEST['varName'],$data['d'])) {
-            $data['d'][$_REQUEST['varName']] = array(sprintf("%f",$csv[$i][$vStr]));
-            $data['u'][$_REQUEST['varName']] = $_REQUEST['varUnits'];
+          if (!array_key_exists($a[1],$data['d'])) {
+            $data['d'][$a[1]] = array(array(sprintf("%f",$csv[$i][$vStr])));
+            $data['u'][$a[1]] = $_REQUEST['varUnits'];
           }
           else {
-            array_push($data['d'][$_REQUEST['varName']],array(sprintf("%f",$csv[$i][$vStr])));
+            array_push($data['d'][$a[1]],array(sprintf("%f",$csv[$i][$vStr])));
           }
         }
+      }
+    }
+
+    // Assume that if the varName request has a comma in it, it is made up of u,v.
+    // Go back through the collected data to come up w/ speed & dir, but pass it back
+    // as speed,dir in under original varName.  It's the client's job to figure out what
+    // to do w/ that.
+    $voi = explode(',',$_REQUEST['varName']);
+    if (count($voi) == 2) {
+      if (array_key_exists($voi[0],$data['d']) && array_key_exists($voi[1],$data['d'])) {
+        for ($i = 0; $i < count($data['d'][$voi[0]]); $i++) {
+          if ($i == 0) {
+            $data['d'][$_REQUEST['varName']] = array();
+          }
+          $u = $data['d'][$voi[0]][$i][0];
+          $v = $data['d'][$voi[1]][$i][0];
+          $spd = sqrt(pow($u,2) + pow($v,2));
+          $dir = 90 - rad2deg(atan2($v,$u));
+          $dir += $dir < 0 ? 360 : 0;
+          array_push(
+             $data['d'][$_REQUEST['varName']]
+            ,array(sprintf("%f,%d",$spd,$dir))
+          );
+        }
+        $data['u'][$_REQUEST['varName']] = $_REQUEST['varUnits'];
+        unset($data['u'][$voi[0]]);
+        unset($data['u'][$voi[1]]);
+        unset($data['d'][$voi[0]]);
+        unset($data['d'][$voi[1]]);
       }
     }
   }
