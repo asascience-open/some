@@ -45,7 +45,7 @@ var lineColors = [
   ,['#E5C494','#A6761D']
   ,['#B3B3B3','#666666']
 ];
-var lineColorCounter = 1;
+var lineColorCounter = 0;
 
 function init() {
   var loadingMask = Ext.get('loading-mask');
@@ -1255,7 +1255,7 @@ function getObsCallback(property,name,url,lon,lat,r) {
       ,lon   : lon
       ,lat   : lat
       ,id    : Ext.id()
-      ,color : lineColors[lineColors.length % lineColorCounter++][0]
+      ,color : lineColors[lineColorCounter++ % lineColors.length][0]
     });
   }
   Ext.getCmp('timeseriesPanel').fireEvent('resize',Ext.getCmp('timeseriesPanel'));
@@ -2320,7 +2320,7 @@ function addToChart(a) {
           ,label  : title.split('||')[0] + ' : ' + v + ' (' + obs.u[v] + ')'
           ,lines  : {show : true}
           ,id     : Ext.id()
-          ,color  : lineColors[lineColors.length % lineColorCounter++][0]
+          ,color  : lineColors[lineColorCounter++ % lineColors.length][0]
         });
         for (var i = 0; i < obs.d[v].length; i++) {
           var p = obs.d[v][i].split(',');
