@@ -339,8 +339,11 @@ function init() {
                 store : new Ext.data.ArrayStore({
                    fields : ['id','eventtime','year']
                   ,data   : [
-                     ['Isaac','2012-08-30T19:00:00Z/2012-09-04T18:00:00Z','2012']
+                     ['2012']
+                    ,['Isaac','2012-08-30T19:00:00Z/2012-09-04T18:00:00Z','2012']
+                    ,['2008']
                     ,['Ike'  ,'2008-09-08T00:30:00Z/2008-09-16T00:00:00Z','2008']
+                    ,['2005']
                     ,['Rita' ,'2005-09-21T00:00:00Z/2005-09-27T00:00:00Z','2005']
                   ]
                 })
@@ -349,6 +352,15 @@ function init() {
                 ,fieldLabel     : 'Storm or event'
                 ,displayField   : 'id'
                 ,valueField     : 'id'
+                ,tpl            : new Ext.XTemplate(
+                  '<tpl for=".">'
+                    ,'<div class="x-combo-list-item">'
+                    ,'{[!values.eventtime ? "<font color=gray>" : "&nbsp;&nbsp;&nbsp;"]}'
+                    ,'{id}'
+                    ,'{[!values.eventtime ? "</font>" : ""]}'
+                    ,'</div>'
+                  ,'</tpl>'
+                )
                 ,mode           : 'local'
                 ,forceSelection : true
                 ,triggerAction  : 'all'
@@ -1459,6 +1471,11 @@ function prepAndRunQuery() {
   var selMod = Ext.getCmp('modelsGridPanel').getSelectionModel();
   var selObs = Ext.getCmp('observationsGridPanel').getSelectionModel();
   var selGrd = Ext.getCmp('layersGridPanel').getSelectionModel();
+
+  if (!getEventtimeFromEventsComboBox()) {
+    Ext.MessageBox.alert('Invalid query','Please select a storm or event.');
+    return;
+  }
 
   if (selMod.getSelections().length + selObs.getSelections().length + selGrd.getSelections().length > 0) {
     Ext.MessageBox.confirm('Comfirm map reset','You have changed your filter options; the map must be reset.  Are you sure you wish to continue?',function(but) {
