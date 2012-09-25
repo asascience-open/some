@@ -316,7 +316,7 @@ function init() {
           new Ext.FormPanel({
              title     : 'Catalog query filters'
             ,id        : 'queryFiltersPanel'
-            ,height    : 175
+            ,height    : 150
             ,border    : false
             ,bodyStyle : 'padding:5px 5px 0'
             ,labelWidth     : 90
@@ -407,6 +407,7 @@ function init() {
                 }
               })
             ]
+/*
             ,tbar        : {items : [
               {
                  text    : 'View transaction logs'
@@ -451,11 +452,12 @@ function init() {
                 }
               }
             ]}
+*/
           })
           ,{
              title     : 'Catalog query results'
             ,id        : 'queryResultsPanel'
-            ,anchor    : '100% -180'
+            ,anchor    : '100% -155'
             ,border    : false
             ,bodyStyle : 'padding:5px 5px 0'
             ,layout    : 'fit'
