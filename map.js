@@ -993,7 +993,7 @@ function renderLayerStatus(val,metadata,rec) {
 function renderLegend(val,metadata,rec) {
   metadata.attr = 'ext:qtip="' + val.split('.').slice(1) + '"';
   var a = [val.split('.').slice(1)];
-  // don't save room for the timestamp
+  // don't save room for the TIMESTAMP
 /*
   if (rec.get('timestamp') && rec.get('timestamp') != '') {
     a.push(rec.get('timestamp'));
@@ -2120,7 +2120,7 @@ function addGrid(url,lyr,stl,sgl,name,type,ele) {
         }
       });
 */
-      // don't fire the getTimestamp request
+      // don't fire the getTIMESTAMP request
       rec.set('status','drawn');
       rec.commit();
     }
@@ -2186,6 +2186,8 @@ function queryWMS(xy,a) {
     var mapTime;
     var legIdx = sto.find('name',a[i].name);
     var grdIdx = grdSto.find('name',a[i].name);
+    // don't worry about TIMESTAMP
+/*
     if (legIdx >= 0 && String(sto.getAt(legIdx).get('timestamp')).indexOf('alert') < 0) {
       var d = sto.getAt(legIdx).get('jsDate');
       if (d) {
@@ -2196,6 +2198,7 @@ function queryWMS(xy,a) {
         return;
       }
     }
+*/
     var paramOrig = OpenLayers.Util.getParameters(a[i].getFullRequestString({}));
     var minT = new Date(grdSto.getAt(grdIdx).get('minT') * 1000);
     var maxT = new Date(grdSto.getAt(grdIdx).get('maxT') * 1000);
