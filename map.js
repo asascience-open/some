@@ -2210,7 +2210,7 @@ function queryWMS(xy,a) {
           paramNew
          ,'getFeatureInfo.php?' + a[i].url 
            + '&tz=' + new Date().getTimezoneOffset() 
-           + mapTime 
+           + (mapTime ? mapTime : '')
            + '&varName=' + grdSto.getAt(grdIdx).get('varName') 
            + '&varUnits=' + grdSto.getAt(grdIdx).get('varUnits')
        )
