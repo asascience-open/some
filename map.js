@@ -339,8 +339,9 @@ function init() {
                 store : new Ext.data.ArrayStore({
                    fields : ['id','eventtime','year']
                   ,data   : [
-                     ['Ike'  ,'2008-09-08T00:30:00Z/2008-09-16T00:00:00Z','2008']
-                    ,['Isaac','2012-08-30T19:00:00Z/2012-09-04T18:00:00Z','2012']
+                     ['Isaac','2012-08-30T19:00:00Z/2012-09-04T18:00:00Z','2012']
+                    ,['Ike'  ,'2008-09-08T00:30:00Z/2008-09-16T00:00:00Z','2008']
+                    ,['Rita' ,'2005-09-21T00:00:00Z/2005-09-27T00:00:00Z','2005']
                   ]
                 })
                 ,width          : 165
@@ -481,7 +482,7 @@ function init() {
                       }
                       ,new Ext.form.FieldSet({
                          title  : '&nbsp;Gridded datasets&nbsp;'
-                        ,anchor : ['100%',-292 - (Ext.isIE ? 28 : 0)].join(' ')
+                        ,anchor : ['100%',-392 - (Ext.isIE ? 28 : 0)].join(' ')
                         ,layout : 'fit'
                         ,items  : gridsTreePanel
                       })
@@ -493,7 +494,7 @@ function init() {
                       })
                       ,new Ext.form.FieldSet({
                          title  : '&nbsp;Active legends&nbsp;'
-                        ,height : 100
+                        ,height : 200
                         ,layout : 'fit'
                         ,items  : legendsGridPanel
                       })
@@ -1552,19 +1553,6 @@ function runQuery() {
               }}
             ]);
           }
-          if (gridsData.length == 0 && eventTime[0] == '2012-08-30T19:00:00Z') {
-            rec.set('title','ADS (Alex\'s Data Server)');
-            services['Open Geospatial Consortium Web Mapping Service (WMS)'] = 'http://ec2-107-21-136-52.compute-1.amazonaws.com:8080/wms/RENCI_ISAAC_39/?REQUEST=GetCapabilities&SERVICE=WMS&VERSION=1.1.1';
-            rec.commit();
-            gridsData.push({
-               text : rec.get('title')
-              ,url  : services['Open Geospatial Consortium Web Mapping Service (WMS)']
-              ,leaf : false
-              ,minT : '2012-08-30T19:00:00Z'
-              ,maxT : '2012-09-04T18:00:00Z'
-              ,bbox : [rec.get('bboxWest'),rec.get('bboxSouth'),rec.get('bboxEast'),rec.get('bboxNorth')].join(',')
-            });
-          }
         });
 
         // hack for obs
@@ -1580,6 +1568,28 @@ function runQuery() {
               ,getObsExtra : ''
             }}
           ]);
+        }
+
+        // hack for grids
+        if (eventTime[0] == '2005-09-21T00:00:00Z') {
+          gridsData.push({
+             text : 'SCI-WMS WMS Server on the Cloud'
+            ,url  : 'http://ec2-107-21-136-52.compute-1.amazonaws.com:8080/wms/in_usf_fvcom_rita_ultralite_vardrag_nowave_2d/?service=WMS&version=1.1.1&request=GetCapabilities'
+            ,leaf : false
+            ,minT : '2005-09-21T00:00:00Z'
+            ,maxT : '2005-09-27T00:00:00Z'
+            ,bbox : [-180,-90,180,90]
+          });
+        }
+        else if (eventTime[0] == '2012-08-30T19:00:00Z') {
+          gridsData.push({
+             text : 'SCI-WMS WMS Server on the Cloud'
+            ,url  : 'http://ec2-107-21-136-52.compute-1.amazonaws.com:8080/wms/RENCI_ISAAC_39/?REQUEST=GetCapabilities&SERVICE=WMS&VERSION=1.1.1'
+            ,leaf : false
+            ,minT : '2012-08-30T19:00:00Z'
+            ,maxT : '2012-09-04T18:00:00Z'
+            ,bbox : [-180,-90,180,90]
+          });
         }
     
         modelsStore.loadData(modelsData);
