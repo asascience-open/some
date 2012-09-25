@@ -936,6 +936,7 @@ function initMap() {
   map.setCenter(new OpenLayers.LonLat(-10536302.833765,3885808.4963698),4);
 
   map.events.register('click',this,function(e) {
+console.dir(e.xy);
     mapClick(e.xy);
   });
 
@@ -992,9 +993,12 @@ function renderLayerStatus(val,metadata,rec) {
 function renderLegend(val,metadata,rec) {
   metadata.attr = 'ext:qtip="' + val.split('.').slice(1) + '"';
   var a = [val.split('.').slice(1)];
+  // don't save room for the timestamp
+/*
   if (rec.get('timestamp') && rec.get('timestamp') != '') {
     a.push(rec.get('timestamp'));
   }
+*/
   var gridsSto = Ext.getCmp('layersGridPanel').getStore();
   var gridsRec = gridsSto.getAt(gridsSto.find('name',val));
   if (!legendImages[val]) {
@@ -2088,6 +2092,7 @@ function addGrid(url,lyr,stl,sgl,name,type,ele) {
     var idx = sto.find('name',lyr.name);
     if (idx >= 0) {
       var rec = sto.getAt(idx);
+/*
       OpenLayers.Request.GET({
          url      : 'getTimestamp.php?'
           + lyr.getFullRequestString({})
@@ -2114,6 +2119,10 @@ function addGrid(url,lyr,stl,sgl,name,type,ele) {
           rec.commit();
         }
       });
+*/
+      // don't fire the getTimestamp request
+      rec.set('status','drawn');
+      rec.commit();
     }
   });
   lyr.mergeNewParams({TIME : makeTimeParam(dNow)});
@@ -2151,6 +2160,7 @@ function mapClick(xy) {
   Ext.getCmp('legendsGridPanel').getStore().each(function(rec) {
     l.push(map.getLayersByName(rec.get('name'))[0]);
   });
+console.dir(l);
 
   if (l.length == 0) {
     if (Ext.getCmp('stationGridTabPanel').getActiveTab().id == 'gridsTab') {
@@ -2159,6 +2169,7 @@ function mapClick(xy) {
   }
   else {
     var lonLat       = map.getLonLatFromPixel(xy);
+console.dir(lonLat);
     var f            = new OpenLayers.Feature.Vector(new OpenLayers.Geometry.Point(lonLat.lon,lonLat.lat));
     f.attributes.img = 'Delete-icon.png';
     lyrQueryPts.addFeatures(f);
