@@ -47,11 +47,11 @@
         array_push($data['t'],$t * 1000);
         $vStr = $_REQUEST['varName'];
         if (!array_key_exists($vStr,$data['d'])) {
-          $data['d'][$vStr] = array(array(sprintf("%f",$p->{'value'}[0])));
+          $data['d'][$vStr] = array(sprintf("%f",$p->{'value'}[0]));
           $data['u'][$vStr] = $_REQUEST['varUnits'];
         }
         else {
-          array_push($data['d'][$vStr],array(sprintf("%f",$p->{'value'}[0])));
+          array_push($data['d'][$vStr],sprintf("%f",$p->{'value'}[0]));
         }
       }
     }
@@ -70,11 +70,11 @@
         if ($vStr != 'time') {
           preg_match("/(.*)\[(.*)\]/",$vStr,$a);
           if (!array_key_exists($a[1],$data['d'])) {
-            $data['d'][$a[1]] = array(array(sprintf("%f",$csv[$i][$vStr])));
-            $data['u'][$a[1]] = $_REQUEST['varUnits'];
+            $data['d'][$a[1]] = array(sprintf("%f",$csv[$i][$vStr]));
+            $data['u'][$a[1]] = $a[0];
           }
           else {
-            array_push($data['d'][$a[1]],array(sprintf("%f",$csv[$i][$vStr])));
+            array_push($data['d'][$a[1]],sprintf("%f",$csv[$i][$vStr]));
           }
         }
       }
@@ -91,17 +91,14 @@
           if ($i == 0) {
             $data['d'][$_REQUEST['varName']] = array();
           }
-          $u = $data['d'][$voi[0]][$i][0];
-          $v = $data['d'][$voi[1]][$i][0];
+          $u = $data['d'][$voi[0]][$i];
+          $v = $data['d'][$voi[1]][$i];
           $spd = sqrt(pow($u,2) + pow($v,2));
           $dir = 90 - rad2deg(atan2($v,$u));
           $dir += $dir < 0 ? 360 : 0;
-          array_push(
-             $data['d'][$_REQUEST['varName']]
-            ,array(sprintf("%f,%d",$spd,$dir))
-          );
+          array_push($data['d'][$_REQUEST['varName']],sprintf("%f,%d",$spd,$dir));
         }
-        $data['u'][$_REQUEST['varName']] = $_REQUEST['varUnits'];
+        $data['u'][$_REQUEST['varName']] = $data['u'][$voi[0]];
         unset($data['u'][$voi[0]]);
         unset($data['u'][$voi[1]]);
         unset($data['d'][$voi[0]]);

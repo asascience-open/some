@@ -2260,7 +2260,8 @@ function addToChart(a) {
           ,id     : Ext.id()
         });
         for (var i = 0; i < obs.d[v].length; i++) {
-          chartData[chartData.length-1].data.push([obs.t[i],obs.d[v][i]]);
+          var mag = obs.d[v][i].split(',')[0];
+          chartData[chartData.length-1].data.push([obs.t[i],mag]);
         }
         if (obs.d[v].length == 1) {
           chartData[chartData.length - 1].points = {show : true};
@@ -2386,7 +2387,7 @@ function setLayerSettings(name,position) {
     var id        = Ext.id();
     var items     = [
       new Ext.Slider({
-         fieldLabel : 'Opacity<a href="javascript:Ext.getCmp(\'tooltip.' + id + '.opacity' + '\').show()"><img style="margin-left:2px;margin-bottom:2px" id="' + id + '.opacity' + '" src="img/info.png"></a>'
+         fieldLabel : 'Opacity<a href="javascript:Ext.getCmp(\'tooltip.' + id + '.opacity' + '\').show()"><img style="margin-left:2px;margin-bottom:2px" id="' + id + '.opacity' + '" width=8 height=12  src="img/info.png"></a>'
         ,id       : 'opacity.' + id
         ,width    : 130
         ,minValue : 0
@@ -2411,7 +2412,7 @@ function setLayerSettings(name,position) {
         }
       })
       ,new Ext.form.ComboBox({
-         fieldLabel     : 'Tiling' + '<a href="javascript:Ext.getCmp(\'tooltip.' + id + '.' + 'tiling' + '\').show()"><img style="margin-left:2px;margin-bottom:2px" id="' + id + '.' + 'tiling' + '" src="img/info.png"></a>'
+         fieldLabel     : 'Tiling' + '<a href="javascript:Ext.getCmp(\'tooltip.' + id + '.' + 'tiling' + '\').show()"><img style="margin-left:2px;margin-bottom:2px" id="' + id + '.' + 'tiling' + '" width=8 height=12  src="img/info.png"></a>'
         ,id             : 'tiling' + '.' + id
         ,store          : new Ext.data.ArrayStore({
           fields : [
@@ -2499,6 +2500,7 @@ function setLayerSettings(name,position) {
       ,y         : position ? position[1] : pos.top
       ,width     : 270
       ,layout    : 'fit'
+      ,resizable : false
       ,constrainHeader : true
       ,title     : name.split('.').slice(1) + ' :: settings'
       ,items     : new Ext.FormPanel({
@@ -2541,7 +2543,7 @@ function buildSelect(field,data,lbl,tip,lyr,allowAnyVal) {
     val = val.split('_')[fld[1]];
   }
   return new Ext.form.ComboBox({
-     fieldLabel     : lbl + '<a href="javascript:Ext.getCmp(\'tooltip.' + id + '.' + field + '\').show()"><img style="margin-left:2px;margin-bottom:2px" id="' + id + '.' + field + '" src="img/info.png"></a>'
+     fieldLabel     : lbl + '<a href="javascript:Ext.getCmp(\'tooltip.' + id + '.' + field + '\').show()"><img style="margin-left:2px;margin-bottom:2px" id="' + id + '.' + field + '" width=8 height=12  src="img/info.png"></a>'
     ,id             : field + '.' + id
     ,store          : new Ext.data.ArrayStore({
       fields : [
