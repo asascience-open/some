@@ -2500,7 +2500,6 @@ function setLayerSettings(name,position) {
       ,width     : 270
       ,layout    : 'fit'
       ,constrainHeader : true
-      ,resizable : false
       ,title     : name.split('.').slice(1) + ' :: settings'
       ,items     : new Ext.FormPanel({
          border         : false
