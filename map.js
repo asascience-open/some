@@ -35,6 +35,18 @@ var legendImages = {};
 var activeSettingsWindows = {};
 var activeInfoWindows     = {};
 
+var lineColors = [
+   ['#66C2A5','#1B9E77']
+  ,['#FC8D62','#D95F02']
+  ,['#8DA0CB','#7570B3']
+  ,['#E78AC3','#E7298A']
+  ,['#A6D854','#66A61E']
+  ,['#FFD92F','#E6AB02']
+  ,['#E5C494','#A6761D']
+  ,['#B3B3B3','#666666']
+];
+var lineColorCounter = 1;
+
 function init() {
   var loadingMask = Ext.get('loading-mask');
   var loading = Ext.get('loading');
@@ -289,6 +301,7 @@ function init() {
     ,autoExpandColumn : 'legend'
     ,hideHeaders      : true
     ,disableSelection : true
+    ,viewConfig       : {markDirty : false}
   });
 
   new Ext.Viewport({
@@ -815,14 +828,17 @@ function init() {
                       }
                     });
 
-                    $.plot(
+                    var p = $.plot(
                      $('#chart')
                       ,chartData
                       ,{
-                         xaxis  : {mode : 'time'}
-                        ,pan    : {interactive : true}
-                        ,grid   : {backgroundColor : {colors : ['#fff','#eee']},borderWidth : 1,borderColor : '#99BBE8',hoverable : true}
-                        ,legend : {
+                         xaxis     : {mode : 'time'}
+                        ,pan       : {interactive : true}
+                        ,grid      : {backgroundColor : {colors : ['#fff','#eee']},borderWidth : 1,borderColor : '#99BBE8',hoverable : true}
+                        ,zoom      : {interactive : false}
+                        ,pan       : {interactive : false}
+                        ,crosshair : {mode  : 'x'   }
+                        ,legend    : {
                            show           : Ext.getCmp('legendPositionComboBox').getValue() != 'Off'
                           ,position       : Ext.getCmp('legendPositionComboBox').getValue().toLowerCase(),backgroundOpacity : 0.3
                           ,labelFormatter : function(label,series) {
@@ -837,6 +853,23 @@ function init() {
                         }
                       }
                     );
+
+                    // Keep track of any arrows that will need to be plotted.  Something that started out as a u,v
+                    // request will end up in the chartData as [t,spd,dir].  Fortunately, flot ignores the dir value.
+                    console.dir(chartData);
+                    var imageSize = 80;
+                    var type      = 'arrow';
+                    for (var i = 0; i < chartData.length; i++) {
+                      if (chartData[i].data && chartData[i].data[0].length == 3) {
+                        for (var j = 0; j < chartData[i].data.length; j++) {
+                          var o = p.pointOffset({
+                             x : chartData[i].data[j][0]
+                            ,y : chartData[i].data[j][1]
+                          });
+                          $('#chart').prepend('<div class="dir" style="position:absolute;left:' + (o.left-imageSize/2) + 'px;top:' + (o.top-(imageSize/2)) + 'px;background-image:url(\'http://assets.maracoos.org/img/vectors/' + type + '/' + imageSize + 'x' + imageSize + '.dir' + chartData[i].data[j][2] + '.' + lineColor2VectorColor(chartData[i].color).replace('#','') + '.png\');width:' + imageSize + 'px;height:' + imageSize + 'px;"></div>');
+                        }
+                      }
+                    }
                   }
                 });
               }
@@ -1204,6 +1237,7 @@ function getObsCallback(property,name,url,lon,lat,r) {
       ,lon   : lon
       ,lat   : lat
       ,id    : Ext.id()
+      ,color : lineColors[lineColors.length % lineColorCounter++][0]
     });
   }
   Ext.getCmp('timeseriesPanel').fireEvent('resize',Ext.getCmp('timeseriesPanel'));
@@ -2119,13 +2153,12 @@ function addGrid(url,lyr,stl,sgl,name,type,ele) {
         }
       });
 */
-      // don't fire the getTIMESTAMP request
+      // don't fire the TIMESTAMP request
       rec.set('status','drawn');
-      rec.commit();
     }
   });
-  lyr.mergeNewParams({TIME : makeTimeParam(dNow)});
 
+  lyr.mergeNewParams({TIME : makeTimeParam(dNow)});
   map.addLayer(lyr);
 }
 
@@ -2269,10 +2302,13 @@ function addToChart(a) {
           ,label  : title.split('||')[0] + ' : ' + v + ' (' + obs.u[v] + ')'
           ,lines  : {show : true}
           ,id     : Ext.id()
+          ,color  : lineColors[lineColors.length % lineColorCounter++][0]
         });
         for (var i = 0; i < obs.d[v].length; i++) {
-          var mag = obs.d[v][i].split(',')[0];
-          chartData[chartData.length-1].data.push([obs.t[i],mag]);
+          var p = obs.d[v][i].split(',');
+          var mag = p[0];
+          var dir = p[1];
+          chartData[chartData.length-1].data.push([obs.t[i],mag,dir]);
         }
         if (obs.d[v].length == 1) {
           chartData[chartData.length - 1].points = {show : true};
@@ -2665,4 +2701,13 @@ function wmsGetCaps(node,cb) {
      url      : 'get.php?u=' + encodeURIComponent(node.attributes.url)
     ,callback : OpenLayers.Function.bind(wmsGetCapsCallback,null,node)
   });
+}
+
+function lineColor2VectorColor(l) {
+  for (var i = 0; i < lineColors.length; i++) {
+    if (lineColors[i][0] == l) {
+      return lineColors[i][1];
+    }
+  }
+  return lineColors[0][1];
 }

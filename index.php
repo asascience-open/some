@@ -21,7 +21,7 @@
     <script type="text/javascript" src="./js/jquery/jquery.parseSOSGetCap.js"></script>
     <script type="text/javascript" src="./js/jquery/jquery.parseSOSGetObs.js"></script>
     <script type="text/javascript" src="./js/jquery/jquery.flot.js"></script>
-    <script type="text/javascript" src="./js/jquery/jquery.flot.navigate.js"></script>
+    <script type="text/javascript" src="./js/jquery/jquery.flot.crosshair.js"></script>
     <script type="text/javascript" src="map.js"></script>
   </body>
 </html>
