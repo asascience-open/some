@@ -936,7 +936,6 @@ function initMap() {
   map.setCenter(new OpenLayers.LonLat(-10536302.833765,3885808.4963698),4);
 
   map.events.register('click',this,function(e) {
-console.dir(e.xy);
     mapClick(e.xy);
   });
 
@@ -2160,7 +2159,6 @@ function mapClick(xy) {
   Ext.getCmp('legendsGridPanel').getStore().each(function(rec) {
     l.push(map.getLayersByName(rec.get('name'))[0]);
   });
-console.dir(l);
 
   if (l.length == 0) {
     if (Ext.getCmp('stationGridTabPanel').getActiveTab().id == 'gridsTab') {
@@ -2169,7 +2167,6 @@ console.dir(l);
   }
   else {
     var lonLat       = map.getLonLatFromPixel(xy);
-console.dir(lonLat);
     var f            = new OpenLayers.Feature.Vector(new OpenLayers.Geometry.Point(lonLat.lon,lonLat.lat));
     f.attributes.img = 'Delete-icon.png';
     lyrQueryPts.addFeatures(f);
