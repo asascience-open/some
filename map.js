@@ -2454,7 +2454,7 @@ function setLayerSettings(name,position) {
       new Ext.Slider({
          fieldLabel : 'Opacity<a href="javascript:Ext.getCmp(\'tooltip.' + id + '.opacity' + '\').show()"><img style="margin-left:2px;margin-bottom:2px" id="' + id + '.opacity' + '" width=8 height=12  src="img/info.png"></a>'
         ,id       : 'opacity.' + id
-        ,width    : 130
+        ,width    : 120
         ,minValue : 0
         ,maxValue : 100
         ,value    : lyr.opacity * 100
@@ -2492,7 +2492,7 @@ function setLayerSettings(name,position) {
         ,editable       : false
         ,triggerAction  : 'all'
         ,mode           : 'local'
-        ,width          : 130
+        ,width          : 120
         ,forceSelection : true
         ,lastQuery      : ''
         ,listeners      : {
@@ -2572,7 +2572,7 @@ function setLayerSettings(name,position) {
          border         : false
         ,bodyStyle      : 'background:transparent'
         ,width          : 240
-        ,labelWidth     : 100
+        ,labelWidth     : 110
         ,labelSeparator : ''
         ,items          : items
       })
@@ -2623,7 +2623,7 @@ function buildSelect(field,data,lbl,tip,lyr,allowAnyVal) {
     ,editable       : allowAnyVal
     ,triggerAction  : 'all'
     ,mode           : 'local'
-    ,width          : 130
+    ,width          : 120
     ,forceSelection : !allowAnyVal
     ,lastQuery      : ''
     ,listeners      : {
