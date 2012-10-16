@@ -879,7 +879,7 @@ function init() {
                     var imageSize = 80;
                     var type      = 'arrow';
                     for (var i = 0; i < chartData.length; i++) {
-                      if (chartData[i].data && chartData[i].data[0].length == 3) {
+                      if (chartData[i].data && chartData[i].data.length > 0 && chartData[i].data[0].length == 3) {
                         for (var j = 0; j < chartData[i].data.length; j++) {
                           var o = p.pointOffset({
                              x : chartData[i].data[j][0]
@@ -1257,6 +1257,13 @@ function getObsCallback(property,name,url,lon,lat,r) {
       ,lat   : lat
       ,id    : Ext.id()
       ,color : lineColors[lineColorCounter++ % lineColors.length][0]
+    });
+  }
+  else {
+    chartData.push({
+       data   : []
+      ,label  : name + ': NO DATA'
+      ,id     : Ext.id()
     });
   }
   Ext.getCmp('timeseriesPanel').fireEvent('resize',Ext.getCmp('timeseriesPanel'));
