@@ -379,7 +379,7 @@ function init() {
                 ,forceSelection : true
                 ,triggerAction  : 'all'
                 ,editable       : false
-                ,value          : 'Isaac'
+                ,value          : 'Rita'
                 ,listeners      : {
                   select : function(combo,rec) {
                     prepAndRunQuery();
@@ -1600,17 +1600,29 @@ function runQuery() {
             services[services[i].data.type] = services[i].data.url;
           }
           if (rec.get('coverageType') == 'modelResult') {
-            modelsData.push([
-               'model.' + rec.get('title')
-              ,rec.get('cswId')
-              ,'Click <a target=_blank href="http://testbed.sura.org/inventory?id=' + rec.get('cswId') + '">here</a> to access the online metadata record.'
-              ,[rec.get('bboxWest'),rec.get('bboxSouth'),rec.get('bboxEast'),rec.get('bboxNorth')].join(',')
-              ,services['Open Geospatial Consortium Sensor Observation Service (SOS)'] + '&useCache=true'
-              ,{'Water level' : {
-                 prop        : 'watlev'
-                ,getObsExtra : '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
-              }}
-            ]);
+            if (services['Open Geospatial Consortium Sensor Observation Service (SOS)']) {
+              modelsData.push([
+                 'model.' + rec.get('title')
+                ,rec.get('cswId')
+                ,'Click <a target=_blank href="http://testbed.sura.org/inventory?id=' + rec.get('cswId') + '">here</a> to access the online metadata record.'
+                ,[rec.get('bboxWest'),rec.get('bboxSouth'),rec.get('bboxEast'),rec.get('bboxNorth')].join(',')
+                ,services['Open Geospatial Consortium Sensor Observation Service (SOS)'] + '&useCache=true'
+                ,{'Water level' : {
+                   prop        : 'watlev'
+                  ,getObsExtra : '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
+                }}
+              ]);
+            }
+            if (services['Open Geospatial Consortium Web Map Service (WMS)']) {
+              gridsData.push({
+                 text : rec.get('title')
+                ,url  : services['Open Geospatial Consortium Web Map Service (WMS)']
+                ,leaf : false
+                ,minT : eventTime[0]
+                ,maxT : eventTime[1]
+                ,bbox : [rec.get('bboxWest'),rec.get('bboxSouth'),rec.get('bboxEast'),rec.get('bboxNorth')]
+              });
+            }
           }
           else if (rec.get('coverageType') == 'physicalMeasurement') {
             obsData.push([
@@ -1643,6 +1655,7 @@ function runQuery() {
         }
 
         // hack for grids
+/*
         if (eventTime[0] == '2005-09-21T00:00:00Z') {
           gridsData.push({
              text : 'SCI-WMS WMS Server on the Cloud'
@@ -1663,6 +1676,7 @@ function runQuery() {
             ,bbox : [-180,-90,180,90]
           });
         }
+*/
     
         modelsStore.loadData(modelsData);
         obsStore.loadData(obsData);
@@ -2476,6 +2490,7 @@ function setLayerSettings(name,position) {
           }
         }
       })
+/*
       ,new Ext.form.ComboBox({
          fieldLabel     : 'Tiling' + '<a href="javascript:Ext.getCmp(\'tooltip.' + id + '.' + 'tiling' + '\').show()"><img style="margin-left:2px;margin-bottom:2px" id="' + id + '.' + 'tiling' + '" width=8 height=12  src="img/info.png"></a>'
         ,id             : 'tiling' + '.' + id
@@ -2509,6 +2524,7 @@ function setLayerSettings(name,position) {
           }
         }
       })
+*/
     ];
 
     if (customize.elevation.length > 0) {
