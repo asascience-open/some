@@ -1733,6 +1733,11 @@ function buildFilter() {
             ,property : 'title'
             ,value    : 'Imeds UND-CHL watlev_IKE.IMEDS'
           })
+          ,new OpenLayers.Filter.Comparison({
+             type     : OpenLayers.Filter.Comparison.EQUAL_TO
+            ,property : 'title'
+            ,value    : 'Imeds UND-CHL watlev_RITA.IMEDS'
+          })
         ]
       })
     ]
