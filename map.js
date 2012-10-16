@@ -876,7 +876,6 @@ function init() {
 
                     // Keep track of any arrows that will need to be plotted.  Something that started out as a u,v
                     // request will end up in the chartData as [t,spd,dir].  Fortunately, flot ignores the dir value.
-                    console.dir(chartData);
                     var imageSize = 80;
                     var type      = 'arrow';
                     for (var i = 0; i < chartData.length; i++) {
