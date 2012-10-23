@@ -381,7 +381,7 @@ function init() {
                 ,forceSelection : true
                 ,triggerAction  : 'all'
                 ,editable       : false
-                ,value          : 'Rita'
+                ,value          : 'Ike'
                 ,listeners      : {
                   select : function(combo,rec) {
                     prepAndRunQuery();
