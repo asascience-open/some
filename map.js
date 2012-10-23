@@ -353,11 +353,9 @@ function init() {
                 store : new Ext.data.ArrayStore({
                    fields : ['id','eventtime','year']
                   ,data   : [
-/*
                      ['2012']
                     ,['Isaac','2012-08-30T19:00:00Z/2012-09-04T18:00:00Z','2012']
-*/
-                     ['2008']
+                    ,['2008']
                     ,['Ike'  ,'2008-09-08T00:30:00Z/2008-09-16T00:00:00Z','2008']
                     ,['2005']
                     ,['Rita' ,'2005-09-21T00:00:00Z/2005-09-27T00:00:00Z','2005']
@@ -1674,7 +1672,8 @@ function runQuery() {
             ,bbox : [-180,-90,180,90]
           });
         }
-        else if (eventTime[0] == '2012-08-30T19:00:00Z') {
+*/
+        if (eventTime[0] == '2012-08-30T19:00:00Z') {
           gridsData.push({
              text : 'SCI-WMS WMS Server on the Cloud'
             ,url  : 'http://ec2-107-21-136-52.compute-1.amazonaws.com:8080/wms/RENCI_ISAAC_39/?REQUEST=GetCapabilities&SERVICE=WMS&VERSION=1.1.1'
@@ -1684,7 +1683,6 @@ function runQuery() {
             ,bbox : [-180,-90,180,90]
           });
         }
-*/
     
         modelsStore.loadData(modelsData);
         obsStore.loadData(obsData);
