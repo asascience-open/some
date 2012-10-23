@@ -131,16 +131,25 @@ function init() {
     }}
   });
 
-  var gridsTreePanel = new Ext.tree.TreePanel({
+  var gridsTreePanel = new Ext.ux.tree.TreeGrid({
      id          : 'gridsTreePanel'
     ,rootVisible : false
-    ,autoScroll  : true
+    ,autoScroll  : false
     ,root        : new Ext.tree.AsyncTreeNode()
     ,loader      : new Ext.tree.TreeLoader({
       directFn : function(nodeId,callback) {
         wmsGetCaps(gridsTreePanel.getNodeById(nodeId),callback);
       }
     })
+    ,hideHeaders : true
+    ,columns     : [
+      {id : 'text',dataIndex : 'text' ,width : 150}
+     ,{id : 'info',dataIndex : 'cswId',width : 25,tpl : new Ext.XTemplate(
+       '<tpl for=".">'
+         ,'<a id="info.grid0.{text}" href=javascript:void(0) onclick="goLayerCallout(\'grid0.{text}\')"><img title="Layer details and customization" src="img/page_go.png"></a>'
+       ,'</tpl>'
+     )}
+    ]
     ,listeners   : {click : function(node,e) {
       if (node.leaf) {
         var firstStyle     = node.attributes.layer.styles.length > 0 ? node.attributes.layer.styles[0] : false;
@@ -1621,12 +1630,14 @@ function runQuery() {
             }
             if (services['Open Geospatial Consortium Web Map Service (WMS)']) {
               gridsData.push({
-                 text : rec.get('title')
-                ,url  : services['Open Geospatial Consortium Web Map Service (WMS)']
-                ,leaf : false
-                ,minT : eventTime[0]
-                ,maxT : eventTime[1]
-                ,bbox : [rec.get('bboxWest'),rec.get('bboxSouth'),rec.get('bboxEast'),rec.get('bboxNorth')]
+                 text     : rec.get('title')
+                ,cswId    : rec.get('cswId')
+                ,abstract : 'Click <a target=_blank href="http://testbed.sura.org/inventory?id=' + rec.get('cswId') + '">here</a> to access the online metadata record.'
+                ,url      : services['Open Geospatial Consortium Web Map Service (WMS)']
+                ,leaf     : false
+                ,minT     : eventTime[0]
+                ,maxT     : eventTime[1]
+                ,bbox     : [rec.get('bboxWest'),rec.get('bboxSouth'),rec.get('bboxEast'),rec.get('bboxNorth')]
               });
             }
           }
@@ -2389,6 +2400,10 @@ function goLayerCallout(name) {
     if (!new RegExp(/^grid\./).test(name)) {
       customize = '<img width=32 height=32 src="img/settings_tools_big_disabled.png"><br><font color="lightgray">Customize<br>appearance</font>';
     }
+    var zoom = '<a class="blue-href-only" href="javascript:zoomToBbox(\'' + name + '\')"><img width=32 height=32 src="img/find_globe_big.png"><br>Zoom<br>to layer</a>';
+    if (new RegExp(/^grid0/).test(name)) {
+      zoom = '<img width=32 height=32 src="img/find_globe_big_disabled.png"><br><font color="lightgray">Zoom<br>to layer</font>';
+    }
     new Ext.ToolTip({
        id        : 'info.popup.' + name
       ,title     : name
@@ -2403,7 +2418,7 @@ function goLayerCallout(name) {
         ,height   : 75
         ,bodyStyle : 'padding:6'
         ,items    :  [
-           {columnWidth : 0.33,items : {xtype : 'container',autoEl : {tag : 'center'},items : {border : false,html : '<a class="blue-href-only" href="javascript:zoomToBbox(\'' + name + '\')"><img width=32 height=32 src="img/find_globe_big.png"><br>Zoom<br>to layer</a>'}}}
+           {columnWidth : 0.33,items : {xtype : 'container',autoEl : {tag : 'center'},items : {border : false,html : zoom}}}
           ,{columnWidth : 0.34,items : {xtype : 'container',autoEl : {tag : 'center'},items : {border : false,html : customize}}}
           ,{columnWidth : 0.33,items : {xtype : 'container',autoEl : {tag : 'center'},items : {border : false,html : '<a class="blue-href-only" href="javascript:showLayerInfo(\'' + name + '\')"><img width=32 height=32 src="img/document_image.png"><br>Layer<br>information</a>'}}}
         ]
@@ -2448,9 +2463,22 @@ function showLayerInfo(name) {
       ,model : 'modelsGridPanel'
       ,obs   : 'observationsGridPanel'
     };
-    var sto = Ext.getCmp(gp[name.split('.')[0]]).getStore();
-    var idx = sto.find('name',name);
-    if (idx >= 0) {
+    var html;
+    if (name.split('.')[0] == 'grid0') {
+      Ext.getCmp('gridsTreePanel').root.cascade(function(node) {
+        if ('grid0.' + node.attributes.text == name) {
+          html = node.attributes.abstract;
+        }
+      });
+    }
+    else {
+      var sto = Ext.getCmp(gp[name.split('.')[0]]).getStore();
+      var idx = sto.find('name',name);
+      if (idx >= 0) {
+        html = sto.getAt(idx).get('abstract');
+      }
+    }
+    if (html) {
       var pos = getOffset(document.getElementById('info.' + name));
       activeInfoWindows[name] = new Ext.Window({
          width      : 400
@@ -2459,7 +2487,7 @@ function showLayerInfo(name) {
         ,autoScroll : true
         ,constrainHeader : true
         ,title      : name.split('.').slice(1) + ' :: info'
-        ,items      : {border : false,bodyCssClass : 'popup',html : sto.getAt(idx).get('abstract')}
+        ,items      : {border : false,bodyCssClass : 'popup',html : html}
         ,listeners  : {hide : function() {
           activeInfoWindows[name] = null;
         }}
