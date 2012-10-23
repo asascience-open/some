@@ -2125,12 +2125,13 @@ function addGrid(url,lyr,stl,sgl,name,type,ele) {
       ,elevation   : ele
     }
     ,{
-       isBaseLayer  : false
-      ,projection   : proj3857
-      ,singleTile   : sgl
-      ,wrapDateLine : true
-      ,visibility   : true
-      ,opacity      : 1
+       isBaseLayer      : false
+      ,projection       : proj3857
+      ,singleTile       : sgl
+      ,wrapDateLine     : true
+      ,visibility       : true
+      ,opacity          : 1
+      ,transitionEffect : 'resize'
     }
   );
   lyr.defaultStyle = stl;
