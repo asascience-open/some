@@ -76,6 +76,10 @@ div.olLayerGoogleCopyright, div.olLayerGooglePoweredBy {
   background-image : url('img/blank.png');
 }
 
+#gridsTreePanel .x-treegrid-root-table, .x-treegrid-col {
+  border-color   : #ffffff;
+}
+
 .popup {
   background : white;
   padding    : 6px;

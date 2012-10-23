@@ -143,12 +143,8 @@ function init() {
     })
     ,hideHeaders : true
     ,columns     : [
-      {id : 'text',dataIndex : 'text' ,width : 150}
-     ,{id : 'info',dataIndex : 'cswId',width : 25,tpl : new Ext.XTemplate(
-       '<tpl for=".">'
-         ,'<a id="info.grid0.{text}" href=javascript:void(0) onclick="goLayerCallout(\'grid0.{text}\')"><img title="Layer details and customization" src="img/page_go.png"></a>'
-       ,'</tpl>'
-     )}
+      {id : 'text',dataIndex : 'text'  ,width : 183}
+     ,{id : 'info',dataIndex : 'goInfo',width : 25}
     ]
     ,listeners   : {click : function(node,e) {
       if (node.leaf) {
@@ -1631,8 +1627,11 @@ function runQuery() {
             if (services['Open Geospatial Consortium Web Map Service (WMS)']) {
               gridsData.push({
                  text     : rec.get('title')
+                ,qtip     : rec.get('title')
                 ,cswId    : rec.get('cswId')
                 ,abstract : 'Click <a target=_blank href="http://testbed.sura.org/inventory?id=' + rec.get('cswId') + '">here</a> to access the online metadata record.'
+                // simpler to define this here vs. an XTemplate
+                ,goInfo   : '<a id="info.grid0.' + rec.get('title') + '" href="javascript:void(0)" onclick="goLayerCallout(\'grid0.' + rec.get('title') + '\')"><img title="Layer details and customization" src="img/page_go.png"></a>'
                 ,url      : services['Open Geospatial Consortium Web Map Service (WMS)']
                 ,leaf     : false
                 ,minT     : eventTime[0]
