@@ -1675,7 +1675,7 @@ function runQuery() {
 */
         if (eventTime[0] == '2012-08-30T19:00:00Z') {
           gridsData.push({
-             text : 'SCI-WMS WMS Server on the Cloud'
+             text : 'Isaac 29'
             ,url  : 'http://ec2-107-21-136-52.compute-1.amazonaws.com:8080/wms/RENCI_ISAAC_39/?REQUEST=GetCapabilities&SERVICE=WMS&VERSION=1.1.1'
             ,leaf : false
             ,minT : '2012-08-30T19:00:00Z'
