@@ -1615,7 +1615,7 @@ function runQuery() {
               modelsData.push([
                  'model.' + rec.get('title')
                 ,rec.get('cswId')
-                ,'Click <a target=_blank href="http://testbed.sura.org/inventory?id=' + rec.get('cswId') + '">here</a> to access the online metadata record.'
+                ,'Click <a target=_blank href="http://testbed.sura.org/inventory-update?id=' + rec.get('cswId') + '">here</a> to access the online metadata record.'
                 ,[rec.get('bboxWest'),rec.get('bboxSouth'),rec.get('bboxEast'),rec.get('bboxNorth')].join(',')
                 ,services['Open Geospatial Consortium Sensor Observation Service (SOS)'] + '&useCache=true'
                 ,{'Water level' : {
@@ -1629,7 +1629,7 @@ function runQuery() {
                  text     : rec.get('title')
                 ,qtip     : rec.get('title')
                 ,cswId    : rec.get('cswId')
-                ,abstract : 'Click <a target=_blank href="http://testbed.sura.org/inventory?id=' + rec.get('cswId') + '">here</a> to access the online metadata record.'
+                ,abstract : 'Click <a target=_blank href="http://testbed.sura.org/inventory-update?id=' + rec.get('cswId') + '">here</a> to access the online metadata record.'
                 // simpler to define this here vs. an XTemplate
                 ,goInfo   : '<a id="info.grid0.' + rec.get('title') + '" href="javascript:void(0)" onclick="goLayerCallout(\'grid0.' + rec.get('title') + '\')"><img title="Layer details and customization" src="img/page_go.png"></a>'
                 ,url      : services['Open Geospatial Consortium Web Map Service (WMS)']
@@ -1644,7 +1644,7 @@ function runQuery() {
             obsData.push([
                'obs.' + rec.get('title')
               ,rec.get('cswId')
-              ,'Click <a target=_blank href="http://testbed.sura.org/inventory?id=' + rec.get('cswId') + '">here</a> to access the onlin e metadata record.'
+              ,'Click <a target=_blank href="http://testbed.sura.org/inventory-update?id=' + rec.get('cswId') + '">here</a> to access the onlin e metadata record.'
               ,[rec.get('bboxWest'),rec.get('bboxSouth'),rec.get('bboxEast'),rec.get('bboxNorth')].join(',')
               ,services['Open Geospatial Consortium Sensor Observation Service (SOS)'] + '&useCache=true'
               ,{'Water level' : {
