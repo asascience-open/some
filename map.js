@@ -321,7 +321,7 @@ function init() {
           new Ext.FormPanel({
              title          : 'Catalog query filters'
             ,id             : 'queryFiltersPanel'
-            ,height         : 150
+            ,height         : 165
             ,border         : false
             ,bodyStyle      : 'padding:5px 5px 0'
             ,collapsible    : true
@@ -410,6 +410,11 @@ function init() {
                   }
                 }
               })
+              ,{
+                 border : false
+                ,cls    : 'directionsPanel'
+                ,html   : 'Or click <a href="http://testbedapps.sura.org/gi-cat/gi-portal/index.jsp">here</a> to perform a free text search.'
+              }
             ]
 /*
             ,tbar        : {items : [
@@ -467,7 +472,7 @@ function init() {
               ,expand : function(p) {
                 var queryResultsPanel = Ext.getCmp('queryResultsPanel');
                 delete queryResultsPanel.anchorSpec;
-                queryResultsPanel.anchor = '100% -155';
+                queryResultsPanel.anchor = '100% -170';
                 Ext.getCmp('catalogPanel').doLayout();
               }
             }
@@ -475,7 +480,7 @@ function init() {
           ,{
              title     : 'Catalog query results'
             ,id        : 'queryResultsPanel'
-            ,anchor    : '100% -155'
+            ,anchor    : '100% -170'
             ,border    : false
             ,bodyStyle : 'padding:5px 5px 0'
             ,layout    : 'fit'
