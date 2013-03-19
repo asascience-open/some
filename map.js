@@ -258,6 +258,25 @@ function init() {
     }}
   });
 
+  var othersGridPanel = new Ext.grid.GridPanel({
+     id          : 'othersGridPanel'
+    ,store       : new Ext.data.ArrayStore({
+       fields   : [{name : 'name',sortType : Ext.data.SortTypes.asUCString},'cswId','abstract','bbox','url','properties','services']
+      ,sortInfo : {field : 'name',direction : 'ASC'}
+    })
+    ,loadMask    : true
+    ,autoExpandColumn : 'name'
+    ,columns     : [
+       {id : 'name',dataIndex :'name',renderer : renderName}
+      ,{id : 'info'                  ,renderer : renderLayerCalloutButton,width : 25}
+    ]
+    ,hideHeaders : true
+    ,disableSelection : true
+    ,listeners   : {viewready : function() {
+      viewReady();
+    }}
+  });
+
   var layersSelModel = new Ext.grid.CheckboxSelectionModel({
      header     : ''
     ,checkOnly  : true
@@ -489,13 +508,12 @@ function init() {
                  activeTab  : 0
                 ,plain      : true
                 ,resizeTabs : true
-                ,tabWidth   : 135
                 ,bodyStyle  : 'padding:5px 5px 0'
                 ,id         : 'stationGridTabPanel'
                 ,deferredRender : false
                 ,items          : [
                   {
-                     title  : 'Available stations'
+                     title  : 'Stations'
                     ,id     : 'stationsTab'
                     ,layout : 'anchor'
                     ,items  : [
@@ -520,7 +538,7 @@ function init() {
                     ]
                   }
                   ,{
-                     title  : 'Available grids'
+                     title  : 'Grids'
                     ,id     : 'gridsTab'
                     ,layout : 'anchor'
                     ,items  : [
@@ -547,6 +565,25 @@ function init() {
                         ,height : 150
                         ,layout : 'fit'
                         ,items  : legendsGridPanel
+                      })
+                    ]
+                  }
+                  ,{
+                     title  : 'Other'
+                    ,id     : 'othersTab'
+                    ,layout : 'anchor'
+                    ,items  : [
+                      {
+                         border : false
+                        ,cls    : 'directionsPanel'
+                        ,html   : 'The following datasets are not mappable here on the Testbed Explorer.  But you may access them directly via their web services.'
+                        ,height : 48
+                      }
+                      ,new Ext.form.FieldSet({
+                         title  : '&nbsp;Other datasets&nbsp;'
+                        ,anchor : ['100%',-44 - (Ext.isIE ? 12 : 0)].join(' ')
+                        ,layout : 'fit'
+                        ,items  : othersGridPanel
                       })
                     ]
                   }
@@ -1606,9 +1643,12 @@ function runQuery() {
         var modelsStore = Ext.getCmp('modelsGridPanel').getStore();
         var modelsData  = [];
         var obsStore    = Ext.getCmp('observationsGridPanel').getStore();
+        var othersStore = Ext.getCmp('othersGridPanel').getStore();
         var obsData     = [];
         var gridsData   = [];
+        var othersData  = [];
         sto.each(function(rec) {
+          var recognized = false;
           var services = rec.get('services');
           for (var i = 0; i < services.length; i++) {
             services[services[i].data.type] = services[i].data.url;
@@ -1627,6 +1667,7 @@ function runQuery() {
                 }}
                 ,rec.get('services')
               ]);
+              recognized = true;
             }
             if (services['Open Geospatial Consortium Web Map Service (WMS)']) {
               gridsData.push({
@@ -1643,6 +1684,7 @@ function runQuery() {
                 ,bbox     : [rec.get('bboxWest'),rec.get('bboxSouth'),rec.get('bboxEast'),rec.get('bboxNorth')]
                 ,services : rec.get('services')
               });
+              recognized = true;
             }
           }
           else if (rec.get('coverageType') == 'physicalMeasurement') {
@@ -1658,7 +1700,21 @@ function runQuery() {
               }}
               ,rec.get('services')
             ]);
+            recognized = true;
           }
+
+          if (!recognized) {
+            othersData.push([
+               'other.' + rec.get('title')
+              ,rec.get('cswId')
+              ,'Click <a target=_blank href="http://testbed.sura.org/inventory-update?id=' + rec.get('cswId') + '">here</a> to access the online metadata record.'
+              ,null
+              ,null
+              ,null
+              ,rec.get('services')
+            ]);
+          }
+
         });
 
         modelsStore.loadData(modelsData);
@@ -1669,6 +1725,8 @@ function runQuery() {
           ,leaf     : false
           ,children : gridsData
         }));
+        othersStore.loadData(othersData);
+        othersStore.sort('name','ASC');
 
         setdNow(isoDateToDate(eventTime[0]));
         setMapTime();
@@ -1738,7 +1796,7 @@ function buildFilter() {
 
 function viewReady() {
   viewsReady++;
-  if (viewsReady == 2) {
+  if (viewsReady == 3) {
     prepAndRunQuery();
   }
 }
@@ -2367,7 +2425,7 @@ function goLayerCallout(name) {
       customize = '<img width=32 height=32 src="img/settings_tools_big_disabled.png"><br><font color="lightgray">Customize<br>appearance</font>';
     }
     var zoom = '<a class="blue-href-only" href="javascript:zoomToBbox(\'' + name + '\')"><img width=32 height=32 src="img/find_globe_big.png"><br>Zoom<br>to layer</a>';
-    if (new RegExp(/^grid0/).test(name)) {
+    if (new RegExp(/^grid0|other/).test(name)) {
       zoom = '<img width=32 height=32 src="img/find_globe_big_disabled.png"><br><font color="lightgray">Zoom<br>to layer</font>';
     }
     new Ext.ToolTip({
@@ -2411,6 +2469,7 @@ function zoomToBbox(name) {
      grid  : 'layersGridPanel'
     ,model : 'modelsGridPanel'
     ,obs   : 'observationsGridPanel'
+    ,other : 'othersGridPanel'
   };
   var sto = Ext.getCmp(gp[name.split('.')[0]]).getStore();
   var idx = sto.find('name',name);
@@ -2421,7 +2480,6 @@ function zoomToBbox(name) {
 }
 
 function showLayerInfo(name) {
-// foo
   destroyLayerCallout(name);
   if (!activeInfoWindows[name]) {
     // figure out which gp's store to hit
@@ -2429,6 +2487,7 @@ function showLayerInfo(name) {
        grid  : 'layersGridPanel'
       ,model : 'modelsGridPanel'
       ,obs   : 'observationsGridPanel'
+      ,other : 'othersGridPanel'
     };
     var html = [];
     var svc;
