@@ -109,6 +109,21 @@
 
   echo json_encode($data);
 
+  // from http://www.php.net/manual/en/function.str-getcsv.php#100579
+  if (!function_exists('str_getcsv')) {
+    function str_getcsv($input, $delimiter=',', $enclosure='"', $escape=null, $eol=null) {
+      $temp=fopen("php://memory", "rw");
+      fwrite($temp, $input);
+      fseek($temp, 0);
+      $r = array();
+      while (($data = fgetcsv($temp, 4096, $delimiter, $enclosure)) !== false) {
+        $r[] = $data;
+      }
+      fclose($temp);
+      return $r;
+    }
+  } 
+
   // from http://www.php.net/manual/en/function.str-getcsv.php#104558
   function csv_to_array($input,$delimiter=',') {
     $header  = null;
