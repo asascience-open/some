@@ -84,7 +84,7 @@ function init() {
   var observationsGridPanel = new Ext.grid.GridPanel({
      id          : 'observationsGridPanel'
     ,store       : new Ext.data.ArrayStore({
-      fields : ['name','cswId','abstract','bbox','url','properties']
+      fields : ['name','cswId','abstract','bbox','url','properties','services']
     })
     ,selModel    : observationsSelModel
     ,loadMask    : true
@@ -115,7 +115,7 @@ function init() {
   var modelsGridPanel = new Ext.grid.GridPanel({
      id          : 'modelsGridPanel'
     ,store       : new Ext.data.ArrayStore({
-      fields : ['name','cswId','abstract','bbox','url','properties']
+      fields : ['name','cswId','abstract','bbox','url','properties','services']
     })
     ,selModel    : modelsSelModel
     ,loadMask    : true
@@ -358,9 +358,7 @@ function init() {
                 store : new Ext.data.ArrayStore({
                    fields : ['id','eventtime','year']
                   ,data   : [
-                     ['2012']
-                    ,['Isaac','2012-08-30T19:00:00Z/2012-09-04T18:00:00Z','2012']
-                    ,['2008']
+                     ['2008']
                     ,['Ike'  ,'2008-09-08T00:30:00Z/2008-09-16T00:00:00Z','2008']
                     ,['2005']
                     ,['Rita' ,'2005-09-21T00:00:00Z/2005-09-27T00:00:00Z','2005']
@@ -1622,6 +1620,7 @@ function runQuery() {
                    prop        : 'watlev'
                   ,getObsExtra : '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
                 }}
+                ,rec.get('services')
               ]);
             }
             if (services['Open Geospatial Consortium Web Map Service (WMS)']) {
@@ -1637,6 +1636,7 @@ function runQuery() {
                 ,minT     : eventTime[0]
                 ,maxT     : eventTime[1]
                 ,bbox     : [rec.get('bboxWest'),rec.get('bboxSouth'),rec.get('bboxEast'),rec.get('bboxNorth')]
+                ,services : rec.get('services')
               });
             }
           }
@@ -1651,49 +1651,11 @@ function runQuery() {
                  prop        : 'watlev'
                 ,getObsExtra : '&result=VerticalDatum==urn:ogc:def:datum:epsg::5103'
               }}
+              ,rec.get('services')
             ]);
           }
         });
 
-        // hack for obs
-        if (eventTime[0] == '2012-08-30T19:00:00Z') {
-          obsData.push([
-             'obs.COOPS'
-            ,null
-            ,null
-            ,null
-            ,'xml/coops.xml'
-            ,{'Water level' : {
-               prop        : 'http://mmisw.org/ont/cf/parameter/water_surface_height_above_reference_datum'
-              ,getObsExtra : ''
-            }}
-          ]);
-        }
-
-        // hack for grids
-/*
-        if (eventTime[0] == '2005-09-21T00:00:00Z') {
-          gridsData.push({
-             text : 'SCI-WMS WMS Server on the Cloud'
-            ,url  : 'http://ec2-107-21-136-52.compute-1.amazonaws.com:8080/wms/in_usf_fvcom_rita_ultralite_vardrag_nowave_2d/?service=WMS&version=1.1.1&request=GetCapabilities'
-            ,leaf : false
-            ,minT : '2005-09-21T00:00:00Z'
-            ,maxT : '2005-09-27T00:00:00Z'
-            ,bbox : [-180,-90,180,90]
-          });
-        }
-*/
-        if (eventTime[0] == '2012-08-30T19:00:00Z') {
-          gridsData.push({
-             text : 'Isaac 29'
-            ,url  : 'http://ec2-107-21-136-52.compute-1.amazonaws.com:8080/wms/RENCI_ISAAC_39/?REQUEST=GetCapabilities&SERVICE=WMS&VERSION=1.1.1'
-            ,leaf : false
-            ,minT : '2012-08-30T19:00:00Z'
-            ,maxT : '2012-09-04T18:00:00Z'
-            ,bbox : [-180,-90,180,90]
-          });
-        }
-    
         modelsStore.loadData(modelsData);
         obsStore.loadData(obsData);
         Ext.getCmp('layersGridPanel').getStore().removeAll();
@@ -2454,6 +2416,7 @@ function zoomToBbox(name) {
 }
 
 function showLayerInfo(name) {
+// foo
   destroyLayerCallout(name);
   if (!activeInfoWindows[name]) {
     // figure out which gp's store to hit
@@ -2462,11 +2425,13 @@ function showLayerInfo(name) {
       ,model : 'modelsGridPanel'
       ,obs   : 'observationsGridPanel'
     };
-    var html;
+    var html = [];
+    var svc;
     if (name.split('.')[0] == 'grid0') {
       Ext.getCmp('gridsTreePanel').root.cascade(function(node) {
         if ('grid0.' + node.attributes.text == name) {
-          html = node.attributes.abstract;
+          html = [node.attributes.abstract];
+          svc = node.attributes.services;
         }
       });
     }
@@ -2474,10 +2439,18 @@ function showLayerInfo(name) {
       var sto = Ext.getCmp(gp[name.split('.')[0]]).getStore();
       var idx = sto.find('name',name);
       if (idx >= 0) {
-        html = sto.getAt(idx).get('abstract');
+        html = [sto.getAt(idx).get('abstract')];
+        svc = sto.getAt(idx).get('services');
       }
     }
-    if (html) {
+    if (svc) {
+      for (var s in svc) {
+        if (typeof(svc[s]) == 'string') {
+          html.push('<a href="' + svc[s] + '" target=_blank>' + s + '</a>');
+        }
+      }
+    }
+    if (html.length > 0) {
       var pos = getOffset(document.getElementById('info.' + name));
       activeInfoWindows[name] = new Ext.Window({
          width      : 400
@@ -2486,7 +2459,7 @@ function showLayerInfo(name) {
         ,autoScroll : true
         ,constrainHeader : true
         ,title      : name.split('.').slice(1) + ' :: info'
-        ,items      : {border : false,bodyCssClass : 'popup',html : html}
+        ,items      : {border : false,bodyCssClass : 'popup',html : html.join('<br>')}
         ,listeners  : {hide : function() {
           activeInfoWindows[name] = null;
         }}
