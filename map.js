@@ -1749,37 +1749,17 @@ function buildFilter() {
       new OpenLayers.Filter.Comparison({
          type     : OpenLayers.Filter.Comparison.LESS_THAN_OR_EQUAL_TO
         ,property : 'apiso:TempExtent_begin'
-        ,value    : eventTime[0]
+        ,value    : eventTime[1]
       })
       ,new OpenLayers.Filter.Comparison({
          type     : OpenLayers.Filter.Comparison.GREATER_THAN_OR_EQUAL_TO
         ,property : 'apiso:TempExtent_end'
-        ,value    : eventTime[1]
+        ,value    : eventTime[0]
       })
       ,new OpenLayers.Filter.Comparison({
          type     : OpenLayers.Filter.Comparison.LIKE
         ,property : 'OrganisationName'
         ,value    : '*' + Ext.getCmp('modelTypesComboBox').getValue() + '*'
-      })
-      ,new OpenLayers.Filter.Logical({
-         type    : OpenLayers.Filter.Logical.OR
-        ,filters : [
-          new OpenLayers.Filter.Comparison({
-             type     : OpenLayers.Filter.Comparison.EQUAL_TO
-            ,property : 'apiso:CoverageContentTypeCode'
-            ,value    : 'modelResult'
-          })
-          ,new OpenLayers.Filter.Comparison({
-             type     : OpenLayers.Filter.Comparison.EQUAL_TO
-            ,property : 'title'
-            ,value    : 'Imeds UND-CHL watlev_IKE.IMEDS'
-          })
-          ,new OpenLayers.Filter.Comparison({
-             type     : OpenLayers.Filter.Comparison.EQUAL_TO
-            ,property : 'title'
-            ,value    : 'Imeds UND-CHL watlev_RITA.IMEDS'
-          })
-        ]
       })
     ]
   });
