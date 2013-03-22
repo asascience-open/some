@@ -2490,7 +2490,7 @@ function showLayerInfo(name) {
     if (svc) {
       for (var s in svc) {
         if (typeof(svc[s]) == 'string') {
-          html.push('<a href="' + svc[s] + '" target=_blank>' + s + '</a>');
+          html.push('<a href="' + svc[s] + (new RegExp(/thredds opendap/i).test(s) ? '.html' : '') + '" target=_blank>' + s + '</a>');
         }
       }
     }
