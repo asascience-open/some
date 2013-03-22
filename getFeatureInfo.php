@@ -3,7 +3,6 @@
 
   $gfiUrl  = substr($_SERVER["REQUEST_URI"],strpos($_SERVER["REQUEST_URI"],'?')+1);
   $rawData = file_get_contents($gfiUrl);
-  $xml = @simplexml_load_string($rawData);
 
   $mapTime = $_REQUEST['mapTime'] != 'undefined' ? $_REQUEST['mapTime'] : '';
 
@@ -12,10 +11,15 @@
   $data['u'] = array();
   $data['d'] = array();
 
-  if ($xml->{'ServiceException'}) {
+  $xml = false;
+  if (preg_match('/text\/xml/i',$_REQUEST['FORMAT'])) {
+    $xml = @simplexml_load_string($rawData);
+  }
+
+  if ($xml && $xml->{'ServiceException'}) {
     $data['error'] = sprintf("%s",$xml->{'ServiceException'}->attributes()->{'code'});
   }
-  else if ($xml->{'Point'}) {
+  else if ($xml && $xml->{'Point'}) {
     foreach ($xml->{'Point'} as $p) {
       $a = preg_split("/-| |:/",sprintf("%s",$p->{'Time'}[0]));
       $t = mktime($a[3],$a[4],$a[5],$a[0],$a[1],$a[2]) - $_REQUEST['tz'] * 60;
@@ -38,7 +42,7 @@
       }
     }
   }
-  else if ($xml->{'FeatureInfo'}) {
+  else if ($xml && $xml->{'FeatureInfo'}) {
     foreach ($xml->{'FeatureInfo'} as $p) {
       if (sprintf("%s",$p->{'value'}[0]) != 'none') {
         $t = strtotime($p->{'time'}[0]) - $_REQUEST['tz'] * 60;
@@ -57,9 +61,8 @@
       }
     }
   }
-  else if (!$xml) {
-    $gfiUrl = str_replace('text%2Fxml','text%2Fcsv',$gfiUrl);
-    $csv = csv_to_array(file_get_contents($gfiUrl));
+  else {
+    $csv = csv_to_array($rawData);
     for ($i = 0; $i < count($csv); $i++) {
       preg_match("/(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)Z/",$csv[$i]['time'],$a);
       $t = mktime($a[4],$a[5],$a[6],$a[2],$a[3],$a[1]);

@@ -246,6 +246,7 @@ function init() {
                 }
               }
             }
+            ,gfiFormat : node.attributes.gfiFormat
           }));
           Ext.defer(function() {
             var idx = Ext.getCmp('layersGridPanel').getStore().findExact('name','grid.' + node.attributes.text);
@@ -282,7 +283,7 @@ function init() {
     ,checkOnly  : true
     ,listeners  : {
       rowselect : function(sm,rowIndex,rec) {
-        addGrid(rec.get('url'),rec.get('lyr'),rec.get('stl'),rec.get('sgl'),rec.get('name'),'grids',rec.get('ele'));
+        addGrid(rec.get('url'),rec.get('lyr'),rec.get('stl'),rec.get('sgl'),rec.get('name'),'grids',rec.get('ele'),rec.get('gfiFormat'));
       }
       ,rowdeselect : function(sm,rowIndex,rec) {
         map.getLayersByName(rec.get('name'))[0].setVisibility(false);
@@ -292,7 +293,7 @@ function init() {
   var layersGridPanel = new Ext.grid.GridPanel({
      id          : 'layersGridPanel'
     ,store       : new Ext.data.ArrayStore({
-       fields    : ['name','url','lyr','stl','sgl','leg','varName','varUnits','abstract','bbox','minT','maxT','ele','customize']
+       fields    : ['name','url','lyr','stl','sgl','leg','varName','varUnits','abstract','bbox','minT','maxT','ele','customize','gfiFormat']
       ,listeners : {remove : function(sto,rec,idx) {
         var lyr = map.getLayersByName(rec.get('name'))[0];
         if (lyr) {
@@ -2121,7 +2122,7 @@ function addLayer(lyr,timeSensitive) {
   map.addLayer(lyr);
 }
 
-function addGrid(url,lyr,stl,sgl,name,type,ele) {
+function addGrid(url,lyr,stl,sgl,name,type,ele,gfiFormat) {
   if (map.getLayersByName(name)[0]) {
     var lyr = map.getLayersByName(name)[0];
     lyr.setVisibility(true);
@@ -2148,6 +2149,7 @@ function addGrid(url,lyr,stl,sgl,name,type,ele) {
     }
   );
   lyr.defaultStyle = stl;
+  lyr.gfiFormat    = gfiFormat;
 
   lyr.events.register('visibilitychanged',this,function(e) {
     if (!lyr.visibility) {
@@ -2301,7 +2303,7 @@ function queryWMS(xy,a) {
       ,BBOX          : map.getExtent().toBBOX()
       ,X             : xy.x
       ,Y             : xy.y
-      ,INFO_FORMAT   : 'text/xml'
+      ,INFO_FORMAT   : a[i].gfiFormat
       ,FEATURE_COUNT : 1
       ,WIDTH         : map.size.w
       ,HEIGHT        : map.size.h
@@ -2763,6 +2765,12 @@ function wmsGetCaps(node,cb) {
     }
     var nodesByText = {};
     var nodesText   = [];
+    var gfiAsXml    = false;
+    if (caps.capability.request.getfeatureinfo) {
+      for (var i = 0; i < caps.capability.request.getfeatureinfo.formats.length; i++) {
+        gfiAsXml = gfiAsXml || caps.capability.request.getfeatureinfo.formats[i] == 'text/xml';
+      }
+    }
     for (var i = 0; i < caps.capability.layers.length; i++) {
       nodesByText[(caps.capability.layers[i].title + ' (' + caps.capability.layers[i].name + ')').toLowerCase()] = {
          id        : caps.capability.layers[i].name
@@ -2776,6 +2784,7 @@ function wmsGetCaps(node,cb) {
         ,maxT      : isoDateToDate(node.attributes.maxT).getTime() / 1000
         ,bbox      : caps.capability.layers[i].llbbox ? caps.capability.layers[i].llbbox.join(',') : node.attributes.bbox
         ,version   : caps.version
+        ,gfiFormat : gfiAsXml ? 'text/xml' : 'text/csv'
       };
       nodesText.push(String(caps.capability.layers[i].title + ' (' + caps.capability.layers[i].name + ')').toLowerCase());
     }
