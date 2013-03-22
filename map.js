@@ -341,7 +341,7 @@ function init() {
           new Ext.FormPanel({
              title          : 'Catalog query filters'
             ,id             : 'queryFiltersPanel'
-            ,height         : 165
+            ,height         : 145
             ,border         : false
             ,bodyStyle      : 'padding:5px 5px 0'
             ,collapsible    : true
@@ -356,7 +356,7 @@ function init() {
               ,new Ext.form.ComboBox({
                 store : new Ext.data.ArrayStore({
                    fields : ['id']
-                  ,data   : [['Inundation']]
+                  ,data   : [['Inundation'],['Shelf Hypoxia'],['Estuarine Hypoxia']]
                 })
                 ,width          : 165
                 ,id             : 'modelTypesComboBox'
@@ -382,6 +382,8 @@ function init() {
                     ,['Ike'  ,'2008-09-08T00:30:00Z/2008-09-16T00:00:00Z','2008']
                     ,['2005']
                     ,['Rita' ,'2005-09-21T00:00:00Z/2005-09-27T00:00:00Z','2005']
+                    ,['No specific event']
+                    ,['ANY'  ,'1970-01-01T00:00:00Z/3000-01-01T23:59:59Z','No specific event']
                   ]
                 })
                 ,width          : 165
@@ -403,27 +405,6 @@ function init() {
                 ,triggerAction  : 'all'
                 ,editable       : false
                 ,value          : 'Ike'
-                ,listeners      : {
-                  select : function(combo,rec) {
-                    prepAndRunQuery();
-                  }
-                }
-              })
-              ,new Ext.form.ComboBox({
-                store : new Ext.data.ArrayStore({
-                   fields : ['id']
-                  ,data   : [['Water level']]
-                })
-                ,width          : 165
-                ,id             : 'parametersComboBox'
-                ,fieldLabel     : 'Parameter'
-                ,displayField   : 'id'
-                ,valueField     : 'id'
-                ,mode           : 'local'
-                ,forceSelection : true
-                ,triggerAction  : 'all'
-                ,editable       : false
-                ,value          : 'Water level'
                 ,listeners      : {
                   select : function(combo,rec) {
                     prepAndRunQuery();
@@ -500,7 +481,7 @@ function init() {
           ,{
              title     : 'Catalog query results'
             ,id        : 'queryResultsPanel'
-            ,anchor    : '100% -170'
+            ,anchor    : '100% -150'
             ,border    : false
             ,bodyStyle : 'padding:5px 5px 0'
             ,layout    : 'fit'
@@ -1117,7 +1098,7 @@ function sosGetCaps(url,name,type) {
     }
 
     var rec = Ext.getCmp(type + 'GridPanel').getStore().getAt(Ext.getCmp(type + 'GridPanel').getStore().find('name',name));
-    var targetProperties = rec.get('properties')[Ext.getCmp('parametersComboBox').getValue()];
+    var targetProperties = rec.get('properties')['Water level'];
 
     for (var i = 0; i < sos.offerings.length; i++) {
       var properties = getProperties({offering : sos.offerings[i]});
@@ -1741,9 +1722,15 @@ function runQuery() {
 
 function buildFilter() {
   var eventTime = getEventtimeFromEventsComboBox().split('/');
-  var filter = new OpenLayers.Filter.Logical({
-     type    : OpenLayers.Filter.Logical.AND
-    ,filters : [
+  var filters = [
+    new OpenLayers.Filter.Comparison({
+       type     : OpenLayers.Filter.Comparison.LIKE
+      ,property : 'OrganisationName'
+      ,value    : '*' + Ext.getCmp('modelTypesComboBox').getValue() + '*'
+    })
+  ];
+  if (eventTime[0] != '1970-01-01T00:00:00Z' && eventTime[1] != '3000-01-01T23:59:59Z') {
+    filters.push(
       //  We want a date OVERLAP, but there is no such thing available, at least
       //  in this CSW.  So, do it ourselves.
       //  TempExtent_begin <= DATEEND && TempExtent_end >= DATEBEGIN
@@ -1757,12 +1744,11 @@ function buildFilter() {
         ,property : 'apiso:TempExtent_end'
         ,value    : eventTime[0]
       })
-      ,new OpenLayers.Filter.Comparison({
-         type     : OpenLayers.Filter.Comparison.LIKE
-        ,property : 'OrganisationName'
-        ,value    : '*' + Ext.getCmp('modelTypesComboBox').getValue() + '*'
-      })
-    ]
+    );
+  }
+  var filter = new OpenLayers.Filter.Logical({
+     type    : OpenLayers.Filter.Logical.AND
+    ,filters : filters
   });
 
   var xml        = new OpenLayers.Format.XML();
